@@ -1,0 +1,25 @@
+
+
+*.zip
+*.tgz
+*.tar
+*.7z
+*.rar
+*.egg-info
+*dist/
+*build/
+*egg-info/
+*.iml
+*.mf
+
+# JAVA
+
+*.class
+*.jar
+/nbproject/private/
+/build/
+/dist/
+/out/
+/target/
+/nbproject/
+/.idea/
