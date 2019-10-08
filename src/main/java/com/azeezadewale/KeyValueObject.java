@@ -1,5 +1,5 @@
 /*
- * The LGPL-3.0 License
+ * The MIT License
  *
  * Copyright 2019 Azeez Adewale <azeezadewale98@gmail.com>.
  *
