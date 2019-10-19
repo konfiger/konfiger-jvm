@@ -43,7 +43,7 @@ public class KeyValueDB implements Iterable<KeyValueObject> {
     /**
      * 
      */
-    final private ArrayList<KeyValueObject> keyValueObjects = new ArrayList<>();
+    private ArrayList<KeyValueObject> keyValueObjects = new ArrayList<>();
     
     /**
      * 
@@ -485,6 +485,29 @@ public class KeyValueDB implements Iterable<KeyValueObject> {
             dbChanged = false ;
         }
         return stringValue;
+    }
+
+    /**
+     *
+     */
+    public void clear() {
+        keyValueObjects = new ArrayList<>();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEmpty() {
+        return keyValueObjects.size() == 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int size() {
+        return keyValueObjects.size();
     }
     
 }
