@@ -4,7 +4,7 @@
  * Copyright 2019 Azeez Adewale <azeezadewale98@gmail.com>.
  *
  */
-package com.azeezadewale;
+package dev.sourcerersproject;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
