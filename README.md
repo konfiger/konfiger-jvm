@@ -2,8 +2,6 @@
 
 <p style="text-align: center;" align="center">Light weight package to quickly and easily manage, load, update and save key-value type database </p>
 
-This package is a glorified and better HashTable.
-
 The sample use cases of this package is loading configuration file, language file, preference setting in an application. More use cases can be seen [here](https://keyvaluedb.github.io/usecases/index.html).
 
 The package does not do any Input and Output operation as there are several way to read and write to file and the methods has their strength and weakness therefore the developer has to find the efficient way to load and save locally.
@@ -39,49 +37,35 @@ ___
 
 ## Installation
 
-Module name on npm and bower is @thecarisma/key-value-db.
-
-Using npm:
-
-```bash
-npm install @thecarisma/key-value-db
-```
-
-Using bower:
-
-```bash
-bower install @thecarisma/key-value-db
-```
-
-Using yarn:
-
-```bash
-yarn add @thecarisma/key-value-db
-```
+Download the jar file from the [releases](https://github.com/keyvaluedb/key-value-db-java/releases) and add the downloaded `key-value-db-$.jar` to your java or android project class path or library folder.
 
 ## Example
 
 The following example load, update, read and remove a simple key value object 
 
-```js
-const KeyValueDB = require("@thecarisma/key-value-db");
+```java
+import dev.sourcerersproject.KeyValueDB;
 
-//initialize the key-value 
-var keyValueDB = new KeyValueDB.KeyValueDB("Greet=Hello World,Project=KeyValueDB", true, '=', ',', false);
+public class KeyValueTest {
+    public static void main(String[] args) {
+        //initialize the key-value
+        KeyValueDB keyValueDB = new KeyValueDB("Greet=Hello World,Project=KeyValueDB", true, '=', ',', false);
 
-//get an object
-console.log(keyValueDB.get("Greet"));
+        //get an object
+        System.out.println(keyValueDB.get("Greet"));
 
-//remove an object
-keyValueDB.remove("Greet");
+        //remove an object
+        keyValueDB.remove("Greet");
 
-//add an object
-keyValueDB.add("What", "i don't know what to write here");
+        //add an object
+        keyValueDB.add("What", "i don't know what to write here");
 
-//print all the objects
-for (var kvo of keyValueDB) {
-	console.log('$' + kvo);
-};
+        //print all the objects
+        for (KeyValueObject kvo : keyValueDB) {
+            System.out.println(kvo);
+        }
+    }
+}
 ```
 
 ## Legends
@@ -95,22 +79,22 @@ kvo  - Key Value Object
 
 ## API
 
-Even though JavaScript is weakly type the package does type checking to ensure wrong datatype is not passed into the method.
+Only string type is used as the key and value of the kvo. A kvo can be used to replace or set the value for a key.
 
 ### Creating/loading a document
 
 You can use the package to update and create an existing key value database. This library does not read the database from a file which means you have to find a way to read a string from the file. 
 
-Create a new keyValueDB. The seperator between the key and value is `=` and the delimeter between the kvp is `\n`(newline).
+Create a new keyValueDB. The default seperator between the key and value is `=` and the delimeter between the kvp is `\n`(newline).
 
-```js
-var keyValueDB = new KeyValueDB.KeyValueDB();
+```java
+KeyValueDB keyValueDB = new KeyValueDB(();
 ```
 
 To load existing KeyValueDB  
 
-```js
-var keyValueDB = new KeyValueDB.KeyValueDB(
+```java
+KeyValueDB keyValueDB = new KeyValueDB((
         "Greet=Hello World,Project=KeyValueDB", //pss read string from file
         true, //case sensitive is true
         '=', //the seperator from key and value
@@ -125,14 +109,14 @@ The only accepted type that can be inserted is a valid `KeyValueObject` and `Str
 
 Add a kvp with it key and value
 
-```js
+```java
 keyValueDB.add("Greet", "Hello World");
 ```
 
 Add a kvp using the `KeyValueObject` class.
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Greet", "Hello World");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Greet", "Hello World");
 keyValueDB.add(keyValueObject);
 ```
 
@@ -146,22 +130,22 @@ You can get the kvo using either the key or index. If the corresponding kvo is n
 
 Get the kvo using it integer index
 
-```js
+```java
 keyValueDB.getKeyValueObject(0);
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
 ```
 
 Get the kvo using it key 
 
-```js
+```java
 keyValueDB.getKeyValueObject("Greet");
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
 ```
 
 Get the kvo using it key with fallback kvo
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Name", "Azeez Adewale");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Name", "Azeez Adewale");
 keyValueDB.getKeyValueObject("Name", keyValueObject);
 //KeyValueObject {hashcode: 765363576, key: "Name", value: "Azeez Adewale"}
 ```
@@ -172,17 +156,17 @@ Get a kvo by checking the kvdb for the kvo object that contains a part of the ke
 
 Get a similar kvo using it key part 
 
-```js
+```java
 keyValueDB.getLikeKeyValueObject("eet");
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
 ```
 
 Get a similar kvo using it key part with fallback kvo
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Name", "Azeez Adewale");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Name", "Azeez Adewale");
 keyValueDB.getKeyValueObject("Nam", keyValueObject);
-//KeyValueObject {hashcode: 765363576, key: "Name", value: "Azeez Adewale"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Azeez Adewale
 ```
 
 #### Get
@@ -193,29 +177,29 @@ If a fallback kvo is sent as second parameter then when the request key is not f
 
 Get a value using it integer index
 
-```js
+```java
 keyValueDB.get(0);
 //"Hello World"
 ```
 
 Get the value using it key 
 
-```js
+```java
 keyValueDB.get("Greet");
 //"Hello World"
 ```
 
 Get the kvo using it key with fallback value
 
-```js
+```java
 keyValueDB.get("Licence", "The MIT Licence");
 //"The MIT Licence"
 ```
 
 Get the kvo using it key with fallback kvo
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Licence", "The MIT Licence");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
 keyValueDB.get("Name", keyValueObject);
 //"The MIT Licence"
 ```
@@ -228,15 +212,15 @@ If a fallback kvo is sent as second parameter then when the request key is not f
 
 Get a value using it key part 
 
-```js
+```java
 keyValueDB.getLike("eet");
 //"Hello World"
 ```
 
 Get a value using it key part with fallback kvo
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Licence", "The MIT Licence");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
 keyValueDB.getLike("Li", keyValueObject);
 //"The MIT Licence"
 ```
@@ -251,16 +235,16 @@ The `set` method is used to change the value of the kvo using the index of the k
 
 Set a kvo value using it index
 
-```js
+```java
 keyValueDB.set(0, "Hello World from thecarisma");
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World from thecarisma"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World from thecarisma
 ```
 
 Set a kvo value using it key
 
-```js
+```java
 keyValueDB.set("Greet", "Hello World from thecarisma");
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World from thecarisma"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World from thecarisma
 ```
 
 #### Set KeyValue Object
@@ -270,18 +254,18 @@ Note that this method completly changes the kvo so it can be used to replace a k
 
 Set a kvo using it index
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Licence", "The MIT Licence");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
 keyValueDB.setKeyValueObject(0, keyValueObject);
-//KeyValueObject {hashcode: 566565, key: "Licence", value: "The MIT Licence"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Licence,Value=The MIT Licence
 ```
 
 Set a kvo value using it key
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Licence", "The MIT Licence");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
 keyValueDB.setKeyValueObject("Greet", keyValueObject);
-//KeyValueObject {hashcode: 566565, key: "Licence", value: "The MIT Licence"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Licence,Value=The MIT Licence
 ```
 
 ### Inserting Data
@@ -290,14 +274,14 @@ A new kvp can be inserted by invoking the `add` method. The kvp can be added usi
 
 Add a new kvp using the key and value
 
-```js
+```java
 keyValueDB.add("Key", "This is the value");
 ```
 
 Add a new kvp using a new KeyValueObject
 
-```js
-const keyValueObject = new KeyValueDB.KeyValueObject("Key", "This is the value");
+```java
+final KeyValueObject keyValueObject = new KeyValueObject("Key", "This is the value");
 keyValueDB.add(keyValueObject);
 ```
 
@@ -307,18 +291,18 @@ Remove a kvp completely from the kvdb using either it key of the integer index. 
 
 Remove a kvp using integer index
 
-```js
+```java
 keyValueDB.remove(0);
 //removes the first kvp in the kvdb
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
 ```
 
 Remove a kvp using it key
 
-```js
+```java
 keyValueDB.remove("Greet");
 //removes the first kvp in the kvdb
-//KeyValueObject {hashcode: 69066473, key: "Greet", value: "Hello World"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
 ```
 
 ## Size, Clear, isEmpty
@@ -327,7 +311,7 @@ keyValueDB.remove("Greet");
 
 Get the size of the kvo in the kvdb.
 
-```js
+```java
 keyValueDB.size();
 //4
 ```
@@ -336,7 +320,7 @@ keyValueDB.size();
 
 Remove all the elements and kvo from the kvdb
 
-```js
+```java
 keyValueDB.clear();
 //keyValueDB.size() = 0
 ```
@@ -345,7 +329,7 @@ keyValueDB.clear();
 
 Check whether the kvdb contains any kvo in it.
 
-```js
+```java
 keyValueDB.isEmpty();
 //false
 ```
@@ -354,7 +338,7 @@ keyValueDB.isEmpty();
 
 The kvp collection kvdb can be inspected as a string using the `toString` method. The returned value can be saved locally by writing to a persistent storage or to a plain text file. The output of the `toString` method is determined by the kvos, the seperator and the delimeter.
 
-```js
+```java
 keyValueDB.toString();
 // "Greet=Hello World,Project=KeyValueDB,Project=KeyValueDB,Licence=The MIT Licence"
 ```
@@ -363,10 +347,10 @@ keyValueDB.toString();
 
 The KeyValueDB object can be iterated natively using the `for..of` loop expression. 
 
-```js
-for (var kvo of keyValueDB) {
+```java
+for (KeyValueObject KeyValueObject : keyValueDB) {
     //operate on the KeyValueObject
-};
+}
 ```
 
 ## Contributing
@@ -382,11 +366,11 @@ You can support some of this community as they make big impact in the developeme
 - https://www.patreon.com/devcareer
 - https://opencollective.com/osca
 
-Or if you want to buy me a drink > https://patreon.com/thecarisma. Thanks!🤗
+Or you can support me to continue making awesome open source projects > https://patreon.com/thecarisma. Thanks!🤗
 
 **You can make big difference**.
 
 ## License
 
-MIT License Copyright (c) 2019 Azeez Adewale
+MIT License Copyright (c) 2019 Azeez Adewale - keyvaluedb
 
