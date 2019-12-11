@@ -88,7 +88,7 @@ You can use the package to update and create an existing key value database. Thi
 Create a new keyValueDB. The default seperator between the key and value is `=` and the delimeter between the kvp is `\n`(newline).
 
 ```java
-KeyValueDB keyValueDB = new KeyValueDB(();
+KeyValueDB keyValueDB = new KeyValueDB();
 ```
 
 To load existing KeyValueDB  
