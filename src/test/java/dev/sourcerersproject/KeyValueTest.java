@@ -1,14 +1,14 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Azeez Adewale <azeezadewale98@gmail.com>.
+ * Copyright 2019 Adewale Azeez <azeezadewale98@gmail.com>.
  *
  */
 package dev.sourcerersproject;
 
 /**
  *
- * @author Azeez Adewale <azeezadewale98@gmail.com>
+ * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
 public class KeyValueTest {
 
@@ -23,7 +23,7 @@ public class KeyValueTest {
         System.out.println();
         
         System.out.println(keyValueDB.get("Greeting"));
-        keyValueDB.set("Greeting", "Hello from Azeez Adewale");
+        keyValueDB.set("Greeting", "Hello from Adewale Azeez");
         keyValueDB.add("One", "Added another one element");
 		keyValueDB.add("Null", "Remove this");
         System.out.println(keyValueDB.getLike("Three"));

@@ -145,9 +145,9 @@ keyValueDB.getKeyValueObject("Greet");
 Get the kvo using it key with fallback kvo
 
 ```java
-final KeyValueObject keyValueObject = new KeyValueObject("Name", "Azeez Adewale");
+final KeyValueObject keyValueObject = new KeyValueObject("Name", "Adewale Azeez");
 keyValueDB.getKeyValueObject("Name", keyValueObject);
-//KeyValueObject {hashcode: 765363576, key: "Name", value: "Azeez Adewale"}
+//KeyValueObject {hashcode: 765363576, key: "Name", value: "Adewale Azeez"}
 ```
 
 #### Get Like KeyValue Object
@@ -164,9 +164,9 @@ keyValueDB.getLikeKeyValueObject("eet");
 Get a similar kvo using it key part with fallback kvo
 
 ```java
-final KeyValueObject keyValueObject = new KeyValueObject("Name", "Azeez Adewale");
+final KeyValueObject keyValueObject = new KeyValueObject("Name", "Adewale Azeez");
 keyValueDB.getKeyValueObject("Nam", keyValueObject);
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Azeez Adewale
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Adewale Azeez
 ```
 
 #### Get
@@ -372,5 +372,5 @@ Or you can support me to continue making awesome open source projects > https://
 
 ## License
 
-MIT License Copyright (c) 2019 Azeez Adewale - keyvaluedb
+MIT License Copyright (c) 2019 Adewale Azeez - keyvaluedb
 
