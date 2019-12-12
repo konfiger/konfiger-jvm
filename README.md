@@ -94,7 +94,7 @@ KeyValueDB keyValueDB = new KeyValueDB();
 To load existing KeyValueDB  
 
 ```java
-KeyValueDB keyValueDB = new KeyValueDB((
+KeyValueDB keyValueDB = new KeyValueDB(
         "Greet=Hello World,Project=KeyValueDB", //pss read string from file
         true, //case sensitive is true
         '=', //the seperator from key and value
