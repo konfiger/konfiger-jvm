@@ -345,7 +345,7 @@ keyValueDB.toString();
 
 ## Iterating collection
 
-The KeyValueDB object can be iterated natively using the `for..of` loop expression. 
+The KeyValueDB object can be iterated natively using the `for..:` loop expression. 
 
 ```java
 for (KeyValueObject KeyValueObject : keyValueDB) {
