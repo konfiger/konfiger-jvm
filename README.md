@@ -147,7 +147,7 @@ Get the kvo using it key with fallback kvo
 ```java
 final KeyValueObject keyValueObject = new KeyValueObject("Name", "Adewale Azeez");
 keyValueDB.getKeyValueObject("Name", keyValueObject);
-//KeyValueObject {hashcode: 765363576, key: "Name", value: "Adewale Azeez"}
+//dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Adewale Azeez
 ```
 
 #### Get Like KeyValue Object
