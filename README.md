@@ -1,4 +1,4 @@
-# <p style="text-align: center;" align="center"><img src="https://github.com/keyvaluedb/key-value-db/raw/master/icons/key-value-db-java.png" alt="key-value-db-java" style="width:180px;height:160px;" width="180" height="160" /><br /> key-value-db-java</p>
+# <p style="text-align: center;" align="center"><img src="https://github.com/keyvaluedb/keyvaluedb.github.io/raw/master/icons/key-value-db-java.png" alt="key-value-db-java" style="width:180px;height:160px;" width="180" height="160" /><br /> key-value-db-java</p>
 
 <p style="text-align: center;" align="center">Light weight package to quickly and easily manage, load, update and save key-value type database </p>
 
@@ -357,7 +357,7 @@ for (KeyValueObject KeyValueObject : keyValueDB) {
 
 Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://keyvaluedb.github.io/contributing.html)
 
-You can open issue or file a request that only address problems in this implementation on this repo, if the issue address the concepts of the package then create an issue or rfc [here](https://github.com/keyvaluedb/key-value-db/)
+You can open issue or file a request that only address problems in this implementation on this repo, if the issue address the concepts of the package then create an issue or rfc [here](https://github.com/keyvaluedb/keyvaluedb.github.io/)
 
 ## Support
 
