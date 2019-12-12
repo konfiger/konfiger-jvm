@@ -165,7 +165,7 @@ Get a similar kvo using it key part with fallback kvo
 
 ```java
 final KeyValueObject keyValueObject = new KeyValueObject("Name", "Adewale Azeez");
-keyValueDB.getKeyValueObject("Nam", keyValueObject);
+keyValueDB.getLikeKeyValueObject("Nam", keyValueObject);
 //dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Adewale Azeez
 ```
 
