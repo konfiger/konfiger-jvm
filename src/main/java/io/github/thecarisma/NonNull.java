@@ -4,7 +4,7 @@
  * Copyright 2019 Adewale Azeez <azeezadewale98@gmail.com>.
  *
  */
-package dev.sourcerersproject;
+package io.github.thecarisma;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

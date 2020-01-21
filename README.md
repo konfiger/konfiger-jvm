@@ -44,7 +44,7 @@ Download the jar file from the [releases](https://github.com/keyvaluedb/key-valu
 The following example load, update, read and remove a simple key value object 
 
 ```java
-import dev.sourcerersproject.KeyValueDB;
+import io.github.thecarisma.KeyValueDB;
 
 public class KeyValueTest {
     public static void main(String[] args) {
