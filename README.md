@@ -33,6 +33,7 @@ ___
     - [Iterating collection](#iterating-collection)
 - [Contributing](#contributing)
 - [Support](#support)
+- [Reference](#reference)
 - [License](#license)
 
 ## Installation
@@ -364,6 +365,10 @@ You can open issue or file a request that only address problems in this implemen
 You can support some of this community as they make big impact in the developement of people to get started with software engineering.
 
 - https://www.patreon.com/devcareer
+
+## Reference
+
+[Hosting maven repository on github](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github)
 
 ## License
 
