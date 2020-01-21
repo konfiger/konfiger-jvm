@@ -41,6 +41,25 @@ ___
 
 Download the jar file from the [releases](https://github.com/keyvaluedb/key-value-db-java/releases) and add the downloaded `key-value-db-$.jar` to your java or android project class path or library folder.
 
+To install with maven add the following repository and dependency detail to your pom.xml
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>io.github.thecarisma</groupId>
+        <artifactId>key-value-db</artifactId>
+        <version>1.1.5</version>
+    </dependency>
+</dependencies>
+
+<repositories>
+    <repository>
+        <id>key-value-db</id>
+        <url>https://raw.github.com/keyvaluedb/key-value-db-java/mvn-repo/</url>
+    </repository>
+</repositories>
+```
+
 ## Example
 
 The following example load, update, read and remove a simple key value object 
