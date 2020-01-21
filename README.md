@@ -31,6 +31,7 @@ ___
         - [isEmpty](#isempty)
     - [Saving collection](#saving-collection)
     - [Iterating collection](#iterating-collection)
+- [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Reference](#reference)
@@ -353,6 +354,17 @@ for (KeyValueObject KeyValueObject : keyValueDB) {
     //operate on the KeyValueObject
 }
 ```
+
+## How it works
+
+KeyValueObject class contains the key and value field and the fields setter and getter. 
+The KeyValueObject is the main internal type used in the KeyValueDB class.
+ 
+In KeyValueDB the key value pair is stored in `ArrayList<KeyValueObject>` type, all search, 
+updating and removal is done on the `keyValueObjects` in the class. The string sent as 
+first parameter if parsed into valid key value using the separator and delimiter fields. The 
+`toString` method also parse the `keyValueObjects` content into a valid string with regards to the 
+separator and delimeter. 
 
 ## Contributing
 
