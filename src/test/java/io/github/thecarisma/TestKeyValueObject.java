@@ -10,7 +10,7 @@ package io.github.thecarisma;
  *
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
-public class KeyValueObjectTest {
+public class TestKeyValueObject {
     
     public static void main(String[] args) {
         KeyValueObject kvo1 = new KeyValueObject("Greetings ", "Hello world from thecarisma");

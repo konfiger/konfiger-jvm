@@ -10,7 +10,7 @@ package io.github.thecarisma;
  *
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
-public class KeyValueTest {
+public class TestKeyValueDB {
 
     /**
      * @param args the command line arguments
