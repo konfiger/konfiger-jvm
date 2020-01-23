@@ -447,6 +447,7 @@ You can support some of this community as they make big impact in the developeme
 ## Reference
 
 [Hosting maven repository on github](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github)
+[Deliver github repository using gitpack.io](https://stackoverflow.com/questions/8871056/can-i-use-a-github-project-directly-in-maven/28483461#28483461)
 
 ## License
 
