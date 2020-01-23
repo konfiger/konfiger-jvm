@@ -10,6 +10,7 @@ ___
 
 ## Table of content
 - [Installation](#installation)
+    - [Maven](maven)
 - [Example](#example)
 - [Legends](#legends)
 - [API](#api)
@@ -41,7 +42,11 @@ ___
 
 Download the jar file from the [releases](https://github.com/keyvaluedb/key-value-db-java/releases) and add the downloaded `key-value-db-$.jar` to your java or android project class path or library folder.
 
-To install with maven add the following repository and dependency detail to your pom.xml
+### Maven 
+
+Using mvn-repo:
+
+Add the following repository and dependency detail to your pom.xml
 
 ```xml
 <dependencies>
