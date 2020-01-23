@@ -44,9 +44,9 @@ Download the jar file from the [releases](https://github.com/keyvaluedb/key-valu
 
 ### Maven 
 
-Using mvn-repo:
-
 Add the following repository and dependency detail to your pom.xml
+
+Using mvn-repo:
 
 ```xml
 <dependencies>
@@ -61,6 +61,25 @@ Add the following repository and dependency detail to your pom.xml
     <repository>
         <id>key-value-db</id>
         <url>https://raw.github.com/keyvaluedb/key-value-db-java/mvn-repo/</url>
+    </repository>
+</repositories>
+```
+
+Using jitpack.io:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.github.keyvaluedb</groupId>
+        <artifactId>key-value-db-java</artifactId>
+        <version>1.1.5</version>
+    </dependency>
+</dependencies>
+
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
     </repository>
 </repositories>
 ```
