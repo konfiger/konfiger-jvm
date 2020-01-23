@@ -38,7 +38,7 @@ ___
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [Support](#support)
-- [Reference](#reference)
+- [References](#references)
 - [License](#license)
 
 ## Installation
@@ -444,7 +444,7 @@ You can support some of this community as they make big impact in the developeme
 
 - https://www.patreon.com/devcareer
 
-## Reference
+## References
 
  - [Hosting a maven repository on Github. mvn-repo and gitpack.io walkthrough](https://dev.to/iamthecarisma/hosting-your-maven-repository-on-github-4e93-temp-slug-8240369?preview=3d7cc55e52efedac769d3c892552c9137ecef7b6fbb2bb27206424bc6e347e243b1d9a4002e2070f29790a361d08a3450c571a6542c0e03a928e0a5f)
  - [Hosting maven repository on github](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github)
