@@ -98,6 +98,13 @@ allprojects {
 }
 ```
 
+
+```gradle
+dependencies {
+        implementation 'com.github.keyvaluedb:key-value-db-java:1.1.5'
+}
+```
+
 ## Example
 
 The following example load, update, read and remove a simple key value object 
