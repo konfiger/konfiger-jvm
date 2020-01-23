@@ -1,7 +1,5 @@
 # <p style="text-align: center;" align="center"><img src="https://github.com/keyvaluedb/keyvaluedb.github.io/raw/master/icons/key-value-db-java.png" alt="key-value-db-java" style="width:180px;height:160px;" width="180" height="160" /><br /> key-value-db-java</p>
 
-<span style="display:block;text-align:center"> [![](https://jitpack.io/v/keyvaluedb/key-value-db-java.svg)](https://jitpack.io/#keyvaluedb/key-value-db-java) ![GitHub repo size](https://img.shields.io/github/repo-size/keyvaluedb/key-value-db-csharp)	![GitHub contributors](https://img.shields.io/github/contributors/keyvaluedb/key-value-db-csharp) [![Twitter Follow](https://img.shields.io/twitter/follow/iamthecarisma?style=social)](https://twitter.com/iamthecarisma) </span>
-
 <p style="text-align: center;" align="center">Light weight package to quickly and easily manage, load, update and save key-value type database </p>
 
 The sample use cases of this package is loading configuration file, language file, preference setting in an application. More use cases can be seen [here](https://keyvaluedb.github.io/usecases/index.html).
@@ -12,7 +10,8 @@ ___
 
 ## Table of content
 - [Installation](#installation)
-    - [Maven](maven)
+    - [Maven](#maven)
+    - [Gradle](#gradle)
 - [Example](#example)
 - [Legends](#legends)
 - [API](#api)
@@ -84,6 +83,19 @@ Using jitpack.io:
         <url>https://jitpack.io</url>
     </repository>
 </repositories>
+```
+
+### Gradle
+
+Add it in your root build.gradle at the end of repositories:
+
+```gradle
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
 ```
 
 ## Example
