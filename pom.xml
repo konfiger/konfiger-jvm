@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.thecarisma</groupId>
-    <artifactId>key-value-db</artifactId>
-    <version>1.1.5</version>
+    <artifactId>konfiger</artifactId>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -42,8 +42,8 @@
                     <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
                     <branch>refs/heads/mvn-repo</branch>
                     <includes><include>**/*</include></includes>
-                    <repositoryName>key-value-db-java</repositoryName>
-                    <repositoryOwner>keyvaluedb</repositoryOwner>
+                    <repositoryName>konfiger-java</repositoryName>
+                    <repositoryOwner>konfiger</repositoryOwner>
                 </configuration>
                 <executions>
                     <execution>
