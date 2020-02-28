@@ -1,6 +1,7 @@
 package io.github.thecarisma;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class KonfigerStream {
 
@@ -18,7 +19,7 @@ public class KonfigerStream {
         this(rawString, '=', '\n', false);
     }
 
-    public KonfigerStream(File file) {
+    public KonfigerStream(File file) throws FileNotFoundException {
         this(file, '=', '\n', false);
     }
 
@@ -26,7 +27,7 @@ public class KonfigerStream {
         this(rawString, delimeter, seperator, false);
     }
 
-    public KonfigerStream(File file, char delimeter, char seperator) {
+    public KonfigerStream(File file, char delimeter, char seperator) throws FileNotFoundException {
         this(file, delimeter, seperator, false);
     }
 
@@ -38,7 +39,10 @@ public class KonfigerStream {
         this.isFile = false;
     }
 
-    public KonfigerStream(File file, char delimeter, char seperator, boolean errTolerance) {
+    public KonfigerStream(File file, char delimeter, char seperator, boolean errTolerance) throws FileNotFoundException {
+        if (!file.exists()) {
+            throw new FileNotFoundException("The file does not exist " + file.getAbsolutePath());
+        }
         this.file = file;
         this.delimeter = delimeter;
         this.seperator = seperator;
