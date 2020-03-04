@@ -146,7 +146,7 @@ public class KonfigerStream {
             }
         }
         ret[0] = key.toString();
-        ret[1] = value.toString(); //escape it
+        ret[1] = KonfigerUtil.unEscapeString(value.toString(), this.seperator);
         return ret;
     }
 
