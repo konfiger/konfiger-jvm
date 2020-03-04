@@ -1,6 +1,7 @@
 package io.github.thecarisma;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class Konfiger {
     private boolean changesOccur = false;
     private char delimeter = '=';
     private char separator = '\n';
+    private String stringValue = "";
 
     public Konfiger(String rawString, boolean lazyLoad, char delimeter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
         this(new KonfigerStream(rawString, delimeter, separator, errTolerance), lazyLoad);
@@ -205,6 +207,14 @@ public class Konfiger {
         return konfigerObjects;
     }
 
+    public void enableCache(boolean enableCache_) {
+        this.enableCache_ = enableCache_;
+        prevCachedObject[0] = "";
+        prevCachedObject[1] = "";
+        currentCachedObject[0] = "";
+        currentCachedObject[1] = "";
+    }
+
     public boolean contains(String key) {
         return konfigerObjects.containsKey(key);
     }
@@ -276,6 +286,63 @@ public class Konfiger {
 
     public boolean isErrorTolerant() {
         return this.stream.errTolerance;
+    }
+
+    @Override
+    public String toString() {
+        if (changesOccur) {
+            if (lazyLoad) {
+                try {
+                    lazyLoader();
+                } catch (IOException | InvalidEntryException e) {
+                    e.printStackTrace();
+                }
+            }
+            stringValue = "";
+            int index = 0;
+            Map<String, String> en = entries();
+            for (String key : en.keySet()) {
+                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), separator);
+                if (index != size() - 1) stringValue += separator;
+                ++index;
+            }
+            changesOccur = false;
+        }
+        return stringValue;
+    }
+
+    public void save() {
+
+    }
+
+    public void save(String filePath) {
+
+    }
+
+    public void appendString(String rawString) throws IOException, InvalidEntryException {
+        appendString(rawString, this.delimeter, this.separator);
+    }
+
+    public void appendString(String rawString, char delimeter, char separator) throws IOException, InvalidEntryException {
+        KonfigerStream _stream = new KonfigerStream(rawString, delimeter, separator);
+        while (_stream.hasNext()) {
+            String[] obj = _stream.next();
+            putString(obj[0], obj[1]);
+        }
+        changesOccur = true;
+    }
+
+    public void appendFile(File file) throws IOException, InvalidEntryException {
+        appendFile(file, this.delimeter, this.separator);
+    }
+
+    public void appendFile(File file, char delimeter, char separator) throws IOException, InvalidEntryException {
+        KonfigerStream _stream = new KonfigerStream(file, delimeter, separator);
+        while (_stream.hasNext()) {
+            String[] obj = _stream.next();
+            putString(obj[0], obj[1]);
+        }
+        changesOccur = true;
     }
 
     private void lazyLoader() throws IOException, InvalidEntryException {
