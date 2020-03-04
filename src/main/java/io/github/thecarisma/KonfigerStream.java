@@ -6,7 +6,7 @@ public class KonfigerStream {
 
     private char delimeter;
     private char seperator;
-    private boolean errTolerance;
+    boolean errTolerance;
     private boolean isFile = false;
     private String strStream = "" ;
     private InputStream in;

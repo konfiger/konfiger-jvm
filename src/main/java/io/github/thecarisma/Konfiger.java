@@ -1,14 +1,9 @@
 package io.github.thecarisma;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Konfiger {
 
@@ -27,8 +22,16 @@ public class Konfiger {
         this(new KonfigerStream(rawString, delimeter, separator, errTolerance), lazyLoad);
     }
 
+    public Konfiger(String rawString) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(rawString, '=', '\n', false), false);
+    }
+
     public Konfiger(File file, char delimeter, boolean lazyLoad, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
         this(new KonfigerStream(file, delimeter, separator, errTolerance), lazyLoad);
+    }
+
+    public Konfiger(File file) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(file, '=', '\n', false), false);
     }
 
     public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad) throws IOException, InvalidEntryException {
@@ -50,8 +53,10 @@ public class Konfiger {
             putLong(key, (long)value);
         } else if (value instanceof Integer) {
             putInt(key, (int)value);
-        } else if (value instanceof Float || value instanceof Double) {
+        } else if (value instanceof Float) {
             putFloat(key, (float)value);
+        } else if (value instanceof Double) {
+            putDouble(key, (double)value);
         } else {
             putString(key, value.toString());
         }
@@ -96,16 +101,93 @@ public class Konfiger {
         putString(key, Float.toString(value));
     }
 
-    public boolean contains(String key) {
-        return false;
+    public void putDouble(String key, double value) {
+        putString(key, Double.toString(value));
     }
 
     public Object get(String key) {
-        return null;
+        if (enableCache_) {
+            if (currentCachedObject[0].equals(key)) {
+                return currentCachedObject[1];
+            }
+            if (prevCachedObject[0].equals(key)) {
+                return prevCachedObject[1];
+            }
+        }
+        if (!contains(key) && lazyLoad) {
+            if (!loadingEnds) {
+
+            }
+        }
+        return konfigerObjects.get(key);
     }
 
     public String getString(String key) {
-        return "";
+        return get(key).toString();
+    }
+
+    public boolean getBoolean(String key) {
+        boolean ret = false;
+        try {
+            ret = Boolean.parseBoolean(getString(key));
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public long getLong(String key) {
+        long ret = 0;
+        try {
+            ret = Long.parseLong(getString(key));
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public long getInt(String key) {
+        int ret = 0;
+        try {
+            ret = Integer.parseInt(getString(key));
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public float getFloat(String key) {
+        float ret = 0;
+        try {
+            ret = Float.parseFloat(getString(key));
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public double getDouble(String key) {
+        double ret = 0;
+        try {
+            ret = Double.parseDouble(getString(key));
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public boolean contains(String key) {
+        return konfigerObjects.containsKey(key);
     }
 
     private void lazyLoader() throws IOException, InvalidEntryException {
@@ -120,11 +202,10 @@ public class Konfiger {
     }
 
     private void shiftCache(String key, String value) {
-        prevCachedObject = currentCachedObject;
+        prevCachedObject[0] = currentCachedObject[0];
+        prevCachedObject[1] = currentCachedObject[1];
         currentCachedObject[0] = key;
         currentCachedObject[1] = value;
-        System.out.println(prevCachedObject[0]);
-        System.out.println(currentCachedObject[0]);
     }
 
 }
