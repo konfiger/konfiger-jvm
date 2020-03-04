@@ -1,9 +1,6 @@
 package io.github.thecarisma;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 
 public class KonfigerStream {
 
@@ -16,6 +13,7 @@ public class KonfigerStream {
     private int readPosition = 0;
     private boolean hasNext_ = false;
     private boolean doneReading_ = false;
+    private int i = -1;
 
     public KonfigerStream(String rawString) {
         this(rawString, '=', '\n', false);
@@ -52,10 +50,11 @@ public class KonfigerStream {
         this.isFile = true;
     }
 
-    public boolean hasNext() {
+    public boolean hasNext() throws IOException {
         if (!this.doneReading_) {
             if (this.isFile) {
-
+                this.hasNext_ = ((i = in.read()) != -1);
+                return this.hasNext_;
             } else {
                 while (this.readPosition < this.strStream.length()) {
                     if (!(""+this.strStream.charAt(this.readPosition)).trim().isEmpty()) {
@@ -71,7 +70,7 @@ public class KonfigerStream {
         return this.hasNext_;
     }
 
-    public String[] next() throws InvalidEntryException {
+    public String[] next() throws InvalidEntryException, IOException {
         String[] ret = new String[2];
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
@@ -81,7 +80,33 @@ public class KonfigerStream {
         int column = 0;
 
         if (this.isFile) {
-
+            do {
+                char c = (char)i;
+                ++column;
+                if (c == '\n') {
+                    ++line;
+                    column = 0;
+                }
+                if (c == this.seperator /*&& this.strStream.charAt(this.readPosition-1) != '\\'*/) {
+                    if ((key.length() == 0) && (value.length() == 0)) continue;
+                    if (parseKey && !this.errTolerance) {
+                        throw new InvalidEntryException("Invalid entry detected near", line, column);
+                    }
+                    break;
+                }
+                if (c == this.delimeter && parseKey) {
+                    if ((value.length() > 0) && !this.errTolerance) {
+                        throw new InvalidEntryException("The input is improperly separated near", line, column);
+                    }
+                    parseKey = false;
+                    continue;
+                }
+                if (parseKey) {
+                    key.append(c);
+                } else {
+                    value.append(c);
+                }
+            } while ((i = in.read()) != -1);
         } else {
             for (;this.readPosition <= this.strStream.length(); ++this.readPosition) {
                 if (this.readPosition == this.strStream.length()) {
@@ -93,30 +118,30 @@ public class KonfigerStream {
                     this.doneReading();
                     break;
                 }
-                char char_ = this.strStream.charAt(this.readPosition);
+                char c = this.strStream.charAt(this.readPosition);
                 ++column;
-                if (char_ == '\n') {
+                if (c == '\n') {
                     ++line;
                     column = 0;
                 }
-                if (char_ == this.seperator && this.strStream.charAt(this.readPosition-1) != '\\') {
+                if (c == this.seperator && this.strStream.charAt(this.readPosition-1) != '\\') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
                     }
                     break;
                 }
-                if (char_ == this.delimeter && parseKey) {
+                if (c == this.delimeter && parseKey) {
                     if ((value.length() > 0) && !this.errTolerance) {
-                        throw new InvalidEntryException("The input is imporperly sepreated near", line, column);
+                        throw new InvalidEntryException("The input is improperly separated near", line, column);
                     }
                     parseKey = false;
                     continue;
                 }
                 if (parseKey) {
-                    key.append(char_);
+                    key.append(c);
                 } else {
-                    value.append(char_);
+                    value.append(c);
                 }
             }
         }

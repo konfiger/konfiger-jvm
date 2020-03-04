@@ -1,10 +1,11 @@
 package io.github.thecarisma;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class TestKonfigerStringStream {
 
-    public static void main(String[] args) throws InvalidEntryException {
+    public static void main(String[] args) throws InvalidEntryException, IOException {
         KonfigerStream ks = new KonfigerStream("\n" +
                 "Ones:11111111111\n" +
                 "Twos:2222222222222\n" +
