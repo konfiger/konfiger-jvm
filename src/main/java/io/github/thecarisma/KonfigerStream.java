@@ -10,6 +10,7 @@ public class KonfigerStream {
     private boolean isFile = false;
     private String strStream = "" ;
     private InputStream in;
+    String filePath = "";
     private int readPosition = 0;
     private boolean hasNext_ = false;
     private boolean doneReading_ = false;
@@ -43,6 +44,7 @@ public class KonfigerStream {
         if (!file.exists()) {
             throw new FileNotFoundException("The file does not exist " + file.getAbsolutePath());
         }
+        this.filePath = file.getAbsolutePath();
         in = new FileInputStream(file);
         this.delimeter = delimeter;
         this.seperator = seperator;
