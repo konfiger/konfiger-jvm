@@ -2,8 +2,10 @@ package io.github.thecarisma;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Konfiger {
 
@@ -186,8 +188,35 @@ public class Konfiger {
         return ret;
     }
 
+    public Set<String> keys() {
+        toString();
+        return konfigerObjects.keySet();
+    }
+
+    public Collection<String> values() {
+        toString();
+        return konfigerObjects.values();
+    }
+
+    public Map<String, String> entries() {
+        toString();
+        return konfigerObjects;
+    }
+
     public boolean contains(String key) {
         return konfigerObjects.containsKey(key);
+    }
+
+    public void clear() {
+        changesOccur = true;
+        enableCache(enableCache_);
+        konfigerObjects.clear();
+    }
+
+    public String remove(String key) {
+        changesOccur = true;
+        enableCache(enableCache_);
+        return konfigerObjects.remove(key);
     }
 
     private void lazyLoader() throws IOException, InvalidEntryException {
