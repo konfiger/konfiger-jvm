@@ -54,6 +54,9 @@ public class KonfigerStream {
         if (!this.doneReading_) {
             if (this.isFile) {
                 this.hasNext_ = ((i = in.read()) != -1);
+                if (!this.hasNext_) {
+                    this.doneReading();
+                }
                 return this.hasNext_;
             } else {
                 while (this.readPosition < this.strStream.length()) {
