@@ -58,9 +58,9 @@ public class TestKonfiger_1 {
         System.out.println();
 
         System.out.println(konfiger.size());
-        konfiger.remove("Dummy2");
+        System.out.println(konfiger.remove("Dummy2"));
         System.out.println(konfiger.size());
-        konfiger.remove(konfiger.size() - 1);
+        System.out.println(konfiger.remove(konfiger.size() - 1));
         System.out.println(konfiger.size());
         System.out.println();
     }

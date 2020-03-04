@@ -19,6 +19,8 @@ public class Konfiger {
     private String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
     private boolean changesOccur = false;
+    private char delimeter = '=';
+    private char separator = '\n';
 
     public Konfiger(String rawString, boolean lazyLoad, char delimeter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
         this(new KonfigerStream(rawString, delimeter, separator, errTolerance), lazyLoad);
@@ -217,6 +219,63 @@ public class Konfiger {
         changesOccur = true;
         enableCache(enableCache_);
         return konfigerObjects.remove(key);
+    }
+
+    public String remove(int index) {
+        int i = -1;
+        for (String key : konfigerObjects.keySet()) {
+            ++i;
+            if (i==index) {
+                return remove(key);
+            }
+        }
+        return "";
+    }
+
+    public void updateAt(int index, String value) {
+        if (index < size()) {
+            int i = -1;
+            for (String key : konfigerObjects.keySet()) {
+                ++i;
+                if (i==index) {
+                    this.changesOccur = true;
+                    enableCache(enableCache_);
+                    konfigerObjects.put(key, value);
+                }
+            }
+        }
+    }
+
+    public int size() {
+        return konfigerObjects.size();
+    }
+
+    public boolean isEmpty() {
+        return konfigerObjects.isEmpty();
+    }
+
+    public char getDelimeter() {
+        return delimeter;
+    }
+
+    public void setDelimeter(char delimeter) {
+        this.delimeter = delimeter;
+    }
+
+    public char getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(char separator) {
+        this.separator = separator;
+    }
+
+    public void errTolerance(boolean errTolerance) {
+        this.stream.errTolerance = errTolerance;
+    }
+
+    public boolean isErrorTolerant() {
+        return this.stream.errTolerance;
     }
 
     private void lazyLoader() throws IOException, InvalidEntryException {
