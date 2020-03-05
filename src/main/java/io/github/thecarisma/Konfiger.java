@@ -29,6 +29,10 @@ public class Konfiger {
         this(new KonfigerStream(rawString, delimeter, seperator, errTolerance), lazyLoad);
     }
 
+    public Konfiger(String rawString, boolean lazyLoad, char delimeter, char seperator) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(rawString, delimeter, seperator, false), lazyLoad);
+    }
+
     public Konfiger(String rawString) throws IOException, InvalidEntryException {
         this(new KonfigerStream(rawString, '=', '\n', false), false);
     }
@@ -39,6 +43,10 @@ public class Konfiger {
 
     public Konfiger(File file, char delimeter, boolean lazyLoad, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
         this(new KonfigerStream(file, delimeter, seperator, errTolerance), lazyLoad);
+    }
+
+    public Konfiger(File file, char delimeter, boolean lazyLoad, char seperator) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(file, delimeter, seperator, false), lazyLoad);
     }
 
     public Konfiger(File file) throws IOException, InvalidEntryException {
