@@ -1,12 +1,11 @@
-# <p style="text-align: center;" align="center"><img src="https://github.com/keyvaluedb/keyvaluedb.github.io/raw/master/icons/key-value-db-java.png" alt="key-value-db-java" style="width:180px;height:160px;" width="180" height="160" /><br /> key-value-db-java</p>
+# <p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/master/icons/konfiger-java.png" alt="konfiger-java" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-java</p>
 
-<p style="text-align: center;" align="center">Light weight package to quickly and easily manage, load, update and save key-value type database </p>
+<p style="text-align: center;" align="center">Light weight package to manage key value based configuration and data files.</p>
 
 ---
 
-The sample use cases of this package is loading configuration file, language file, preference setting in an application. More use cases can be seen [here](https://keyvaluedb.github.io/usecases/index.html).
+The notable use cases of this package is loading configuration file, language file, preference setting in an application. More use cases and examples can be seen [here](https://github.com/konfiger/konfiger.github.io/blob/master/usecases/use_cases.java.md).
 
-The package does not do any Input and Output operation as there are several way to read and write to file and the methods has their strength and weakness therefore the developer has to find the efficient way to load and save locally.
 
 ___
 
@@ -14,38 +13,36 @@ ___
 - [Installation](#installation)
     - [Maven](#maven)
     - [Gradle](#gradle)
-- [Example](#example)
-- [Legends](#legends)
-- [API](#api)
-	- [Creating/loading a document](#creating/loading-a-document)
-	- [Inserting data](#inserting-data)
-	- [Finding data](#finding-data)
-	    - [Get KeyValue Object](#get-keyvalue-object)
-	    - [Get Like KeyValue Object](#get-like-keyvalue-object)
-	    - [Get](#get)
-	    - [Get Like](#get-like)
-	- [Updating data](#updating-data)
-        - [Set](#set)
-        - [Set KeyValue Object](#set-keyvalue-object)
-	- [Inserting data](#inserting-data)
-	- [Removing data](#removing-data)
-	- [Size, Clear, isEmpty](#size,-clear,-isempty)
-        - [Size](#size)
-        - [Clear](#clear)
-        - [isEmpty](#isempty)
-    - [Saving collection](#saving-collection)
-    - [Iterating collection](#iterating-collection)
+- [Examples](#examples)
+    - [Basic](#basic)
+    - [Write to disk](#write-to-disk)
+    - [Get Types](#get-types)
+    - [Lazy Loading](#lazy-loading)
+    - [Seperator and delimeter](#seperator-and-delimeter)
+    - [Read file with Stream](#read-file-with-stream)
+    - [Read String with Stream](#read-string-with-stream)
+- [API Documentations](#api-documentations)
+    - [KonfigerStream](#konfigerstream)
+    - [Konfiger](#konfiger)
+        - [Fields](#fields)
+        - [Functions](#functions)
+- [Usage](#usage)
+	- [Initialization](#initialization)
+	- [Inserting](#inserting)
+	- [Finding](#finding)
+	- [Updating](#updating)
+	- [Removing](#removing)
+    - [Saving to disk](#saving-to-disk)
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [Support](#support)
-- [References](#references)
 - [License](#license)
 
 ## Installation
 
-Download the jar file from the [releases](https://github.com/keyvaluedb/key-value-db-java/releases) and add the downloaded `key-value-db-$.jar` to your java or android project class path or library folder.
+Download the jar file from the [releases](https://github.com/konfiger/konfiger-java/releases) and add the downloaded konfiger-$.jar to your java or android project class path or library folder.
 
-### Maven 
+### Maven
 
 Add the following repository and dependency detail to your pom.xml
 
@@ -55,15 +52,15 @@ Using mvn-repo:
 <dependencies>
     <dependency>
         <groupId>io.github.thecarisma</groupId>
-        <artifactId>key-value-db</artifactId>
-        <version>1.1.5</version>
+        <artifactId>konfiger</artifactId>
+        <version>1.2.0</version>
     </dependency>
 </dependencies>
 
 <repositories>
     <repository>
-        <id>key-value-db</id>
-        <url>https://raw.github.com/keyvaluedb/key-value-db-java/mvn-repo/</url>
+        <id>konfiger</id>
+        <url>https://raw.github.com/konfiger/konfiger-java/mvn-repo/</url>
     </repository>
 </repositories>
 ```
@@ -73,9 +70,9 @@ Using jitpack.io:
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.github.keyvaluedb</groupId>
-        <artifactId>key-value-db-java</artifactId>
-        <version>1.1.5</version>
+        <groupId>com.github.konfiger</groupId>
+        <artifactId>konfiger-java</artifactId>
+        <version>1.2.0</version>
     </dependency>
 </dependencies>
 
@@ -99,358 +96,391 @@ allprojects {
     }
 }
 ```
+
 Add the dependency:
 
 ```gradle
 dependencies {
-        implementation 'com.github.keyvaluedb:key-value-db-java:1.1.5'
+        implementation 'com.github.konfiger:konfiger-java:1.2.0'
 }
 ```
 
-## Example
+## Examples
 
-The following example load, update, read and remove a simple key value object 
+### Basic
 
-```java
-import io.github.thecarisma.KeyValueDB;
+The following example load from file, add an entry, remove an entry and iterate all the key value entries
 
-public class KeyValueTest {
-    public static void main(String[] args) {
-        //initialize the key-value
-        KeyValueDB keyValueDB = new KeyValueDB("Greet=Hello World,Project=KeyValueDB", true, '=', ',', false);
+```js
+const { Konfiger } = require("konfiger")
 
-        //get an object
-        System.out.println(keyValueDB.get("Greet"));
+//initialize the key-value from file
+var konfiger = Konfiger.fromFile('test/test.config.ini', true)
 
-        //remove an object
-        keyValueDB.remove("Greet");
+//add a string
+konfiger.putString("Greet", "Hello World")
 
-        //add an object
-        keyValueDB.add("What", "i don't know what to write here");
+//get an object
+console.log(konfiger.get("Greet"))
 
-        //print all the objects
-        for (KeyValueObject kvo : keyValueDB) {
-            System.out.println(kvo);
-        }
-    }
+//remove an object
+konfiger.remove("Greet")
+
+//add an String
+konfiger.putString("What", "i don't know what to write here");
+
+for (var entry of konfiger.entries()) {
+	console.log(entry)
 }
 ```
 
-## Legends
+### Write to disk
 
-```
-kvp  - Key Value Pair
-kvdb - Key value Database
-pss  - Possibly
-kvo  - Key Value Object
-```
+Initialize an empty konfiger object and populate it with random data, then save it to a file
 
-## API
+```js
+const { Konfiger } = require("konfiger")
 
-Only string type is used as the key and value of the kvo. A kvo can be used to replace or set the value for a key.
+let randomValues = [ 'One', 'Two', 'Three', 'Four', 'Five' ]
+var konfiger = Konfiger.fromString("", false)
 
-### Creating/loading a document
-
-You can use the package to update and create an existing key value database. This library does not read the database from a file which means you have to find a way to read a string from the file. 
-
-Create a new keyValueDB. The default seperator between the key and value is `=` and the delimeter between the kvp is `\n`(newline).
-
-```java
-KeyValueDB keyValueDB = new KeyValueDB();
+for (var i = 0; i < 200; ++i) {
+    var random = Math.floor(Math.random() * (randomValues.length - 1) + 0)
+    konfiger.putString(''+i, randomValues[random])
+}
+konfiger.save('test/konfiger.conf')
 ```
 
-To load existing KeyValueDB  
+### Get Types
 
-```java
-KeyValueDB keyValueDB = new KeyValueDB(
-        "Greet=Hello World,Project=KeyValueDB", //pss read string from file
-        true, //case sensitive is true
-        '=', //the seperator from key and value
-        ',', //the delimeter for the key-value-pair
-        false //error tolerance if true no exception is thrown
-        );
+Load the entries as string and get them as a true type.
+
+```js
+const { Konfiger } = require("konfiger")
+
+var konfiger = Konfiger.fromString(`
+String=This is a string
+Number=215415245
+Float=56556.436746
+Boolean=true
+`, false)
+
+var str = konfiger.getString("String")
+var num = konfiger.getLong("Number")
+var flo = konfiger.getFloat("Float")
+var bool = konfiger.getBoolean("Boolean")
+
+console.log(typeof str)
+console.log(typeof num)
+console.log(typeof flo)
+console.log(typeof bool)
 ```
 
-### Inserting Data
+### Lazy Loading
 
-The only accepted type that can be inserted is a valid `KeyValueObject` and `String`. The method `add` can be used to add a new kvp into the object.
+The lazyLoad parameter is useful for progressively read entries from a large file. The next example shows initializing from a file with so much key value entry with lazy loading:
 
-Add a kvp with it key and value
+The content of `test/konfiger.conf` is 
 
-```java
-keyValueDB.add("Greet", "Hello World");
+```
+Ones=11111111111
+Twos=2222222222222
+Threes=3333333333333
+Fours=444444444444
+Fives=5555555555555
 ```
 
-Add a kvp using the `KeyValueObject` class.
+```js
+const { Konfiger } = require("konfiger")
 
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Greet", "Hello World");
-keyValueDB.add(keyValueObject);
+let konfiger = Konfiger.fromFile('test/konfiger.conf', //the file pth
+                                true //lazyLoad true
+                                )
+//at this point nothing is read from the file
+
+//the size of konfiger is 0 even if the file contains over 1000 entries
+console.log(konfiger.size())
+
+//the key 'Twos' is at the second line in the file, therefore two entry has 
+//been read to get the value.
+console.log(konfiger.get("Twos"))
+
+//the size becomes 2, 
+console.log(konfiger.size())
+
+//to read all the entries simple call the toString() method
+console.log(konfiger.toString())
+
+//now the size is equal to the entry
+console.log(konfiger.size())
 ```
 
-### Finding Data
+### Seperator and delimeter
 
-There are several way to find and get a value from the kvdb object. The value or the KeyValueObject can be gotten using the methods below
+Initailize a konfiger object with default seperator and delimeter then change the seperator and selimeter at runtime
 
-#### Get KeyValue Object
+```js
+const { Konfiger } = require("konfiger")
 
-You can get the kvo using either the key or index. If the corresponding kvo is not found, an empty kvo is added to the db and then returned but not in the case when requested with the integer index. If a fallback kvo is sent as second parameter then when the request kvo is not found the fallback second parameter is added to the kvdb and then returned.
+let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
+konfiger.setDelimeter('?')
+konfiger.setSeperator(',')
 
-Get the kvo using it integer index
-
-```java
-keyValueDB.getKeyValueObject(0);
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
+console.log(konfiger.toString())
 ```
 
-Get the kvo using it key 
+### Read file with Stream
 
-```java
-keyValueDB.getKeyValueObject("Greet");
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
-```
+Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-java/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-Get the kvo using it key with fallback kvo
+```js
+const { KonfigerStream } = require("konfiger")
 
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Name", "Adewale Azeez");
-keyValueDB.getKeyValueObject("Name", keyValueObject);
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Adewale Azeez
-```
-
-#### Get Like KeyValue Object
-
-Get a kvo by checking the kvdb for the kvo object that contains a part of the key. If a fallback kvo is sent as second parameter then when the request kvo is not found the fallback second parameter is added to the kvdb and then returned.
-
-Get a similar kvo using it key part 
-
-```java
-keyValueDB.getLikeKeyValueObject("eet");
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
-```
-
-Get a similar kvo using it key part with fallback kvo
-
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Name", "Adewale Azeez");
-keyValueDB.getLikeKeyValueObject("Nam", keyValueObject);
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Name,Value=Adewale Azeez
-```
-
-#### Get
-
-You can get a kvdb value using either the key or index. If the corresponding value is not found, an empty string is added to the db and then returned but not in the case when requested with the integer index. 
-
-If a fallback kvo is sent as second parameter then when the request key is not found the fallback second parameter is added to the kvdb and then value is returned. If a string value is sent as the second value it is returned if the key is not found in the kvdb.
-
-Get a value using it integer index
-
-```java
-keyValueDB.get(0);
-//"Hello World"
-```
-
-Get the value using it key 
-
-```java
-keyValueDB.get("Greet");
-//"Hello World"
-```
-
-Get the kvo using it key with fallback value
-
-```java
-keyValueDB.get("Licence", "The MIT Licence");
-//"The MIT Licence"
-```
-
-Get the kvo using it key with fallback kvo
-
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
-keyValueDB.get("Name", keyValueObject);
-//"The MIT Licence"
-```
-
-#### Get Like 
-
-Get a value by checking the kvdb for the kvo object that contains a part of the key. 
-
-If a fallback kvo is sent as second parameter then when the request key is not found the fallback second parameter is added to the kvdb and then value is returned.
-
-Get a value using it key part 
-
-```java
-keyValueDB.getLike("eet");
-//"Hello World"
-```
-
-Get a value using it key part with fallback kvo
-
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
-keyValueDB.getLike("Li", keyValueObject);
-//"The MIT Licence"
-```
-
-### Updating Data
-
-There are various way to update a kvp in the kvdb, the value can be changed directly or set to a new KeyValueObject. If you try to set a kvo that does not exist in the kvdb using it key, it is added to the kvdb.
-
-#### Set
-
-The `set` method is used to change the value of the kvo using the index of the kvo or a kvo key. 
-
-Set a kvo value using it index
-
-```java
-keyValueDB.set(0, "Hello World from thecarisma");
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World from thecarisma
-```
-
-Set a kvo value using it key
-
-```java
-keyValueDB.set("Greet", "Hello World from thecarisma");
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World from thecarisma
-```
-
-#### Set KeyValue Object
-
-Completly change a KeyValueObject in the kvdb using either it index or it key. The kvo is completly replaced which means unique fields like the hashcode of the kvo changes. When the kvo is set using it key if the corresponding kvo does not exist it is added into the kvdb.
-Note that this method completly changes the kvo so it can be used to replace a kvo.
-
-Set a kvo using it index
-
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
-keyValueDB.setKeyValueObject(0, keyValueObject);
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Licence,Value=The MIT Licence
-```
-
-Set a kvo value using it key
-
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Licence", "The MIT Licence");
-keyValueDB.setKeyValueObject("Greet", keyValueObject);
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Licence,Value=The MIT Licence
-```
-
-### Inserting Data
-
-A new kvp can be inserted by invoking the `add` method. The kvp can be added using it key and value or by directly adding the KeyValueObject to the kvdb. 
-
-Add a new kvp using the key and value
-
-```java
-keyValueDB.add("Key", "This is the value");
-```
-
-Add a new kvp using a new KeyValueObject
-
-```java
-final KeyValueObject keyValueObject = new KeyValueObject("Key", "This is the value");
-keyValueDB.add(keyValueObject);
-```
-
-### Removing Data
-
-Remove a kvp completely from the kvdb using either it key of the integer index. The kvp that was removed is returned from the method. If the index does not exist out of bound error occur and if a kvo with the key is not present nothing is done but an empty kvo is returned.
-
-Remove a kvp using integer index
-
-```java
-keyValueDB.remove(0);
-//removes the first kvp in the kvdb
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
-```
-
-Remove a kvp using it key
-
-```java
-keyValueDB.remove("Greet");
-//removes the first kvp in the kvdb
-//dev.sourcerersproject.KeyValueObject@4554617c:Key=Greet,Value=Hello World
-```
-
-## Size, Clear, isEmpty
-
-### Size
-
-Get the size of the kvo in the kvdb.
-
-```java
-keyValueDB.size();
-//4
-```
-
-### Clear
-
-Remove all the elements and kvo from the kvdb
-
-```java
-keyValueDB.clear();
-//keyValueDB.size() = 0
-```
-
-### isEmpty
-
-Check whether the kvdb contains any kvo in it.
-
-```java
-keyValueDB.isEmpty();
-//false
-```
-
-## Saving collection
-
-The kvp collection kvdb can be inspected as a string using the `toString` method. The returned value can be saved locally by writing to a persistent storage or to a plain text file. The output of the `toString` method is determined by the kvos, the seperator and the delimeter.
-
-```java
-keyValueDB.toString();
-// "Greet=Hello World,Project=KeyValueDB,Project=KeyValueDB,Licence=The MIT Licence"
-```
-
-## Iterating collection
-
-The KeyValueDB object can be iterated natively using the `for..:` loop expression. 
-
-```java
-for (KeyValueObject KeyValueObject : keyValueDB) {
-    //operate on the KeyValueObject
+var kStream = KonfigerStream.fileStream('test/konfiger.conf', false)
+while (kStream.hasNext()) {
+    let entry = kStream.next()
+    console.log(entry)
 }
 ```
+
+### Read String with Stream
+
+Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-java/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+
+```js
+const { KonfigerStream } = require("konfiger")
+
+var kStream = KonfigerStream.stringStream(`
+String=This is a string
+Number=215415245
+Float=56556.436746
+Boolean=true
+`, false)
+
+while (kStream.hasNext()) {
+    let entry = kStream.next()
+    console.log(entry)
+}
+```
+
+## Usage
+
+### Initialization
+
+The main Konfiger contructor is not exported from the package, the two functions are exported for initialization, `fromString` and `fromFile`. The fromString function creates a Konfiger object from a string with valid key value entry or from empty string, the fromFile function creates the Konfiger object from a file, the two functions accept a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimeter` and `seperator`. If the third and fourth parameter is not specified the default is used, delimeter = `=`, seperator = `\n`. If the file or string has different delimeter and seperator always send the third and fourth parameter.
+
+The following initializer progressively read the file when needed
+
+```js
+let konfiger = Konfiger.fromFile('test/konfiger.conf', true)
+```
+
+The following initializer read all the entries from file at once
+
+```js
+let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
+```
+
+The following initializer read all the entries from string when needed
+
+```js
+let konfiger = Konfiger.fromString(`
+Ones=11111111111
+Twos=2222222222222
+`, true)
+```
+
+The following initializer read all the entries from String at once
+
+```js
+let konfiger = Konfiger.fromString(`
+Ones=11111111111
+Twos=2222222222222
+`, false)
+```
+
+Initialize a string which have custom delimeter and seperator
+
+```js
+let konfiger = Konfiger.fromString(`Ones:11111111111,Twos:2222222222222`, 
+                                false, 
+                                ':',
+                                ',')
+```
+
+### Inserting
+
+The following types can be added into the object, int, float, long, boolean, object and string.
+
+To add any object into the entry use the `put` method as it check the value type and properly get it string value
+
+```js
+konfiger.put("String", "This is a string")
+konfiger.put("Long", 143431423)
+konfiger.put("Boolean", true)
+konfiger.put("Float", 12.345)
+```
+
+The `put` method do a type check on the value and calls the appropriate put method e.g `konfiger.put("Boolean", true)` will result in a call to `konfiger.putBoolean("Boolean", true)`. The following method are avaliable to directly add the value according to the type, `putString`, `putBoolean`, `putLong` and `putInt`. The previous example can be re-written as:
+
+```js
+konfiger.putString("String", "This is a string")
+konfiger.putLong("Long", 143431423)
+konfiger.putBoolean("Boolean", true)
+konfiger.putFloat("Float", 12.345)
+```
+
+### Finding
+
+There are various ways to get the value from the konfiger object, the main `get` method and `getString` method both returns a string type, the other get methods returns specific types
+
+```js
+konfiger.get("String")
+```
+
+To get specific type from the object use the following methods, `getString`, `getBoolean`, `getLong`, `getFloat` and `getInt`. 
+
+```js
+konfiger.getString("String")
+konfiger.getLong("Long")
+konfiger.getBoolean("Boolean")
+konfiger.getFloat("Float")
+```
+
+If the requested entrr does not exist a null/undefined value is returned, to prevent that a fallback value should be sent as second parameter incase the key is not found the second parameter will be returned.
+
+```js
+konfiger.get("String", "Default Value")
+konfiger.getBoolean("Boolean", false)
+```
+
+If the konfiger is initialized with lazy loading enabled if the get method is called the stream will start reading until the key is found and the stream is paused again, if the key is not found the stream will read to end. 
+
+### Updating
+
+The `put` method can be used to add new entry or to update an already existing entry in the object. The `updateAt` method is usefull for updating a value using it index instead of key
+
+```js
+konfiger.updateAt(0, "This is an updated string")
+```
+
+### Removing
+
+The `remove` method removes a key value entry from the konfiger, it returns true if an entry is removed and false if no entry is removed. The `remove` method accept either key(string) or index(int) of the entry.
+
+```js
+konfiger.remove("String")
+konfiger.remove(0)
+```
+
+### Saving to disk
+
+Every operation on the konfiger object is done in memory to save the updated entries in a file call the `save` method with the file path to save the entry. If the konfiger is initiated from file then there is no need to add the file path to the `save` method, the entries will be saved to the file path used during initialization.
+
+```js
+konfiger.save("test/test.config.ini")
+```
+
+in case of load from file, the save will write the entries to *test/test.config.ini*.
+
+```js
+//...
+var konfiger = Konfiger.fromFile('test/test.config.ini', true)
+//...
+konfiger.save()
+```
+
+## API Documentations
+
+Even though JavaScript is weakly type the package does type checking to ensure wrong datatype is not passed into the functions.
+
+### KonfigerStream
+
+| Function        | Description         
+| --------------- | ------------- 
+| fileStream(filePath, delimeter, seperator, errTolerance)  | Initialize a new KonfigerStream object from the filePath. It throws en exception if the filePath does not exist or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
+| stringStream(rawString, delimeter, seperator, errTolerance)  | Initialize a new KonfigerStream object from a string. It throws en exception if the rawString is not a string or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
+| Boolean hasNext()  | Check if the KonfigerStream still has a key value entry, returns true if there is still entry, returns false if there is no more entry in the KonfigerStream
+| Array next()  | Get the next Key Value array from the KonfigerStream is it still has an entry. Throws an error if there is no more entry. Always use `hasNext()` to check if there is still an entry in the stream
+| void validateFileExistence(filePath)  | Validate the existence of the specified file path if it does not exist an exception is thrown
+
+### Konfiger
+
+#### Fields
+
+| Field        | Description         
+| --------------- | ------------- 
+| MAX_CAPACITY  | The number of datas the konfiger can take, 10000000
+
+#### Functions
+
+| Function        | Description         
+| --------------- | ------------- 
+| Konfiger fromFile(filePath, lazyLoad)           | Create the konfiger object from a file, the first parameter(string) is the file path, the second parameter(boolean) indicates whether to read all the entry in the file in the constructor or when needed, the default delimeter(`=`) and seperator(`\n`) will be used. This creates the konfiger object from call to `fromStream(konfigerStream, lazyLoad)` with the konfigerStream initialized with the filePath parameter. The new Konfiger object is returned.
+| Konfiger fromFile(filePath, lazyLoad, delimeter, seperator)           | Create the konfiger object from a file, the first(string) parameter is the file path, the second parameter(boolean) indicates whether to read all the entry in the file in the constructor or when needed, the third param(char) is the delimeter and the fourth param(char) is the seperator. This creates the konfiger object from call to `fromStream(konfigerStream, lazyLoad)` with the konfigerStream initialized with the filePath parameter. The new Konfiger object is returned.
+| Konfiger fromString(rawString, lazyLoad)           | Create the konfiger object from a string, the first parameter is the String(can be empty), the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed, the default delimeter(`=`) and seperator(`\n`) will be used. The new Konfiger object is returned.
+| Konfiger fromString(rawString, lazyLoad, delimeter, seperator)           | Create the konfiger object from a string, the first parameter is the String(can be empty), the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed, the third param is the delimeter and the fourth param is the seperator. The new Konfiger object is returned.
+| Konfiger fromStream(KonfigerStream, Boolean)           | Create the konfiger object from a KonfigerStream object, the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed this make data loading progressive as data is only loaded from the file when put or get until the Stream reaches EOF. The new Konfiger object is returned.
+| void put(key, value)           | Put any object into the konfiger. if the second parameter is a Javascript Object, `JSON.stringify` will be used to get the string value of the object else the appropriate put* method will be called. e.g `put('Name', 'Adewale')` will result in the call `putString('Name', 'Adewale')`.
+| void putString(key, value)           | Put a String into the konfiger, the second parameter must be a string.
+| void putBoolean(key, value)           | Put a Boolean into the konfiger, the second parameter must be a Boolean.
+| void putLong(key, value)           | Put a Long into the konfiger, the second parameter must be a Number.
+| void putInt(key, value)           | Put a Int into the konfiger, alias for `void putLong(key, value)`.
+| void putFloat(key, value)           | Put a Float into the konfiger, the second parameter must be a Float
+| void putDouble(key, value)           | Put a Double into the konfiger, the second parameter must be a Double
+| Array keys()           | Get all the keys entries in the konfiger object in iterable array list
+| Array values()           | Get all the values entries in the konfiger object in iterable array list
+| Array[Key, Value] entries()           | Get all the entries in the konfiger in a `[['Key', 'Value'], ...]`
+| String get(key, defaultValue)       | Get a value as string, the second parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified `undefined` will be returned
+| String getString(key, defaultValue)   | Get a value as string, the second(string) parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified empty string will be returned. 
+| Boolean getBoolean(key, defaultValue)   | Get a value as boolean, the second(Boolean) parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified `false` will be returned. When trying to cast the value to boolean if an error occur an exception will be thrown except if error tolerance is set to true then false will be returned. use `errorTolerance(Boolean)` to set the konfiger object error tolerancy.
+| Number getLong(key, defaultValue)   | Get a value as Number, the second(Number) parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified `0` will be returned. When trying to cast the value to Number if an error occur an exception will be thrown except if error tolerance is set to true then `0` will be returned. use `errorTolerance(Boolean)` to set the konfiger object error tolerancy.
+| Number getInt(key, defaultValue)   | Get a value as Number, alias for `Number getLong(key, defaultValue)`.
+| Float getFloat(key, defaultValue)   | Get a value as Float, the second(Float) parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified `0.0` will be returned. When trying to cast the value to Float if an error occur an exception will be thrown except if error tolerance is set to true then `0.0` will be returned. use `errorTolerance(Boolean)` to set the konfiger object error tolerancy.
+| Double getDouble(key, defaultValue)   | Get a value as Double, the second(Double) parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified `0.0` will be returned. When trying to cast the value to Double if an error occur an exception will be thrown except if error tolerance is set to true then `0.0` will be returned. use `errorTolerance(Boolean)` to set the konfiger object error tolerancy.
+| remove(keyIndex)           | Remove a key value entry at a particular index. Returns the value of the entry that was removed.
+| remove(keyIndex)           | Remove a key value entry using the entry Key. Returns the value of the entry that was removed.
+| appendString(rawString)          | Append new data to the konfiger from a string, the new string delimeter and seperator must be the same with the current konfigure delimeter and seperator, if it not the same use the `setDelimeter` and `setSeperator` to change the konfiger seperator and delimeter to the new file seperator and delimeter. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| appendFile(filePath)          | Read new datas from the file path and append, the new file delimeter and seperator must be the same with the current konfigure delimeter and seperator, if it not the same use the `setDelimeter` and `setSeperator` to change the konfiger seperator and delimeter to the new file seperator and delimeter. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| appendString(rawString, delimeter, separator)          | Append new data to the konfiger from a string. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| appendFile(filePath, delimeter, separator)          | Read new datas from the file path and append. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| save(filePath?)         | Save the konfiger datas into a file. The argument filePath is optional if specified the entries is writtent to the filePath else the filePath used to initialize the Konfiger object is used and if the Konfiger is initialized `fromString` and the filePath is not specified an exception is thrown. This does not clear the already added entries.
+| getSeperator()           | Get seperator char that seperate the key value entry, default is `\n`.
+| getDelimeter()           | Get delimeter char that seperated the key from it value, default is `=`.
+| setSeperator(seperator)           | Change seperator char that seperate the datas, note that the file is not updates, to change the file call the `save()` function
+| setDelimeter(delimeter)           | Change delimeter char that seperated the key from object, note that the file is not updates, to change the file call the `save()` function 
+| size()           | Get the total size of key value entries in the konfiger
+| clear()           | clear all the key value entries in the konfiger. This does not update the file call the `save` method to update the file
+| isEmpty()           | Check if the konfiger does not have an key value entry.
+| updateAt(index, value)           | Update the value at the specified index with the new string value, throws an error if the index is OutOfRange 
+| contains(key)           | Check if the konfiger contains a key 
+| enableCache(enableCache_)           | Enable or disable caching, caching speeds up data search but can take up space in memory (very small though). Using `getString` method to fetch vallue **99999999999** times with cache disabled takes over 1hr and with cache enabled takes 20min.
+| errorTolerance(errTolerance)           | Enable or disable the error tolerancy property of the konfiger, if enabled no exception will be throw even when it suppose to there for it a bad idea but useful in a fail safe environment.
+| isErrorTolerant() | Check if the konfiger object errTolerance is set to true.
+| toString()           | All the kofiger datas are parsed into valid string with regards to the delimeter and seprator, the result of this method is what get written to file in the `save` method. The result is cached and calling the method while the no entry is added, deleted or updated just return the last result instead of parsing the entries again.
 
 ## How it works
 
-KeyValueObject class contains the key and value field and the fields setter and getter. 
-The KeyValueObject is the main internal type used in the KeyValueDB class.
+Konfiger stream progressively load the key value entry from a file or string when needed, it uses two method `hasNext` which check if there is still an entry in the stream and `next` for the current key value entry in the stream. 
  
-In KeyValueDB the key value pair is stored in `ArrayList<KeyValueObject>` type, all search, 
-updating and removal is done on the `keyValueObjects` in the class. The string sent as 
-first parameter if parsed into valid key value using the separator and delimiter fields. The 
-`toString` method also parse the `keyValueObjects` content into a valid string with regards to the 
-separator and delimeter. 
+In Konfiger the key value pair is stored in a `map`, all search updating and removal is done on the `konfigerObjects` in the class. The string sent as first parameter if parsed into valid key value using the separator and delimiter fields and if loaded from file it content is parsed into valid key value pair. The `toString` method also parse the `konfigerObjects` content into a valid string with regards to the 
+separator and delimeter. The value is properly escaped and unescaped.
+
+The `save` function write the current `Konfiger` to the file, if the file does not exist it is created if it can. Everything is written in memory and is disposed on app exit hence it important to call the `save` function when nessasary.
 
 ## Contributing
 
-Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://keyvaluedb.github.io/contributing.html)
+Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://github.com/konfiger/konfiger.github.io/blob/master/CONTRIBUTING.MD)
 
-You can open issue or file a request that only address problems in this implementation on this repo, if the issue address the concepts of the package then create an issue or rfc [here](https://github.com/keyvaluedb/keyvaluedb.github.io/)
+You can open issue or file a request that only address problems in this implementation on this repo, if the issue address the concepts of the package then create an issue or rfc [here](https://github.com/konfiger/konfiger.github.io/)
 
 ## Support
 
-You can support some of this community as they make big impact in the developement of people to get started with software engineering.
+You can support some of this community as they make big impact in the traing of individual to get started with software engineering and open source contribution.
 
-- https://www.patreon.com/devcareer
-
-## References
-
- - [Hosting a maven repository on Github. mvn-repo and gitpack.io walkthrough](https://dev.to/iamthecarisma/hosting-your-maven-repository-on-github-4e93-temp-slug-8240369?preview=3d7cc55e52efedac769d3c892552c9137ecef7b6fbb2bb27206424bc6e347e243b1d9a4002e2070f29790a361d08a3450c571a6542c0e03a928e0a5f)
- - [Hosting maven repository on github](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github)
- - [Deliver github repository using gitpack.io](https://stackoverflow.com/questions/8871056/can-i-use-a-github-project-directly-in-maven/28483461#28483461)
+- [https://www.patreon.com/devcareer](https://www.patreon.com/devcareer)
 
 ## License
 
-MIT License Copyright (c) 2019 Adewale Azeez - keyvaluedb
+MIT License Copyright (c) 2020 [Adewale Azeez](https://twitter.com/iamthecarisma) - konfiger
 
