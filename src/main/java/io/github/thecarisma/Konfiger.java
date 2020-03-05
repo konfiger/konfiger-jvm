@@ -3,6 +3,7 @@ package io.github.thecarisma;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -394,12 +395,14 @@ public class Konfiger {
         return stringValue;
     }
 
-    public void save() {
-
+    public void save() throws FileNotFoundException {
+        save(filePath);
     }
 
-    public void save(String filePath) {
-
+    public void save(String filePath) throws FileNotFoundException {
+        try (PrintWriter out = new PrintWriter(filePath)) {
+            out.println(toString());
+        }
     }
 
     public void appendString(String rawString) throws IOException, InvalidEntryException {
