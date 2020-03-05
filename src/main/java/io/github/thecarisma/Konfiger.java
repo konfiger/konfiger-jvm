@@ -22,23 +22,31 @@ public class Konfiger {
     private boolean loadingEnds = false;
     private boolean changesOccur = false;
     private char delimeter = '=';
-    private char separator = '\n';
+    private char seperator = '\n';
     private String stringValue = "";
 
-    public Konfiger(String rawString, boolean lazyLoad, char delimeter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
-        this(new KonfigerStream(rawString, delimeter, separator, errTolerance), lazyLoad);
+    public Konfiger(String rawString, boolean lazyLoad, char delimeter, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(rawString, delimeter, seperator, errTolerance), lazyLoad);
     }
 
     public Konfiger(String rawString) throws IOException, InvalidEntryException {
         this(new KonfigerStream(rawString, '=', '\n', false), false);
     }
 
-    public Konfiger(File file, char delimeter, boolean lazyLoad, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
-        this(new KonfigerStream(file, delimeter, separator, errTolerance), lazyLoad);
+    public Konfiger(String rawString, boolean lazyLoad) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(rawString, '=', '\n', false), lazyLoad);
+    }
+
+    public Konfiger(File file, char delimeter, boolean lazyLoad, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(file, delimeter, seperator, errTolerance), lazyLoad);
     }
 
     public Konfiger(File file) throws IOException, InvalidEntryException {
         this(new KonfigerStream(file, '=', '\n', false), false);
+    }
+
+    public Konfiger(File file, boolean lazyLoad) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(file, '=', '\n', false), lazyLoad);
     }
 
     public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad) throws IOException, InvalidEntryException {
@@ -356,12 +364,12 @@ public class Konfiger {
         this.delimeter = delimeter;
     }
 
-    public char getSeparator() {
-        return separator;
+    public char getSeperator() {
+        return seperator;
     }
 
-    public void setSeparator(char separator) {
-        this.separator = separator;
+    public void setSeperator(char seperator) {
+        this.seperator = seperator;
     }
 
     public void errTolerance(boolean errTolerance) {
@@ -386,8 +394,8 @@ public class Konfiger {
             int index = 0;
             Map<String, String> en = entries();
             for (String key : en.keySet()) {
-                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), separator);
-                if (index != size() - 1) stringValue += separator;
+                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), seperator);
+                if (index != size() - 1) stringValue += seperator;
                 ++index;
             }
             changesOccur = false;
@@ -406,11 +414,11 @@ public class Konfiger {
     }
 
     public void appendString(String rawString) throws IOException, InvalidEntryException {
-        appendString(rawString, this.delimeter, this.separator);
+        appendString(rawString, this.delimeter, this.seperator);
     }
 
-    public void appendString(String rawString, char delimeter, char separator) throws IOException, InvalidEntryException {
-        KonfigerStream _stream = new KonfigerStream(rawString, delimeter, separator);
+    public void appendString(String rawString, char delimeter, char seperator) throws IOException, InvalidEntryException {
+        KonfigerStream _stream = new KonfigerStream(rawString, delimeter, seperator);
         while (_stream.hasNext()) {
             String[] obj = _stream.next();
             putString(obj[0], obj[1]);
@@ -419,11 +427,11 @@ public class Konfiger {
     }
 
     public void appendFile(File file) throws IOException, InvalidEntryException {
-        appendFile(file, this.delimeter, this.separator);
+        appendFile(file, this.delimeter, this.seperator);
     }
 
-    public void appendFile(File file, char delimeter, char separator) throws IOException, InvalidEntryException {
-        KonfigerStream _stream = new KonfigerStream(file, delimeter, separator);
+    public void appendFile(File file, char delimeter, char seperator) throws IOException, InvalidEntryException {
+        KonfigerStream _stream = new KonfigerStream(file, delimeter, seperator);
         while (_stream.hasNext()) {
             String[] obj = _stream.next();
             putString(obj[0], obj[1]);
