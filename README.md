@@ -284,28 +284,26 @@ Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), false);
 The following initializer read all the entries from string when needed
 
 ```java
-let konfiger = Konfiger.fromString(`
-Ones=11111111111
-Twos=2222222222222
-`, true)
+Konfiger konfiger = new Konfiger("\n" +
+                "Ones=11111111111\n" +
+                "Twos=2222222222222\n", true);
 ```
 
 The following initializer read all the entries from String at once
 
 ```java
-let konfiger = Konfiger.fromString(`
-Ones=11111111111
-Twos=2222222222222
-`, false)
+Konfiger konfiger = new Konfiger("\n" +
+                "Ones=11111111111\n" +
+                "Twos=2222222222222\n", false);
 ```
 
 Initialize a string which have custom delimeter and seperator
 
 ```java
-let konfiger = Konfiger.fromString(`Ones:11111111111,Twos:2222222222222`, 
-                                false, 
-                                ':',
-                                ',')
+Konfiger konfiger = new Konfiger("Ones:11111111111,Twos:2222222222222", 
+                true, 
+                ':',
+                ',');
 ```
 
 ### Inserting
@@ -315,19 +313,19 @@ The following types can be added into the object, int, float, long, boolean, obj
 To add any object into the entry use the `put` method as it check the value type and properly get it string value
 
 ```java
-konfiger.put("String", "This is a string")
-konfiger.put("Long", 143431423)
-konfiger.put("Boolean", true)
-konfiger.put("Float", 12.345)
+konfiger.put("String", "This is a string");
+konfiger.put("Long", 143431423);
+konfiger.put("Boolean", true);
+konfiger.put("Float", 12.345);
 ```
 
 The `put` method do a type check on the value and calls the appropriate put method e.g `konfiger.put("Boolean", true)` will result in a call to `konfiger.putBoolean("Boolean", true)`. The following method are avaliable to directly add the value according to the type, `putString`, `putBoolean`, `putLong` and `putInt`. The previous example can be re-written as:
 
 ```java
-konfiger.putString("String", "This is a string")
-konfiger.putLong("Long", 143431423)
-konfiger.putBoolean("Boolean", true)
-konfiger.putFloat("Float", 12.345)
+konfiger.putString("String", "This is a string");
+konfiger.putLong("Long", 143431423);
+konfiger.putBoolean("Boolean", true);
+konfiger.putFloat("Float", 12.345);
 ```
 
 ### Finding
@@ -335,23 +333,23 @@ konfiger.putFloat("Float", 12.345)
 There are various ways to get the value from the konfiger object, the main `get` method and `getString` method both returns a string type, the other get methods returns specific types
 
 ```java
-konfiger.get("String")
+konfiger.get("String");
 ```
 
 To get specific type from the object use the following methods, `getString`, `getBoolean`, `getLong`, `getFloat` and `getInt`. 
 
 ```java
-konfiger.getString("String")
-konfiger.getLong("Long")
-konfiger.getBoolean("Boolean")
-konfiger.getFloat("Float")
+konfiger.getString("String");
+konfiger.getLong("Long");
+konfiger.getBoolean("Boolean");
+konfiger.getFloat("Float");
 ```
 
 If the requested entrr does not exist a null/undefined value is returned, to prevent that a fallback value should be sent as second parameter incase the key is not found the second parameter will be returned.
 
 ```java
-konfiger.get("String", "Default Value")
-konfiger.getBoolean("Boolean", false)
+konfiger.get("String", "Default Value");
+konfiger.getBoolean("Boolean", false);
 ```
 
 If the konfiger is initialized with lazy loading enabled if the get method is called the stream will start reading until the key is found and the stream is paused again, if the key is not found the stream will read to end. 
@@ -361,7 +359,7 @@ If the konfiger is initialized with lazy loading enabled if the get method is ca
 The `put` method can be used to add new entry or to update an already existing entry in the object. The `updateAt` method is usefull for updating a value using it index instead of key
 
 ```java
-konfiger.updateAt(0, "This is an updated string")
+konfiger.updateAt(0, "This is an updated string");
 ```
 
 ### Removing
@@ -369,8 +367,8 @@ konfiger.updateAt(0, "This is an updated string")
 The `remove` method removes a key value entry from the konfiger, it returns true if an entry is removed and false if no entry is removed. The `remove` method accept either key(string) or index(int) of the entry.
 
 ```java
-konfiger.remove("String")
-konfiger.remove(0)
+konfiger.remove("String");
+konfiger.remove(0);
 ```
 
 ### Saving to disk
@@ -378,16 +376,16 @@ konfiger.remove(0)
 Every operation on the konfiger object is done in memory to save the updated entries in a file call the `save` method with the file path to save the entry. If the konfiger is initiated from file then there is no need to add the file path to the `save` method, the entries will be saved to the file path used during initialization.
 
 ```java
-konfiger.save("test/test.config.ini")
+konfiger.save("test/test.config.ini");
 ```
 
 in case of load from file, the save will write the entries to *test/test.config.ini*.
 
 ```java
 //...
-var konfiger = Konfiger.fromFile('test/test.config.ini', true)
+Konfiger konfiger = new Konfiger(new File("test/test.config.ini"), true);
 //...
-konfiger.save()
+konfiger.save();
 ```
 
 ## API Documentations
