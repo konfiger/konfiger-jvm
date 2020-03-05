@@ -2,19 +2,20 @@ package io.github.thecarisma;
 
 import io.github.thecarisma.Konfiger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 public class TestKonfiger_1 {
 
     public static void main(String[] args) throws IOException, InvalidEntryException {
-        Konfiger konfiger = new Konfiger("");
+        Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"));
         konfiger.put("One", konfiger);
         konfiger.putLong("Two", 123456789);
         konfiger.putBoolean("Bool", true);
         konfiger.putFloat("Float", 123.56f);
         konfiger.putString("Dummy", "Noooooo 1");
-        konfiger.putString("Dummy2", "Noooooo 1");
+        konfiger.putString("Dummy2", "Noooooo 2");
 
 
         System.out.println("=====================================");
@@ -30,7 +31,7 @@ public class TestKonfiger_1 {
         System.out.println("=====================================");
         System.out.println(konfiger.get("Float"));
         System.out.println("IsString: " + (konfiger.get("Float") instanceof String));
-        System.out.println("IsFloat: " + (konfiger.getFloat("Float")));
+        System.out.println("IsFloat: " + (konfiger.getFloat("Float")*0==0));
         System.out.println("IsString: " + (konfiger.get("Float") instanceof String));
         System.out.println("=====================================");
         System.out.println(konfiger.get("Three", "Default Value"));
@@ -38,14 +39,14 @@ public class TestKonfiger_1 {
         System.out.println();
         System.out.println("Keys");
         for (String en : konfiger.keys()) {
-            System.out.println(en);
+            System.out.println("\t"+en);
         }
         System.out.println();
 
 
         System.out.println("Values");
         for (String en : konfiger.values()) {
-            System.out.println(en);
+            System.out.println("\t"+en);
         }
         System.out.println();
 
@@ -53,7 +54,7 @@ public class TestKonfiger_1 {
         System.out.println("Entries");
         Map<String, String> en = konfiger.entries();
         for (String key : en.keySet()) {
-            System.out.println(key + "=" + en.get(key));
+            System.out.println("\t"+key + "=" + en.get(key));
         }
         System.out.println();
 

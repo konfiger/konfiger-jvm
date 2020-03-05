@@ -287,7 +287,6 @@ public class Konfiger {
     }
 
     public Map<String, String> entries() {
-        stringValue = toString();
         return konfigerObjects;
     }
 
