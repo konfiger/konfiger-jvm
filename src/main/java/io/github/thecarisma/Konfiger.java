@@ -78,7 +78,7 @@ public class Konfiger {
     }
 
     public void putString(String key, String value) {
-        if (lazyLoad && !loadingEnds && !contains(key)) {
+        if (lazyLoad && !loadingEnds && contains(key)) {
             String _value = getString(key);
             if (_value.equals(value)) {
                 return;
@@ -138,7 +138,8 @@ public class Konfiger {
     }
 
     public String getString(String key) {
-        return get(key).toString();
+        Object ret = get(key);
+        return (ret != null ? ret.toString() : "");
     }
 
     public boolean getBoolean(String key) {
@@ -222,13 +223,17 @@ public class Konfiger {
     }
 
     public String getString(String key, String fallbackValue) {
-        return get(key, fallbackValue).toString();
+        Object _ret = get(key);
+        return (_ret != null ? _ret.toString() : fallbackValue);
     }
 
     public boolean getBoolean(String key, boolean fallbackValue) {
-        boolean ret = false;
+        boolean ret = fallbackValue;
         try {
-            ret = Boolean.parseBoolean(get(key, fallbackValue).toString());
+            if (!contains(key)) {
+                return ret;
+            }
+            ret = Boolean.parseBoolean((getString(key)));
         } catch (Exception ex) {
             if (!stream.errTolerance) {
                 ex.printStackTrace();
@@ -237,10 +242,13 @@ public class Konfiger {
         return ret;
     }
 
-    public long getLong(String key, long defaultValue) {
-        long ret = 0;
+    public long getLong(String key, long fallbackValue) {
+        long ret = fallbackValue;
         try {
-            ret = Long.parseLong(get(key, defaultValue).toString());
+            if (!contains(key)) {
+                return ret;
+            }
+            ret = Long.parseLong(getString(key));
         } catch (Exception ex) {
             if (!stream.errTolerance) {
                 ex.printStackTrace();
@@ -249,10 +257,13 @@ public class Konfiger {
         return ret;
     }
 
-    public long getInt(String key, int defaultValue) {
-        int ret = 0;
+    public long getInt(String key, int fallbackValue) {
+        int ret = fallbackValue;
         try {
-            ret = Integer.parseInt(get(key, defaultValue).toString());
+            if (!contains(key)) {
+                return ret;
+            }
+            ret = Integer.parseInt(getString(key));
         } catch (Exception ex) {
             if (!stream.errTolerance) {
                 ex.printStackTrace();
@@ -261,9 +272,12 @@ public class Konfiger {
         return ret;
     }
 
-    public float getFloat(String key, float defaultValue) {
-        float ret = 0;
+    public float getFloat(String key, float fallbackValue) {
+        float ret = fallbackValue;
         try {
+            if (!contains(key)) {
+                return ret;
+            }
             ret = Float.parseFloat(getString(key));
         } catch (Exception ex) {
             if (!stream.errTolerance) {
@@ -273,10 +287,13 @@ public class Konfiger {
         return ret;
     }
 
-    public double getDouble(String key, double defaultValue) {
-        double ret = 0;
+    public double getDouble(String key, double fallbackValue) {
+        double ret = fallbackValue;
         try {
-            ret = Double.parseDouble(get(key, defaultValue).toString());
+            if (!contains(key)) {
+                return ret;
+            }
+            ret = Double.parseDouble(getString(key));
         } catch (Exception ex) {
             if (!stream.errTolerance) {
                 ex.printStackTrace();
