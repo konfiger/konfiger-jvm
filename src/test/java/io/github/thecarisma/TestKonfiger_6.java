@@ -1,14 +1,15 @@
 package io.github.thecarisma;
 
+import java.io.File;
 import java.io.IOException;
 
-public class TestKonfiger_5 {
+public class TestKonfiger_6 {
 
     public static void main(String[] args) throws IOException, InvalidEntryException {
         Konfiger konfiger = new Konfiger("\n" +
                 "Name=Adewale Azeez\n" +
                 "Occupation=Software Engineer\n" +
-                "Location=Nigeria\n", false);
+                "Location=Nigeria\n", true);
         konfiger.putString("Greet", "\tHello \tWorld");
         konfiger.putLong("Long", 245134535524372L);
         konfiger.putString("Last", "Hello every one \rStart again");
