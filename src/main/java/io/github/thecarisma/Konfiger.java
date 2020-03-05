@@ -192,18 +192,102 @@ public class Konfiger {
         return ret;
     }
 
+    public Object get(String key, Object fallbackValue) {
+        if (enableCache_) {
+            if (currentCachedObject[0].equals(key)) {
+                return currentCachedObject[1];
+            }
+            if (prevCachedObject[0].equals(key)) {
+                return prevCachedObject[1];
+            }
+        }
+        if (!contains(key) && lazyLoad) {
+            if (!loadingEnds) {
+
+            }
+        }
+        if (!contains(key)) {
+            return fallbackValue;
+        }
+        return konfigerObjects.get(key);
+    }
+
+    public String getString(String key, String fallbackValue) {
+        return get(key, fallbackValue).toString();
+    }
+
+    public boolean getBoolean(String key, boolean fallbackValue) {
+        boolean ret = false;
+        try {
+            ret = Boolean.parseBoolean(get(key, fallbackValue).toString());
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public long getLong(String key, long defaultValue) {
+        long ret = 0;
+        try {
+            ret = Long.parseLong(get(key, defaultValue).toString());
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public long getInt(String key, int defaultValue) {
+        int ret = 0;
+        try {
+            ret = Integer.parseInt(get(key, defaultValue).toString());
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public float getFloat(String key, float defaultValue) {
+        float ret = 0;
+        try {
+            ret = Float.parseFloat(getString(key));
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public double getDouble(String key, double defaultValue) {
+        double ret = 0;
+        try {
+            ret = Double.parseDouble(get(key, defaultValue).toString());
+        } catch (Exception ex) {
+            if (!stream.errTolerance) {
+                ex.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
     public Set<String> keys() {
-        toString();
+        stringValue = toString();
         return konfigerObjects.keySet();
     }
 
     public Collection<String> values() {
-        toString();
+        stringValue = toString();
         return konfigerObjects.values();
     }
 
     public Map<String, String> entries() {
-        toString();
+        stringValue = toString();
         return konfigerObjects;
     }
 
