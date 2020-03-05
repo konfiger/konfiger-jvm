@@ -131,7 +131,25 @@ public class Konfiger {
         }
         if (!contains(key) && lazyLoad) {
             if (!loadingEnds) {
-
+                try {
+                    while (stream.hasNext()) {
+                        String[] obj = stream.next();
+                        putString(obj[0], obj[1]);
+                        changesOccur = true;
+                        if (obj[0].equals(key)) {
+                            if (enableCache_) {
+                                shiftCache(obj[0], obj[1]);
+                            }
+                            return obj[1];
+                        }
+                    }
+                    loadingEnds = true;
+                } catch (IOException | InvalidEntryException ex) {
+                    if (!stream.errTolerance) {
+                        ex.printStackTrace();
+                    }
+                    return null;
+                }
             }
         }
         return konfigerObjects.get(key);
