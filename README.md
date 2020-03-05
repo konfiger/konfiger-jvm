@@ -111,7 +111,7 @@ dependencies {
 
 The following example load from file, add an entry, remove an entry and iterate all the key value entries
 
-```js
+```java
 const { Konfiger } = require("konfiger")
 
 //initialize the key-value from file
@@ -138,7 +138,7 @@ for (var entry of konfiger.entries()) {
 
 Initialize an empty konfiger object and populate it with random data, then save it to a file
 
-```js
+```java
 const { Konfiger } = require("konfiger")
 
 let randomValues = [ 'One', 'Two', 'Three', 'Four', 'Five' ]
@@ -155,7 +155,7 @@ konfiger.save('test/konfiger.conf')
 
 Load the entries as string and get them as a true type.
 
-```js
+```java
 const { Konfiger } = require("konfiger")
 
 var konfiger = Konfiger.fromString(`
@@ -190,7 +190,7 @@ Fours=444444444444
 Fives=5555555555555
 ```
 
-```js
+```java
 const { Konfiger } = require("konfiger")
 
 let konfiger = Konfiger.fromFile('test/konfiger.conf', //the file pth
@@ -219,7 +219,7 @@ console.log(konfiger.size())
 
 Initailize a konfiger object with default seperator and delimeter then change the seperator and selimeter at runtime
 
-```js
+```java
 const { Konfiger } = require("konfiger")
 
 let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
@@ -233,7 +233,7 @@ console.log(konfiger.toString())
 
 Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-java/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-```js
+```java
 const { KonfigerStream } = require("konfiger")
 
 var kStream = KonfigerStream.fileStream('test/konfiger.conf', false)
@@ -247,7 +247,7 @@ while (kStream.hasNext()) {
 
 Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-java/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-```js
+```java
 const { KonfigerStream } = require("konfiger")
 
 var kStream = KonfigerStream.stringStream(`
@@ -267,23 +267,23 @@ while (kStream.hasNext()) {
 
 ### Initialization
 
-The main Konfiger contructor is not exported from the package, the two functions are exported for initialization, `fromString` and `fromFile`. The fromString function creates a Konfiger object from a string with valid key value entry or from empty string, the fromFile function creates the Konfiger object from a file, the two functions accept a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimeter` and `seperator`. If the third and fourth parameter is not specified the default is used, delimeter = `=`, seperator = `\n`. If the file or string has different delimeter and seperator always send the third and fourth parameter.
+the Konfiger class have various constructor which allow initialization with default argument. The contructor is in two main type, the constructors that accept string as the first parameter and the constructors that accepts a File as the first parameter. The constructor with string as it first parameter creates the konfiger objects from a string with valid key value entry or from empty string, the constructors that accept a File as it first parameter creates the Konfiger object from a file. All the constructors a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimeter` and `seperator`. If the third and fourth parameter is not specified the default is used, delimeter = `=`, seperator = `\n`. If the file or string has different delimeter and seperator always send the third and fourth parameter.
 
 The following initializer progressively read the file when needed
 
-```js
-let konfiger = Konfiger.fromFile('test/konfiger.conf', true)
+```java
+Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), true);
 ```
 
 The following initializer read all the entries from file at once
 
-```js
-let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
+```java
+Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), false);
 ```
 
 The following initializer read all the entries from string when needed
 
-```js
+```java
 let konfiger = Konfiger.fromString(`
 Ones=11111111111
 Twos=2222222222222
@@ -292,7 +292,7 @@ Twos=2222222222222
 
 The following initializer read all the entries from String at once
 
-```js
+```java
 let konfiger = Konfiger.fromString(`
 Ones=11111111111
 Twos=2222222222222
@@ -301,7 +301,7 @@ Twos=2222222222222
 
 Initialize a string which have custom delimeter and seperator
 
-```js
+```java
 let konfiger = Konfiger.fromString(`Ones:11111111111,Twos:2222222222222`, 
                                 false, 
                                 ':',
@@ -314,7 +314,7 @@ The following types can be added into the object, int, float, long, boolean, obj
 
 To add any object into the entry use the `put` method as it check the value type and properly get it string value
 
-```js
+```java
 konfiger.put("String", "This is a string")
 konfiger.put("Long", 143431423)
 konfiger.put("Boolean", true)
@@ -323,7 +323,7 @@ konfiger.put("Float", 12.345)
 
 The `put` method do a type check on the value and calls the appropriate put method e.g `konfiger.put("Boolean", true)` will result in a call to `konfiger.putBoolean("Boolean", true)`. The following method are avaliable to directly add the value according to the type, `putString`, `putBoolean`, `putLong` and `putInt`. The previous example can be re-written as:
 
-```js
+```java
 konfiger.putString("String", "This is a string")
 konfiger.putLong("Long", 143431423)
 konfiger.putBoolean("Boolean", true)
@@ -334,13 +334,13 @@ konfiger.putFloat("Float", 12.345)
 
 There are various ways to get the value from the konfiger object, the main `get` method and `getString` method both returns a string type, the other get methods returns specific types
 
-```js
+```java
 konfiger.get("String")
 ```
 
 To get specific type from the object use the following methods, `getString`, `getBoolean`, `getLong`, `getFloat` and `getInt`. 
 
-```js
+```java
 konfiger.getString("String")
 konfiger.getLong("Long")
 konfiger.getBoolean("Boolean")
@@ -349,7 +349,7 @@ konfiger.getFloat("Float")
 
 If the requested entrr does not exist a null/undefined value is returned, to prevent that a fallback value should be sent as second parameter incase the key is not found the second parameter will be returned.
 
-```js
+```java
 konfiger.get("String", "Default Value")
 konfiger.getBoolean("Boolean", false)
 ```
@@ -360,7 +360,7 @@ If the konfiger is initialized with lazy loading enabled if the get method is ca
 
 The `put` method can be used to add new entry or to update an already existing entry in the object. The `updateAt` method is usefull for updating a value using it index instead of key
 
-```js
+```java
 konfiger.updateAt(0, "This is an updated string")
 ```
 
@@ -368,7 +368,7 @@ konfiger.updateAt(0, "This is an updated string")
 
 The `remove` method removes a key value entry from the konfiger, it returns true if an entry is removed and false if no entry is removed. The `remove` method accept either key(string) or index(int) of the entry.
 
-```js
+```java
 konfiger.remove("String")
 konfiger.remove(0)
 ```
@@ -377,13 +377,13 @@ konfiger.remove(0)
 
 Every operation on the konfiger object is done in memory to save the updated entries in a file call the `save` method with the file path to save the entry. If the konfiger is initiated from file then there is no need to add the file path to the `save` method, the entries will be saved to the file path used during initialization.
 
-```js
+```java
 konfiger.save("test/test.config.ini")
 ```
 
 in case of load from file, the save will write the entries to *test/test.config.ini*.
 
-```js
+```java
 //...
 var konfiger = Konfiger.fromFile('test/test.config.ini', true)
 //...
