@@ -20,7 +20,7 @@ public class Konfiger {
     private String[] prevCachedObject = {"", ""};
     private String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
-    private boolean changesOccur = false;
+    private boolean changesOccur = true;
     private char delimeter = '=';
     private char seperator = '\n';
     private String stringValue = "";
