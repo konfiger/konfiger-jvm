@@ -1,11 +1,12 @@
 package io.github.thecarisma;
 
+import java.io.File;
 import java.io.IOException;
 
 public class TestKonfiger_4 {
 
     public static void main(String[] args) throws IOException, InvalidEntryException {
-        Konfiger konfiger = new Konfiger("src/test/resources/test.config.ini", true);
+        Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"), true);
         konfiger.putString("Greet", "\tHello \tWorld");
         konfiger.putLong("Long", 245134535524372L);
         konfiger.putString("Last", "Hello every one \rStart again");
