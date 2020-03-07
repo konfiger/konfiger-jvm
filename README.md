@@ -53,7 +53,7 @@ Using mvn-repo:
     <dependency>
         <groupId>io.github.thecarisma</groupId>
         <artifactId>konfiger</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.3</version>
     </dependency>
 </dependencies>
 
@@ -72,7 +72,7 @@ Using jitpack.io:
     <dependency>
         <groupId>com.github.konfiger</groupId>
         <artifactId>konfiger-java</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.3</version>
     </dependency>
 </dependencies>
 
@@ -101,7 +101,7 @@ Add the dependency:
 
 ```gradle
 dependencies {
-        implementation 'com.github.konfiger:konfiger-java:1.2.2'
+        implementation 'com.github.konfiger:konfiger-java:1.2.3'
 }
 ```
 
