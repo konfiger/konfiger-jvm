@@ -283,7 +283,7 @@ public class Konfiger {
         return ret;
     }
 
-    public long getInt(String key, int fallbackValue) {
+    public int getInt(String key, int fallbackValue) {
         int ret = fallbackValue;
         try {
             if (!contains(key)) {
