@@ -63,6 +63,10 @@ class KonfigerUtil {
         for (int i = 0; i < value.length(); ++i) {
             char c = value.charAt(i);
             if (c=='\\') {
+                if (i==value.length() - 1) {
+                    finalValue.append(c);
+                    break;
+                }
                 int d = ++i;
                 switch (value.charAt(d)) {
                     case 't':
