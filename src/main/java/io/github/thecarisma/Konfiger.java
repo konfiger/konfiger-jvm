@@ -192,7 +192,7 @@ public class Konfiger {
         return ret;
     }
 
-    public long getInt(String key) {
+    public int getInt(String key) {
         int ret = 0;
         try {
             ret = Integer.parseInt(getString(key));
