@@ -452,7 +452,7 @@ public class Konfiger {
 
     public void save(String filePath) throws FileNotFoundException {
         try (PrintWriter out = new PrintWriter(filePath)) {
-            out.println(toString());
+            out.write(toString());
         }
     }
 
