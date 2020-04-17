@@ -437,7 +437,7 @@ public class Konfiger {
             int index = 0;
             Map<String, String> en = entries();
             for (String key : en.keySet()) {
-                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), seperator);
+                stringValue += key + delimeter + (stream.isEscapingEntry() ? KonfigerUtil.escapeString(en.get(key), seperator) : en.get(key));
                 if (index != size() - 1) stringValue += seperator;
                 ++index;
             }
