@@ -14,6 +14,7 @@ public class KonfigerStream {
     private int readPosition = 0;
     private boolean hasNext_ = false;
     private boolean doneReading_ = false;
+    private boolean escapingEntry = true;
     private int i = -1;
 
     public KonfigerStream(String rawString) {
@@ -50,6 +51,14 @@ public class KonfigerStream {
         this.seperator = seperator;
         this.errTolerance = errTolerance;
         this.isFile = true;
+    }
+
+    public boolean isEscapingEntry() {
+        return escapingEntry;
+    }
+
+    public void setEscapingEntry(boolean escapingEntry) {
+        this.escapingEntry = escapingEntry;
     }
 
     public boolean hasNext() throws IOException {
@@ -151,7 +160,7 @@ public class KonfigerStream {
             }
         }
         ret[0] = key.toString();
-        ret[1] = KonfigerUtil.unEscapeString(value.toString(), this.seperator);
+        ret[1] = (escapingEntry ? KonfigerUtil.unEscapeString(value.toString(), this.seperator) : value.toString());
         return ret;
     }
 

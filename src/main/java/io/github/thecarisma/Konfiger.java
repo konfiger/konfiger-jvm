@@ -192,7 +192,7 @@ public class Konfiger {
         return ret;
     }
 
-    public long getInt(String key) {
+    public int getInt(String key) {
         int ret = 0;
         try {
             ret = Integer.parseInt(getString(key));
@@ -283,7 +283,7 @@ public class Konfiger {
         return ret;
     }
 
-    public long getInt(String key, int fallbackValue) {
+    public int getInt(String key, int fallbackValue) {
         int ret = fallbackValue;
         try {
             if (!contains(key)) {
@@ -437,7 +437,7 @@ public class Konfiger {
             int index = 0;
             Map<String, String> en = entries();
             for (String key : en.keySet()) {
-                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), seperator);
+                stringValue += key + delimeter + (stream.isEscapingEntry() ? KonfigerUtil.escapeString(en.get(key), seperator) : en.get(key));
                 if (index != size() - 1) stringValue += seperator;
                 ++index;
             }
@@ -452,7 +452,7 @@ public class Konfiger {
 
     public void save(String filePath) throws FileNotFoundException {
         try (PrintWriter out = new PrintWriter(filePath)) {
-            out.println(toString());
+            out.write(toString());
         }
     }
 
