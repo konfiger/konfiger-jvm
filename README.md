@@ -111,7 +111,7 @@ dependencies {
 
 The following example load from file, add an entry, remove an entry and iterate all the key value entries
 
-```java
+```js
 const { Konfiger } = require("konfiger")
 
 //initialize the key-value from file
@@ -138,7 +138,7 @@ for (var entry of konfiger.entries()) {
 
 Initialize an empty konfiger object and populate it with random data, then save it to a file
 
-```java
+```js
 const { Konfiger } = require("konfiger")
 
 let randomValues = [ 'One', 'Two', 'Three', 'Four', 'Five' ]
@@ -155,7 +155,7 @@ konfiger.save('test/konfiger.conf')
 
 Load the entries as string and get them as a true type.
 
-```java
+```js
 const { Konfiger } = require("konfiger")
 
 var konfiger = Konfiger.fromString(`
@@ -190,7 +190,7 @@ Fours=444444444444
 Fives=5555555555555
 ```
 
-```java
+```js
 const { Konfiger } = require("konfiger")
 
 let konfiger = Konfiger.fromFile('test/konfiger.conf', //the file pth
@@ -219,7 +219,7 @@ console.log(konfiger.size())
 
 Initailize a konfiger object with default seperator and delimeter then change the seperator and selimeter at runtime
 
-```java
+```js
 const { Konfiger } = require("konfiger")
 
 let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
@@ -231,9 +231,9 @@ console.log(konfiger.toString())
 
 ### Read file with Stream
 
-Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-java/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-```java
+```js
 const { KonfigerStream } = require("konfiger")
 
 var kStream = KonfigerStream.fileStream('test/konfiger.conf', false)
@@ -245,9 +245,9 @@ while (kStream.hasNext()) {
 
 ### Read String with Stream
 
-Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-java/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-```java
+```js
 const { KonfigerStream } = require("konfiger")
 
 var kStream = KonfigerStream.stringStream(`
@@ -263,47 +263,70 @@ while (kStream.hasNext()) {
 }
 ```
 
+### Skip Comment entries
+
+Read all the key value entry using the stream and skipping all commented entries. The default comment prefix is `//` but in the example below the commented entries starts with `#` so the prefix is changed. The same thing happen if the key value entry is loaded from file. 
+
+```js
+const { KonfigerStream } = require("konfiger")
+
+var kStream = KonfigerStream.stringStream(`
+String=This is a string
+#Number=215415245
+Float=56556.436746
+#Boolean=true
+`)
+kStream.setCommentPrefix("#")
+
+while (kStream.hasNext()) {
+    let entry = kStream.next()
+    console.log(entry)
+}
+```
+
 ## Usage
 
 ### Initialization
 
-the Konfiger class have various constructor which allow initialization with default argument. The contructor is in two main type, the constructors that accept string as the first parameter and the constructors that accepts a File as the first parameter. The constructor with string as it first parameter creates the konfiger objects from a string with valid key value entry or from empty string, the constructors that accept a File as it first parameter creates the Konfiger object from a file. All the constructors a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimeter` and `seperator`. If the third and fourth parameter is not specified the default is used, delimeter = `=`, seperator = `\n`. If the file or string has different delimeter and seperator always send the third and fourth parameter.
+The main Konfiger contructor is not exported from the package, the two functions are exported for initialization, `fromString` and `fromFile`. The fromString function creates a Konfiger object from a string with valid key value entry or from empty string, the fromFile function creates the Konfiger object from a file, the two functions accept a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimeter` and `seperator`. If the third and fourth parameter is not specified the default is used, delimeter = `=`, seperator = `\n`. If the file or string has different delimeter and seperator always send the third and fourth parameter.
 
 The following initializer progressively read the file when needed
 
-```java
-Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), true);
+```js
+let konfiger = Konfiger.fromFile('test/konfiger.conf', true)
 ```
 
 The following initializer read all the entries from file at once
 
-```java
-Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), false);
+```js
+let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
 ```
 
 The following initializer read all the entries from string when needed
 
-```java
-Konfiger konfiger = new Konfiger("\n" +
-                "Ones=11111111111\n" +
-                "Twos=2222222222222\n", true);
+```js
+let konfiger = Konfiger.fromString(`
+Ones=11111111111
+Twos=2222222222222
+`, true)
 ```
 
 The following initializer read all the entries from String at once
 
-```java
-Konfiger konfiger = new Konfiger("\n" +
-                "Ones=11111111111\n" +
-                "Twos=2222222222222\n", false);
+```js
+let konfiger = Konfiger.fromString(`
+Ones=11111111111
+Twos=2222222222222
+`, false)
 ```
 
 Initialize a string which have custom delimeter and seperator
 
-```java
-Konfiger konfiger = new Konfiger("Ones:11111111111,Twos:2222222222222", 
-                true, 
-                ':',
-                ',');
+```js
+let konfiger = Konfiger.fromString(`Ones:11111111111,Twos:2222222222222`, 
+                                false, 
+                                ':',
+                                ',')
 ```
 
 ### Inserting
@@ -312,44 +335,44 @@ The following types can be added into the object, int, float, long, boolean, obj
 
 To add any object into the entry use the `put` method as it check the value type and properly get it string value
 
-```java
-konfiger.put("String", "This is a string");
-konfiger.put("Long", 143431423);
-konfiger.put("Boolean", true);
-konfiger.put("Float", 12.345);
+```js
+konfiger.put("String", "This is a string")
+konfiger.put("Long", 143431423)
+konfiger.put("Boolean", true)
+konfiger.put("Float", 12.345)
 ```
 
 The `put` method do a type check on the value and calls the appropriate put method e.g `konfiger.put("Boolean", true)` will result in a call to `konfiger.putBoolean("Boolean", true)`. The following method are avaliable to directly add the value according to the type, `putString`, `putBoolean`, `putLong` and `putInt`. The previous example can be re-written as:
 
-```java
-konfiger.putString("String", "This is a string");
-konfiger.putLong("Long", 143431423);
-konfiger.putBoolean("Boolean", true);
-konfiger.putFloat("Float", 12.345);
+```js
+konfiger.putString("String", "This is a string")
+konfiger.putLong("Long", 143431423)
+konfiger.putBoolean("Boolean", true)
+konfiger.putFloat("Float", 12.345)
 ```
 
 ### Finding
 
 There are various ways to get the value from the konfiger object, the main `get` method and `getString` method both returns a string type, the other get methods returns specific types
 
-```java
-konfiger.get("String");
+```js
+konfiger.get("String")
 ```
 
 To get specific type from the object use the following methods, `getString`, `getBoolean`, `getLong`, `getFloat` and `getInt`. 
 
-```java
-konfiger.getString("String");
-konfiger.getLong("Long");
-konfiger.getBoolean("Boolean");
-konfiger.getFloat("Float");
+```js
+konfiger.getString("String")
+konfiger.getLong("Long")
+konfiger.getBoolean("Boolean")
+konfiger.getFloat("Float")
 ```
 
 If the requested entrr does not exist a null/undefined value is returned, to prevent that a fallback value should be sent as second parameter incase the key is not found the second parameter will be returned.
 
-```java
-konfiger.get("String", "Default Value");
-konfiger.getBoolean("Boolean", false);
+```js
+konfiger.get("String", "Default Value")
+konfiger.getBoolean("Boolean", false)
 ```
 
 If the konfiger is initialized with lazy loading enabled if the get method is called the stream will start reading until the key is found and the stream is paused again, if the key is not found the stream will read to end. 
@@ -358,34 +381,34 @@ If the konfiger is initialized with lazy loading enabled if the get method is ca
 
 The `put` method can be used to add new entry or to update an already existing entry in the object. The `updateAt` method is usefull for updating a value using it index instead of key
 
-```java
-konfiger.updateAt(0, "This is an updated string");
+```js
+konfiger.updateAt(0, "This is an updated string")
 ```
 
 ### Removing
 
 The `remove` method removes a key value entry from the konfiger, it returns true if an entry is removed and false if no entry is removed. The `remove` method accept either key(string) or index(int) of the entry.
 
-```java
-konfiger.remove("String");
-konfiger.remove(0);
+```js
+konfiger.remove("String")
+konfiger.remove(0)
 ```
 
 ### Saving to disk
 
 Every operation on the konfiger object is done in memory to save the updated entries in a file call the `save` method with the file path to save the entry. If the konfiger is initiated from file then there is no need to add the file path to the `save` method, the entries will be saved to the file path used during initialization.
 
-```java
-konfiger.save("test/test.config.ini");
+```js
+konfiger.save("test/test.config.ini")
 ```
 
 in case of load from file, the save will write the entries to *test/test.config.ini*.
 
-```java
+```js
 //...
-Konfiger konfiger = new Konfiger(new File("test/test.config.ini"), true);
+var konfiger = Konfiger.fromFile('test/test.config.ini', true)
 //...
-konfiger.save();
+konfiger.save()
 ```
 
 ## API Documentations
@@ -396,10 +419,16 @@ Even though JavaScript is weakly type the package does type checking to ensure w
 
 | Function        | Description         
 | --------------- | ------------- 
-| fileStream(filePath, delimeter, seperator, errTolerance)  | Initialize a new KonfigerStream object from the filePath. It throws en exception if the filePath does not exist or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
-| stringStream(rawString, delimeter, seperator, errTolerance)  | Initialize a new KonfigerStream object from a string. It throws en exception if the rawString is not a string or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
+| KonfigerStream fileStream(filePath, delimeter, seperator, errTolerance)  | Initialize a new KonfigerStream object from the filePath. It throws en exception if the filePath does not exist or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
+| KonfigerStream stringStream(rawString, delimeter, seperator, errTolerance)  | Initialize a new KonfigerStream object from a string. It throws en exception if the rawString is not a string or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
 | Boolean hasNext()  | Check if the KonfigerStream still has a key value entry, returns true if there is still entry, returns false if there is no more entry in the KonfigerStream
 | Array next()  | Get the next Key Value array from the KonfigerStream is it still has an entry. Throws an error if there is no more entry. Always use `hasNext()` to check if there is still an entry in the stream
+| Boolean isEscaping() | Check if the konfiger stream is configured to escape and unescape special characters
+| void setEscaping(escapingEntry) | Change the stream to enable/disable escaping and unescape special characters. This can be used to disable special character escaping if it causing error.
+| Boolean isTrimingKey() | Check if the stream is configured to trim key
+| void setTrimingKey(trimingKey) | Change the stream to enable/disable key trimming
+| getCommentPrefix() | Get the prefix string that indicate a pair entry if commented
+| setCommentPrefix(commentPrefix) | Change the stream comment prefix, any entry starting with the comment prefix will be skipped. Comment in KonfigerStream is relative to the key value entry and not relative to a line.
 | void validateFileExistence(filePath)  | Validate the existence of the specified file path if it does not exist an exception is thrown
 
 ### Konfiger
@@ -445,7 +474,7 @@ Even though JavaScript is weakly type the package does type checking to ensure w
 | save(filePath?)         | Save the konfiger datas into a file. The argument filePath is optional if specified the entries is writtent to the filePath else the filePath used to initialize the Konfiger object is used and if the Konfiger is initialized `fromString` and the filePath is not specified an exception is thrown. This does not clear the already added entries.
 | getSeperator()           | Get seperator char that seperate the key value entry, default is `\n`.
 | getDelimeter()           | Get delimeter char that seperated the key from it value, default is `=`.
-| setSeperator(seperator)           | Change seperator char that seperate the datas, note that the file is not updates, to change the file call the `save()` function
+| setSeperator(seperator)           | Change seperator char that seperate the datas, note that the file is not updates, to change the file call the `save()` function. If the new seperator is different from the old one all the entries values will be re parsed to get the new proper values, this process can take time if the entries is much.
 | setDelimeter(delimeter)           | Change delimeter char that seperated the key from object, note that the file is not updates, to change the file call the `save()` function 
 | size()           | Get the total size of key value entries in the konfiger
 | clear()           | clear all the key value entries in the konfiger. This does not update the file call the `save` method to update the file
