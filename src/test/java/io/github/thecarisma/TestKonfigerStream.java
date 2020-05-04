@@ -1,0 +1,66 @@
+package io.github.thecarisma;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class TestKonfigerStream {
+
+    @Test(expected = FileNotFoundException.class)
+    public void Should_Throw_Exceptions() throws FileNotFoundException {
+        KonfigerStream ks = new KonfigerStream(new File("test.txt"));
+    }
+
+    @Test
+    public void Should_Successfully_Initialize() throws FileNotFoundException {
+        KonfigerStream ks = new KonfigerStream(new File("./README.md"));
+    }
+
+    @Test
+    public void Validate_The_File_Stream_Value() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.txt"));
+        while (ks.hasNext()) {
+            Assert.assertNotEquals(ks.next(), null);
+        }
+    }
+
+    @Test
+    public void Validate_The_String_Stream_Key() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Name=Adewale Azeez,Project=konfiger, Date=April 24 2020", '=', ',');
+        Assert.assertEquals(ks.next()[0], "Name");
+        Assert.assertEquals(ks.next()[0], "Project");
+        Assert.assertEquals(ks.next()[0], " Date");
+    }
+
+    @Test
+    public void Validate_The_String_Stream_Value() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Name=Adewale Azeez,Project=konfiger, Date=April 24 2020", '=', ',');
+        Assert.assertEquals(ks.next()[1], "Adewale Azeez");
+        Assert.assertEquals(ks.next()[1], "konfiger");
+        Assert.assertEquals(ks.next()[1], "April 24 2020");
+    }
+
+    @Test
+    public void Test_String_Stream_Key_Trimming() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':');
+        Assert.assertFalse(ks.isTrimming());
+        ks.setTrimming(true);
+        Assert.assertTrue(ks.isTrimming());
+        Assert.assertEquals(ks.next()[0], "Name");
+        Assert.assertEquals(ks.next()[0], "Project");
+        Assert.assertEquals(ks.next()[0], "Date");
+    }
+
+    @Test
+    public void Test_The_Single_Pair_Commenting_In_String_Stream() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", ':', ',');
+        while (ks.hasNext()) {
+            System.out.println(ks.next()[0]);
+            //Assert.assertNotEquals(ks.next()[0], "Project");
+        }
+    }
+
+}
