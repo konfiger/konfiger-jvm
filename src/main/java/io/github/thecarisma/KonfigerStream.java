@@ -80,27 +80,44 @@ public class KonfigerStream {
     }
 
     public boolean hasNext() throws IOException {
-        if (!this.doneReading_) {
-            if (this.isFile) {
-                this.hasNext_ = ((i = in.read()) != -1);
-                if (!this.hasNext_) {
-                    this.doneReading();
+        int subCount = 0;
+        int commetPrefixSize = commentPrefix.length();
+        if (!doneReading_) {
+            if (isFile) {
+                hasNext_ = ((i = in.read()) != -1);
+                if (!hasNext_) {
+                    doneReading();
                 }
-                return this.hasNext_;
+                return hasNext_;
             } else {
-                while (this.readPosition < this.strStream.length()) {
-                    if (!(""+this.strStream.charAt(this.readPosition)).trim().isEmpty()) {
-                        if (this.strStream.charAt(this.readPosition))
-                        this.hasNext_ = true;
+                while (readPosition < strStream.length()) {
+                    if (!(""+strStream.charAt(readPosition)).trim().isEmpty()) {
+                        if (strStream.charAt(readPosition) == commentPrefix.charAt(subCount)) {
+                            while (strStream.charAt(readPosition+subCount) == commentPrefix.charAt(subCount)) {
+                                ++subCount;
+                                if (commetPrefixSize == subCount) {
+                                    break;
+                                }
+                            }
+                            if (commetPrefixSize == subCount) {
+                                ++readPosition;
+                                while (readPosition < strStream.length() && strStream.charAt(readPosition) != seperator) {
+                                    ++readPosition;
+                                }
+                                ++readPosition;
+                                return hasNext();
+                            }
+                        }
+                        hasNext_ = true;
                         return true;
                     }
-                    ++this.readPosition;
+                    ++readPosition;
                 }
-                this.hasNext_ = false;
+                hasNext_ = false;
                 return false;
             }
         }
-        return this.hasNext_;
+        return hasNext_;
     }
 
     public String[] next() throws InvalidEntryException, IOException {
@@ -120,7 +137,7 @@ public class KonfigerStream {
                     ++line;
                     column = 0;
                 }
-                if (c == this.seperator /*&& this.strStream.charAt(this.readPosition-1) != '\\'*/) {
+                if (c == this.seperator && prevChar != '/') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
@@ -139,6 +156,7 @@ public class KonfigerStream {
                 } else {
                     value.append(c);
                 }
+                prevChar = c;
             } while ((i = in.read()) != -1);
         } else {
             for (;this.readPosition <= this.strStream.length(); ++this.readPosition) {
@@ -157,7 +175,7 @@ public class KonfigerStream {
                     ++line;
                     column = 0;
                 }
-                if (c == this.seperator && this.strStream.charAt(this.readPosition-1) != '\\') {
+                if (c == this.seperator && prevChar != '/') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
@@ -176,7 +194,9 @@ public class KonfigerStream {
                 } else {
                     value.append(c);
                 }
+                prevChar = c;
             }
+            ++readPosition;
         }
         ret[0] = (trimming ? key.toString().trim() : key.toString());
         ret[1] = (escapingEntry ? KonfigerUtil.unEscapeString(value.toString(), this.seperator) : value.toString());

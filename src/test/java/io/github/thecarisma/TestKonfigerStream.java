@@ -58,8 +58,15 @@ public class TestKonfigerStream {
     public void Test_The_Single_Pair_Commenting_In_String_Stream() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", ':', ',');
         while (ks.hasNext()) {
-            System.out.println(ks.next()[0]);
-            //Assert.assertNotEquals(ks.next()[0], "Project");
+            Assert.assertNotEquals(ks.next()[0], "Project");
+        }
+    }
+
+    @Test
+    public void Test_The_Single_Pair_Commenting_In_File_Stream() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        while (ks.hasNext()) {
+            Assert.assertNotEquals(ks.next()[0], "");
         }
     }
 
