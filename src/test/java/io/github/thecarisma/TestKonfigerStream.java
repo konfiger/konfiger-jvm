@@ -6,12 +6,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class TestKonfigerStream {
 
     @Test(expected = FileNotFoundException.class)
     public void Should_Throw_Exceptions() throws FileNotFoundException {
-        KonfigerStream ks = new KonfigerStream(new File("test.txt"));
+        KonfigerStream ks = new KonfigerStream(new File("tryer.ini"));
     }
 
     @Test
@@ -21,7 +22,7 @@ public class TestKonfigerStream {
 
     @Test
     public void Validate_The_File_Stream_Value() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.txt"));
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.config.ini"));
         while (ks.hasNext()) {
             Assert.assertNotEquals(ks.next(), null);
         }
@@ -63,10 +64,19 @@ public class TestKonfigerStream {
     }
 
     @Test
-    public void Test_The_Single_Pair_Commenting_In_File_Stream() throws IOException, InvalidEntryException {
+    public void Test_The_Single_Pair_Commenting_In_File_Stream_1() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        ks.setCommentPrefix("[");
         while (ks.hasNext()) {
-            Assert.assertNotEquals(ks.next()[0], "");
+            Assert.assertFalse(ks.next()[0].startsWith("["));
+        }
+    }
+
+    @Test
+    public void Test_The_Single_Pair_Commenting_In_File_Stream() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.txt"),':', ',');
+        while (ks.hasNext()) {
+            Assert.assertFalse(ks.next()[0].startsWith("//"));
         }
     }
 

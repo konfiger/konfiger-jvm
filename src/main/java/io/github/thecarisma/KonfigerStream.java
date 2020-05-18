@@ -18,6 +18,9 @@ public class KonfigerStream {
     private boolean escapingEntry = true;
     private int i = -1;
     private String commentPrefix = "//";
+    private String patchkey = "";
+    int line = 0;
+    int column = 0;
 
     public KonfigerStream(String rawString) {
         this(rawString, '=', '\n', false);
@@ -82,9 +85,31 @@ public class KonfigerStream {
     public boolean hasNext() throws IOException {
         int subCount = 0;
         int commetPrefixSize = commentPrefix.length();
+        patchkey = "";
         if (!doneReading_) {
             if (isFile) {
                 hasNext_ = ((i = in.read()) != -1);
+                while ((""+(char) i).trim().isEmpty()) {
+                    hasNext_ = ((i = in.read()) != -1);
+                    if (i == '\n') {
+                        ++line;
+                        column = 0;
+                    }
+                }
+                if ((char)i == commentPrefix.charAt(subCount)) {
+                    do {
+                        patchkey += (char)i;
+                        subCount++;
+                        if (commetPrefixSize == subCount) {
+                            break;
+                        }
+                    } while ((i = in.read()) != -1 && (char)i == commentPrefix.charAt(subCount));
+                    if (patchkey.equals(commentPrefix)) {
+                        while ((i = in.read()) != -1 && (char)i != seperator) {}
+                        return hasNext();
+                    }
+                }
+
                 if (!hasNext_) {
                     doneReading();
                 }
@@ -126,8 +151,6 @@ public class KonfigerStream {
         StringBuilder value = new StringBuilder();
         boolean parseKey = true;
         char prevChar = '\0';
-        int line = 1;
-        int column = 0;
 
         if (this.isFile) {
             do {
@@ -198,7 +221,7 @@ public class KonfigerStream {
             }
             ++readPosition;
         }
-        ret[0] = (trimming ? key.toString().trim() : key.toString());
+        ret[0] = (trimming ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
         ret[1] = (escapingEntry ? KonfigerUtil.unEscapeString(value.toString(), this.seperator) : value.toString());
         return ret;
     }
