@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class TestKonfigerStream {
+public class TestStream {
 
     @Test(expected = FileNotFoundException.class)
     public void Should_Throw_Exceptions() throws FileNotFoundException {

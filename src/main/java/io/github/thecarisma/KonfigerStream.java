@@ -4,8 +4,8 @@ import java.io.*;
 
 public class KonfigerStream {
 
-    private char delimeter;
-    private char seperator;
+    char delimeter;
+    char seperator;
     boolean errTolerance;
     private boolean isFile = false;
     private String strStream = "" ;
@@ -15,7 +15,6 @@ public class KonfigerStream {
     private boolean hasNext_ = false;
     private boolean trimming = false;
     private boolean doneReading_ = false;
-    private boolean escapingEntry = true;
     private int i = -1;
     private String commentPrefix = "//";
     private String patchkey = "";
@@ -56,14 +55,6 @@ public class KonfigerStream {
         this.seperator = seperator;
         this.errTolerance = errTolerance;
         this.isFile = true;
-    }
-
-    public boolean isEscapingEntry() {
-        return escapingEntry;
-    }
-
-    public void setEscapingEntry(boolean escapingEntry) {
-        this.escapingEntry = escapingEntry;
     }
 
     public boolean isTrimming() {
@@ -222,7 +213,7 @@ public class KonfigerStream {
             ++readPosition;
         }
         ret[0] = (trimming ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
-        ret[1] = (escapingEntry ? KonfigerUtil.unEscapeString(value.toString(), this.seperator) : value.toString());
+        ret[1] = KonfigerUtil.unEscapeString(value.toString(), this.seperator);
         return ret;
     }
 

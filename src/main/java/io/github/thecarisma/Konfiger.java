@@ -41,11 +41,11 @@ public class Konfiger {
         this(new KonfigerStream(rawString, '=', '\n', false), lazyLoad);
     }
 
-    public Konfiger(File file, char delimeter, boolean lazyLoad, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
+    public Konfiger(File file, boolean lazyLoad, char delimeter, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
         this(new KonfigerStream(file, delimeter, seperator, errTolerance), lazyLoad);
     }
 
-    public Konfiger(File file, char delimeter, boolean lazyLoad, char seperator) throws IOException, InvalidEntryException {
+    public Konfiger(File file, boolean lazyLoad, char delimeter, char seperator) throws IOException, InvalidEntryException {
         this(new KonfigerStream(file, delimeter, seperator, false), lazyLoad);
     }
 
@@ -61,6 +61,8 @@ public class Konfiger {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
         this.filePath = konfigerStream.filePath;
+        this.seperator = konfigerStream.seperator;
+        this.delimeter = konfigerStream.delimeter;
 
         if (!this.lazyLoad) {
             this.lazyLoader();
@@ -404,7 +406,10 @@ public class Konfiger {
     }
 
     public void setDelimeter(char delimeter) {
-        this.delimeter = delimeter;
+        if (this.delimeter != delimeter) {
+            this.delimeter = delimeter;
+            changesOccur = true;
+        }
     }
 
     public char getSeperator() {
@@ -412,10 +417,17 @@ public class Konfiger {
     }
 
     public void setSeperator(char seperator) {
-        this.seperator = seperator;
+        if (this.seperator != seperator) {
+            changesOccur = true;
+            char oldSeperator = this.seperator;
+            this.seperator = seperator;
+            for ( String key : konfigerObjects.keySet()) {
+                konfigerObjects.put(key, KonfigerUtil.unEscapeString(konfigerObjects.get(key), oldSeperator));
+            }
+        }
     }
 
-    public void errTolerance(boolean errTolerance) {
+    public void errorTolerance(boolean errTolerance) {
         this.stream.errTolerance = errTolerance;
     }
 
@@ -437,9 +449,9 @@ public class Konfiger {
             int index = 0;
             Map<String, String> en = entries();
             for (String key : en.keySet()) {
-                stringValue += key + delimeter + (stream.isEscapingEntry() ? KonfigerUtil.escapeString(en.get(key), seperator) : en.get(key));
-                if (index != size() - 1) stringValue += seperator;
+                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), seperator);
                 ++index;
+                if (index < en.size()) stringValue += seperator;
             }
             changesOccur = false;
         }
@@ -451,8 +463,9 @@ public class Konfiger {
     }
 
     public void save(String filePath) throws FileNotFoundException {
+        stringValue = toString();
         try (PrintWriter out = new PrintWriter(filePath)) {
-            out.write(toString());
+            out.write(stringValue);
         }
     }
 
