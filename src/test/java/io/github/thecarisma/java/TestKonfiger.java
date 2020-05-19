@@ -1,5 +1,9 @@
-package io.github.thecarisma;
+package io.github.thecarisma.java;
 
+import io.github.thecarisma.InvalidEntryException;
+import io.github.thecarisma.Konfiger;
+import io.github.thecarisma.KonfigerFieldsExposer;
+import io.github.thecarisma.KonfigerStream;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -194,20 +198,20 @@ public class TestKonfiger {
         Assert.assertEquals(konfiger.get("Project"), "konfiger");
         Assert.assertEquals(konfiger.get("Name"), "Adewale");
         Assert.assertEquals(konfiger.getInt("Year"), 2020);
-        Assert.assertEquals(konfiger.currentCachedObject[0], "Name");
-        Assert.assertEquals(konfiger.prevCachedObject[0], "Year");
-        Assert.assertEquals(konfiger.currentCachedObject[1], "Adewale");
-        Assert.assertEquals(konfiger.prevCachedObject[1], "2020");
+        Assert.assertEquals(KonfigerFieldsExposer.getCurrentCachedObject(konfiger)[0], "Name");
+        Assert.assertEquals(KonfigerFieldsExposer.getPrevCachedObject(konfiger)[0], "Year");
+        Assert.assertEquals(KonfigerFieldsExposer.getCurrentCachedObject(konfiger)[1], "Adewale");
+        Assert.assertEquals(KonfigerFieldsExposer.getPrevCachedObject(konfiger)[1], "2020");
         Assert.assertEquals(konfiger.get("Name"), "Adewale");
         Assert.assertEquals(konfiger.get("Name"), "Adewale");
         Assert.assertEquals(konfiger.get("Project"), "konfiger");
         Assert.assertEquals(konfiger.get("Name"), "Adewale");
         Assert.assertEquals(konfiger.get("Name"), "Adewale");
         Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.currentCachedObject[0], "Project");
-        Assert.assertEquals(konfiger.prevCachedObject[0], "Name");
-        Assert.assertEquals(konfiger.currentCachedObject[1], "konfiger");
-        Assert.assertEquals(konfiger.prevCachedObject[1], "Adewale");
+        Assert.assertEquals(KonfigerFieldsExposer.getCurrentCachedObject(konfiger)[0], "Project");
+        Assert.assertEquals(KonfigerFieldsExposer.getPrevCachedObject(konfiger)[0], "Name");
+        Assert.assertEquals(KonfigerFieldsExposer.getCurrentCachedObject(konfiger)[1], "konfiger");
+        Assert.assertEquals(KonfigerFieldsExposer.getPrevCachedObject(konfiger)[1], "Adewale");
     }
 
     @Test
