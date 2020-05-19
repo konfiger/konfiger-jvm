@@ -142,6 +142,7 @@ public class KonfigerStream {
         StringBuilder value = new StringBuilder();
         boolean parseKey = true;
         char prevChar = '\0';
+        line |= 1;
 
         if (this.isFile) {
             do {

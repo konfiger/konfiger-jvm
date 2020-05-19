@@ -17,8 +17,8 @@ public class Konfiger {
     private String filePath = "";
     private boolean enableCache_ = true;
     private Map<String, String> konfigerObjects = new HashMap<>();
-    private String[] prevCachedObject = {"", ""};
-    private String[] currentCachedObject = {"", ""};
+    String[] prevCachedObject = {"", ""};
+    String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
     private boolean changesOccur = true;
     private char delimeter = '=';
@@ -67,6 +67,15 @@ public class Konfiger {
         if (!this.lazyLoad) {
             this.lazyLoader();
         }
+    }
+
+    public Konfiger(KonfigerStream konfigerStream) throws IOException, InvalidEntryException {
+        this.stream = konfigerStream;
+        this.filePath = konfigerStream.filePath;
+        this.seperator = konfigerStream.seperator;
+        this.delimeter = konfigerStream.delimeter;
+
+        this.lazyLoader();
     }
 
     public void put(String key, Object value) {
@@ -162,7 +171,11 @@ public class Konfiger {
                 }
             }
         }
-        return konfigerObjects.get(key);
+        String value = konfigerObjects.get(key);
+        if (enableCache_ && konfigerObjects.containsKey(key)) {
+            shiftCache(key, value);
+        }
+        return value;
     }
 
     public String getString(String key) {
@@ -231,23 +244,11 @@ public class Konfiger {
     }
 
     public Object get(String key, Object fallbackValue) {
-        if (enableCache_) {
-            if (currentCachedObject[0].equals(key)) {
-                return currentCachedObject[1];
-            }
-            if (prevCachedObject[0].equals(key)) {
-                return prevCachedObject[1];
-            }
+        Object _ret = null;
+        if (lazyLoad && !loadingEnds) {
+            _ret = get(key);
         }
-        if (!contains(key) && lazyLoad) {
-            if (!loadingEnds) {
-
-            }
-        }
-        if (!contains(key)) {
-            return fallbackValue;
-        }
-        return konfigerObjects.get(key);
+        return ( _ret == null ? fallbackValue : _ret );
     }
 
     public String getString(String key, String fallbackValue) {

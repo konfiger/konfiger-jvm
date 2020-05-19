@@ -48,6 +48,16 @@ public class TestKonfiger {
     }
 
     @Test
+    public void Validate_LazyLoad_Konfiger_Entries_Get_With_Fallback() throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"), true);
+
+        Assert.assertEquals(konfiger.get("Occupation", "Pen Tester"), "Software Engineer");
+        Assert.assertEquals(konfiger.get("Hobby", "Worm Creation"), "i don't know");
+        Assert.assertNull(konfiger.get("Fav OS"));
+        Assert.assertNotNull(konfiger.get("Fav OS", "Whatever get work done"));
+    }
+
+    @Test
     public void Validate_Konfiger_Entries_Get_Returned_Types() throws IOException, InvalidEntryException {
         Konfiger konfiger = new Konfiger("");
         konfiger.put("One", konfiger);
@@ -154,6 +164,60 @@ public class TestKonfiger {
         for (String key : konfiger.entries().keySet()) {
             Assert.assertFalse(konfiger.getString(key).contains("\\g"));
         }
+    }
+
+    @Test
+    public void Append_New_Unparsed_Entries_From_String_And_File() throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger("");
+
+        Assert.assertEquals(konfiger.size(), 0);
+        konfiger.appendString("Language=English");
+        Assert.assertEquals(konfiger.size(), 1);
+        Assert.assertNull(konfiger.get("Name"));
+        Assert.assertNotEquals(konfiger.get("Name"), "Adewale Azeez");
+        Assert.assertEquals(konfiger.get("Language"), "English");
+
+        konfiger.appendFile(new File("src/test/resources/test.config.ini"));
+        Assert.assertNotEquals(konfiger.get("Name"), null);
+        Assert.assertEquals(konfiger.get("Name"), "Adewale Azeez");
+    }
+
+    @Test
+    public void Test_Prev_And_Current_Cache() throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger("");
+
+        konfiger.put("Name", "Adewale");
+        konfiger.put("Project", "konfiger");
+        konfiger.putInt("Year", 2020);
+
+        Assert.assertEquals(konfiger.getInt("Year"), 2020);
+        Assert.assertEquals(konfiger.get("Project"), "konfiger");
+        Assert.assertEquals(konfiger.get("Name"), "Adewale");
+        Assert.assertEquals(konfiger.getInt("Year"), 2020);
+        Assert.assertEquals(konfiger.currentCachedObject[0], "Name");
+        Assert.assertEquals(konfiger.prevCachedObject[0], "Year");
+        Assert.assertEquals(konfiger.currentCachedObject[1], "Adewale");
+        Assert.assertEquals(konfiger.prevCachedObject[1], "2020");
+        Assert.assertEquals(konfiger.get("Name"), "Adewale");
+        Assert.assertEquals(konfiger.get("Name"), "Adewale");
+        Assert.assertEquals(konfiger.get("Project"), "konfiger");
+        Assert.assertEquals(konfiger.get("Name"), "Adewale");
+        Assert.assertEquals(konfiger.get("Name"), "Adewale");
+        Assert.assertEquals(konfiger.get("Name"), "Adewale");
+        Assert.assertEquals(konfiger.currentCachedObject[0], "Project");
+        Assert.assertEquals(konfiger.prevCachedObject[0], "Name");
+        Assert.assertEquals(konfiger.currentCachedObject[1], "konfiger");
+        Assert.assertEquals(konfiger.prevCachedObject[1], "Adewale");
+    }
+
+    @Test
+    public void Test_The_Single_Pair_Commenting_In_String_Stream_Konfiger() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", ':', ',');
+        Konfiger kon = new Konfiger(ks);
+        for (String key : kon.keys()) {
+            Assert.assertNotEquals(kon.getString(key), "Project");
+        }
+        Assert.assertEquals(kon.size(), 2);
     }
 
 }
