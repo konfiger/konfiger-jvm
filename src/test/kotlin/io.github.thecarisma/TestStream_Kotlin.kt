@@ -1,4 +1,4 @@
-package io.github.thecarisma.kotlin
+package io.github.thecarisma
 
 import io.github.thecarisma.InvalidEntryException
 import io.github.thecarisma.KonfigerStream
@@ -8,7 +8,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-class TestStream {
+class TestStream_Kotlin {
     @Test(expected = FileNotFoundException::class)
     @Throws(FileNotFoundException::class)
     fun Should_Throw_Exceptions() {

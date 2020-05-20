@@ -1,4 +1,4 @@
-package io.github.thecarisma.scala;
+package io.github.thecarisma;
 
 import io.github.thecarisma.InvalidEntryException;
 import io.github.thecarisma.KonfigerStream;
@@ -8,8 +8,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
-public class TestStream {
+public class TestStream_Java {
 
     @Test(expected = FileNotFoundException.class)
     public void Should_Throw_Exceptions() throws FileNotFoundException {
