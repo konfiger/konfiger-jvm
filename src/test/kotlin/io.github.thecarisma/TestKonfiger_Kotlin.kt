@@ -191,7 +191,7 @@ class TestKonfiger_Kotlin {
         Assert.assertEquals(konfiger["Name"], "Adewale")
         Assert.assertEquals(konfiger.getInt("Year").toLong(), 2020)
         Assert.assertEquals(konfiger.currentCachedObject[0], "Name")
-        Assert.assertEquals(konfiger.prevCachedObject, "Year")
+        Assert.assertEquals(konfiger.prevCachedObject[0], "Year")
         Assert.assertEquals(konfiger.currentCachedObject[1], "Adewale")
         Assert.assertEquals(konfiger.prevCachedObject[1], "2020")
         Assert.assertEquals(konfiger["Name"], "Adewale")
@@ -201,7 +201,7 @@ class TestKonfiger_Kotlin {
         Assert.assertEquals(konfiger["Name"], "Adewale")
         Assert.assertEquals(konfiger["Name"], "Adewale")
         Assert.assertEquals(konfiger.currentCachedObject[0], "Project")
-        Assert.assertEquals(konfiger.prevCachedObject, "Name")
+        Assert.assertEquals(konfiger.prevCachedObject[0], "Name")
         Assert.assertEquals(konfiger.currentCachedObject[1], "konfiger")
         Assert.assertEquals(konfiger.prevCachedObject[1], "Adewale")
     }
