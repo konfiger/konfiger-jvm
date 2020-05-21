@@ -1,8 +1,5 @@
 package io.github.thecarisma
 
-import io.github.thecarisma.InvalidEntryException
-import io.github.thecarisma.Konfiger
-import io.github.thecarisma.KonfigerStream
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -151,16 +148,16 @@ class TestKonfiger_Kotlin {
         val konfiger = Konfiger("Occupation=Software En/gineergLocation=Ni/geriagState=La/gos", false, '=', 'g')
         Assert.assertEquals(konfiger.size().toLong(), 3)
         Assert.assertTrue(konfiger.toString().contains("/g"))
-        for (key in konfiger.entries().keys) {
-            Assert.assertFalse(konfiger.getString(key).contains("/g"))
+        for (entry in konfiger.entries()) {
+            Assert.assertFalse(entry.value.contains("/g"))
         }
         konfiger.seperator = 'f'
         Assert.assertEquals(konfiger["Occupation"], "Software Engineer")
         konfiger.seperator = '\n'
         Assert.assertFalse(konfiger.toString().contains("/g"))
         Assert.assertEquals(konfiger.size().toLong(), 3)
-        for (key in konfiger.entries().keys) {
-            Assert.assertFalse(konfiger.getString(key).contains("\\g"))
+        for (entry in konfiger.entries()) {
+            Assert.assertFalse(entry.value.contains("\\g"))
         }
     }
 

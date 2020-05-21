@@ -43,7 +43,7 @@
                     <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
                     <branch>refs/heads/mvn-repo</branch>
                     <includes><include>**/*</include></includes>
-                    <repositoryName>konfiger-java</repositoryName>
+                    <repositoryName>konfiger-jvm</repositoryName>
                     <repositoryOwner>konfiger</repositoryOwner>
                 </configuration>
                 <executions>

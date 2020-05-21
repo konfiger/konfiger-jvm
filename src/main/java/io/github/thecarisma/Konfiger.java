@@ -341,8 +341,8 @@ public class Konfiger {
         return konfigerObjects.values();
     }
 
-    public Map<String, String> entries() {
-        return konfigerObjects;
+    public Set<Map.Entry<String, String>> entries() {
+        return konfigerObjects.entrySet();
     }
 
     public void enableCache(boolean enableCache_) {
@@ -448,11 +448,10 @@ public class Konfiger {
             }
             stringValue = "";
             int index = 0;
-            Map<String, String> en = entries();
-            for (String key : en.keySet()) {
-                stringValue += key + delimeter + KonfigerUtil.escapeString(en.get(key), seperator);
+            for (Map.Entry<String, String> entry : entries()) {
+                stringValue += entry.getKey() + delimeter + KonfigerUtil.escapeString(entry.getValue(), seperator);
                 ++index;
-                if (index < en.size()) stringValue += seperator;
+                if (index < size()) stringValue += seperator;
             }
             changesOccur = false;
         }

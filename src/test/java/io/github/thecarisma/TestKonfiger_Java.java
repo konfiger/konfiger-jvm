@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class TestKonfiger_Java {
 
@@ -153,16 +154,16 @@ public class TestKonfiger_Java {
 
         Assert.assertEquals(konfiger.size(), 3);
         Assert.assertTrue(konfiger.toString().contains("/g"));
-        for (String key : konfiger.entries().keySet()) {
-            Assert.assertFalse(konfiger.getString(key).contains("/g"));
+        for (Map.Entry<String, String> entry : konfiger.entries()) {
+            Assert.assertFalse(entry.getValue().contains("/g"));
         }
         konfiger.setSeperator('f');
         Assert.assertEquals(konfiger.get("Occupation"), "Software Engineer");
         konfiger.setSeperator('\n');
         Assert.assertFalse(konfiger.toString().contains("/g"));
         Assert.assertEquals(konfiger.size(), 3);
-        for (String key : konfiger.entries().keySet()) {
-            Assert.assertFalse(konfiger.getString(key).contains("\\g"));
+        for (Map.Entry<String, String> entry : konfiger.entries()) {
+            Assert.assertFalse(entry.getValue().contains("\\g"));
         }
     }
 

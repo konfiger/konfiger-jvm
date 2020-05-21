@@ -153,16 +153,16 @@ class TestKonfiger_Scala {
     val konfiger = new Konfiger("Occupation=Software En/gineergLocation=Ni/geriagState=La/gos", false, '=', 'g')
     Assert.assertEquals(konfiger.size, 3)
     Assert.assertTrue(konfiger.toString.contains("/g"))
-    for (key <- konfiger.entries.keySet.asScala) {
-      Assert.assertFalse(konfiger.getString(key).contains("/g"))
+    for (entry <- konfiger.entries.asScala) {
+      Assert.assertFalse(entry.getValue.contains("/g"))
     }
     konfiger.setSeperator('f')
     Assert.assertEquals(konfiger.get("Occupation"), "Software Engineer")
     konfiger.setSeperator('\n')
     Assert.assertFalse(konfiger.toString.contains("/g"))
     Assert.assertEquals(konfiger.size, 3)
-    for (key <- konfiger.entries.keySet.asScala) {
-      Assert.assertFalse(konfiger.getString(key).contains("\\g"))
+    for (entry <- konfiger.entries.asScala) {
+      Assert.assertFalse(entry.getValue.contains("\\g"))
     }
   }
 

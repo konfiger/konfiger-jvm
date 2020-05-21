@@ -1,1 +1,10 @@
-theme: jekyll-theme-hacker
+theme: jekyll-theme-cayman
+maintainer_url: https://github.com/Thecarisma
+maintainer_name: thecarisma
+header_links:
+ - text: Java Doc
+   href: https://konfiger.github.io/konfiger-jvm/index.html
+ - text: Kotlin Doc
+   href: https://konfiger.github.io/konfiger-jvm/README.kotlin.html
+ - text: Scala Doc
+   href: https://konfiger.github.io/konfiger-jvm/README.scala.html

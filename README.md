@@ -1,11 +1,10 @@
-# <p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/master/icons/konfiger-java.png" alt="konfiger-java" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-java</p>
+# <p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/master/icons/konfiger-java.png" alt="konfiger-jvm" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-java</p>
 
 <p style="text-align: center;" align="center">Light weight package to manage key value based configuration and data files.</p>
 
 ---
 
-The notable use cases of this package is loading configuration file, language file, preference setting in an application. More use cases and examples can be seen [here](https://github.com/konfiger/konfiger.github.io/blob/master/usecases/use_cases.java.md).
-
+The notable use cases of this package is loading configuration file, language file, preference setting in an application. 
 
 ___
 
@@ -21,11 +20,6 @@ ___
     - [Seperator and delimeter](#seperator-and-delimeter)
     - [Read file with Stream](#read-file-with-stream)
     - [Read String with Stream](#read-string-with-stream)
-- [API Documentations](#api-documentations)
-    - [KonfigerStream](#konfigerstream)
-    - [Konfiger](#konfiger)
-        - [Fields](#fields)
-        - [Functions](#functions)
 - [Usage](#usage)
 	- [Initialization](#initialization)
 	- [Inserting](#inserting)
@@ -33,6 +27,11 @@ ___
 	- [Updating](#updating)
 	- [Removing](#removing)
     - [Saving to disk](#saving-to-disk)
+- [API Documentations](#api-documentations)
+    - [KonfigerStream](#konfigerstream)
+    - [Konfiger](#konfiger)
+        - [Fields](#fields)
+        - [Functions](#functions)
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [Support](#support)
@@ -40,7 +39,7 @@ ___
 
 ## Installation
 
-Download the jar file from the [releases](https://github.com/konfiger/konfiger-java/releases) and add the downloaded konfiger-$.jar to your java or android project class path or library folder.
+Download the jar file from the [releases](https://github.com/konfiger/konfiger-jvm/releases) and add the downloaded konfiger-$.jar to your java or android project class path or library folder.
 
 ### Maven
 
@@ -60,7 +59,7 @@ Using mvn-repo:
 <repositories>
     <repository>
         <id>konfiger</id>
-        <url>https://raw.github.com/konfiger/konfiger-java/mvn-repo/</url>
+        <url>https://raw.github.com/konfiger/konfiger-jvm/mvn-repo/</url>
     </repository>
 </repositories>
 ```
@@ -71,7 +70,7 @@ Using jitpack.io:
 <dependencies>
     <dependency>
         <groupId>com.github.konfiger</groupId>
-        <artifactId>konfiger-java</artifactId>
+        <artifactId>konfiger-jvm</artifactId>
         <version>1.2.4</version>
     </dependency>
 </dependencies>
@@ -101,7 +100,7 @@ Add the dependency:
 
 ```gradle
 dependencies {
-        implementation 'com.github.konfiger:konfiger-java:1.2.4'
+        implementation 'com.github.konfiger:konfiger-jvm:1.2.4'
 }
 ```
 
@@ -111,26 +110,31 @@ dependencies {
 
 The following example load from file, add an entry, remove an entry and iterate all the key value entries
 
-```js
-const { Konfiger } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.util.Map;
 
-//initialize the key-value from file
-var konfiger = Konfiger.fromFile('test/test.config.ini', true)
+public class Test {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger(new File("test/test.config.ini"), true);
 
-//add a string
-konfiger.putString("Greet", "Hello World")
+        //add a string
+        konfiger.putString("Greet", "Hello World");
 
-//get an object
-console.log(konfiger.get("Greet"))
+        //get an object
+        System.out.println(konfiger.get("Greet"));
 
-//remove an object
-konfiger.remove("Greet")
+        //remove an object
+        konfiger.remove("Greet");
 
-//add an String
-konfiger.putString("What", "i don't know what to write here");
+        //add an String
+        konfiger.putString("What", "i don't know what to write here");
 
-for (var entry of konfiger.entries()) {
-	console.log(entry)
+        for (Map.Entry<String, String> entry : konfiger.entries()) {
+            System.out.println(entry);
+        }
+    }
 }
 ```
 
@@ -138,42 +142,51 @@ for (var entry of konfiger.entries()) {
 
 Initialize an empty konfiger object and populate it with random data, then save it to a file
 
-```js
-const { Konfiger } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
 
-let randomValues = [ 'One', 'Two', 'Three', 'Four', 'Five' ]
-var konfiger = Konfiger.fromString("", false)
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        String[] randomValues = { "One", "Two", "Three", "Four", "Five" };
+        Konfiger konfiger = new Konfiger("", false);
 
-for (var i = 0; i < 200; ++i) {
-    var random = Math.floor(Math.random() * (randomValues.length - 1) + 0)
-    konfiger.putString(''+i, randomValues[random])
+        for (int i = 0; i < 200; ++i) {
+            double random = Math.floor(Math.random() * (randomValues.length - 1) + 0);
+            konfiger.putString(""+i, randomValues[(int)random]);
+        }
+        konfiger.save("test/konfiger.conf");
+    }
 }
-konfiger.save('test/konfiger.conf')
 ```
 
 ### Get Types
 
 Load the entries as string and get them as a true type.
 
-```js
-const { Konfiger } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
 
-var konfiger = Konfiger.fromString(`
-String=This is a string
-Number=215415245
-Float=56556.436746
-Boolean=true
-`, false)
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger("\n" +
+                "String=This is a string\n" +
+                "Number=215415245\n" +
+                "Float=56556.436746\n" +
+                "Boolean=true\n", false);
 
-var str = konfiger.getString("String")
-var num = konfiger.getLong("Number")
-var flo = konfiger.getFloat("Float")
-var bool = konfiger.getBoolean("Boolean")
+        String str = konfiger.getString("String");
+        Long num = konfiger.getLong("Number");
+        Float flo = konfiger.getFloat("Float");
+        Boolean bool = konfiger.getBoolean("Boolean");
 
-console.log(typeof str)
-console.log(typeof num)
-console.log(typeof flo)
-console.log(typeof bool)
+        System.out.println(str instanceof String);
+        System.out.println(num instanceof Long);
+        System.out.println(flo instanceof Float);
+        System.out.println(bool instanceof Boolean);
+    }
+}
 ```
 
 ### Lazy Loading
@@ -190,56 +203,72 @@ Fours=444444444444
 Fives=5555555555555
 ```
 
-```js
-const { Konfiger } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
 
-let konfiger = Konfiger.fromFile('test/konfiger.conf', //the file pth
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), //the file path
                                 true //lazyLoad true
-                                )
-//at this point nothing is read from the file
+                                );
+        //at this point nothing is read from the file
 
-//the size of konfiger is 0 even if the file contains over 1000 entries
-console.log(konfiger.size())
+        //the size of konfiger is 0 even if the file contains over 1000 entries
+        System.out.println(konfiger.size());
 
-//the key 'Twos' is at the second line in the file, therefore two entry has 
-//been read to get the value.
-console.log(konfiger.get("Twos"))
-
-//the size becomes 2, 
-console.log(konfiger.size())
-
-//to read all the entries simple call the toString() method
-console.log(konfiger.toString())
-
-//now the size is equal to the entry
-console.log(konfiger.size())
+        //the key 'Twos' is at the second line in the file, therefore two entry has 
+        //been read to get the value.
+        System.out.println(konfiger.get("Twos"));
+        
+        //the size becomes 2, 
+        System.out.println(konfiger.size());
+        
+        //to read all the entries simply call the toString() method
+        System.out.println(konfiger.toString());
+        
+        //now the size is equal to the entry
+        System.out.println(konfiger.size());
+    }
+}
 ```
 
 ### Seperator and delimeter
 
 Initailize a konfiger object with default seperator and delimeter then change the seperator and selimeter at runtime
 
-```js
-const { Konfiger } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
 
-let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
-konfiger.setDelimeter('?')
-konfiger.setSeperator(',')
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), false);
+        konfiger.setDelimeter('?');
+        konfiger.setSeperator(',');
 
-console.log(konfiger.toString())
+        System.out.println(konfiger.toString());
+    }
+}
 ```
 
 ### Read file with Stream
 
 Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-```js
-const { KonfigerStream } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.util.Arrays;
 
-var kStream = KonfigerStream.fileStream('test/konfiger.conf', false)
-while (kStream.hasNext()) {
-    let entry = kStream.next()
-    console.log(entry)
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        KonfigerStream kStream = new KonfigerStream(new File("test/konfiger.conf"));
+        while (kStream.hasNext()) {
+            String[] entry = kStream.next();
+            System.out.println(Arrays.toString(entry));
+        }
+    }
 }
 ```
 
@@ -247,19 +276,24 @@ while (kStream.hasNext()) {
 
 Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
-```js
-const { KonfigerStream } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.util.Arrays;
 
-var kStream = KonfigerStream.stringStream(`
-String=This is a string
-Number=215415245
-Float=56556.436746
-Boolean=true
-`, false)
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        KonfigerStream kStream = new KonfigerStream("\n" +
+                "String=This is a string\n" +
+                "Number=215415245\n" +
+                "Float=56556.436746\n" +
+                "Boolean=true\n");
 
-while (kStream.hasNext()) {
-    let entry = kStream.next()
-    console.log(entry)
+        while (kStream.hasNext()) {
+            String[] entry = kStream.next();
+            System.out.println(Arrays.toString(entry));
+        }
+    }
 }
 ```
 
@@ -267,20 +301,25 @@ while (kStream.hasNext()) {
 
 Read all the key value entry using the stream and skipping all commented entries. The default comment prefix is `//` but in the example below the commented entries starts with `#` so the prefix is changed. The same thing happen if the key value entry is loaded from file. 
 
-```js
-const { KonfigerStream } = require("konfiger")
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.util.Arrays;
 
-var kStream = KonfigerStream.stringStream(`
-String=This is a string
-#Number=215415245
-Float=56556.436746
-#Boolean=true
-`)
-kStream.setCommentPrefix("#")
-
-while (kStream.hasNext()) {
-    let entry = kStream.next()
-    console.log(entry)
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        KonfigerStream kStream = new KonfigerStream("\n" +
+                "String=This is a string\n" +
+                "#Number=215415245\n" +
+                "Float=56556.436746\n" +
+                "#Boolean=true\n");
+        kStream.setCommentPrefix("#");
+        
+        while (kStream.hasNext()) {
+            String[] entry = kStream.next();
+            System.out.println(Arrays.toString(entry));
+        }
+    }
 }
 ```
 
@@ -292,41 +331,39 @@ The main Konfiger contructor is not exported from the package, the two functions
 
 The following initializer progressively read the file when needed
 
-```js
-let konfiger = Konfiger.fromFile('test/konfiger.conf', true)
+```java
+Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), true);
 ```
 
 The following initializer read all the entries from file at once
 
-```js
-let konfiger = Konfiger.fromFile('test/konfiger.conf', false)
+```java
+Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), false);
 ```
 
 The following initializer read all the entries from string when needed
 
-```js
-let konfiger = Konfiger.fromString(`
-Ones=11111111111
-Twos=2222222222222
-`, true)
+```java
+Konfiger konfiger = new Konfiger("\n" +
+                "Ones=11111111111\n" +
+                "Twos=2222222222222\n", true);
 ```
 
 The following initializer read all the entries from String at once
 
-```js
-let konfiger = Konfiger.fromString(`
-Ones=11111111111
-Twos=2222222222222
-`, false)
+```java
+Konfiger konfiger = new Konfiger("\n" +
+                "Ones=11111111111\n" +
+                "Twos=2222222222222\n", true);
 ```
 
 Initialize a string which have custom delimeter and seperator
 
-```js
-let konfiger = Konfiger.fromString(`Ones:11111111111,Twos:2222222222222`, 
-                                false, 
-                                ':',
-                                ',')
+```java
+Konfiger konfiger = new Konfiger("Ones:11111111111,Twos:2222222222222",
+                true,
+                ':',
+                ',');
 ```
 
 ### Inserting
@@ -335,44 +372,44 @@ The following types can be added into the object, int, float, long, boolean, obj
 
 To add any object into the entry use the `put` method as it check the value type and properly get it string value
 
-```js
-konfiger.put("String", "This is a string")
-konfiger.put("Long", 143431423)
-konfiger.put("Boolean", true)
-konfiger.put("Float", 12.345)
+```java
+konfiger.put("String", "This is a string");
+konfiger.put("Long", 143431423);
+konfiger.put("Boolean", true);
+konfiger.put("Float", 12.345);
 ```
 
 The `put` method do a type check on the value and calls the appropriate put method e.g `konfiger.put("Boolean", true)` will result in a call to `konfiger.putBoolean("Boolean", true)`. The following method are avaliable to directly add the value according to the type, `putString`, `putBoolean`, `putLong` and `putInt`. The previous example can be re-written as:
 
-```js
-konfiger.putString("String", "This is a string")
-konfiger.putLong("Long", 143431423)
-konfiger.putBoolean("Boolean", true)
-konfiger.putFloat("Float", 12.345)
+```java
+konfiger.putString("String", "This is a string");
+konfiger.putLong("Long", 143431423);
+konfiger.putBoolean("Boolean", true);
+konfiger.putFloat("Float", 12.345F);
 ```
 
 ### Finding
 
 There are various ways to get the value from the konfiger object, the main `get` method and `getString` method both returns a string type, the other get methods returns specific types
 
-```js
-konfiger.get("String")
+```java
+konfiger.get("String");
 ```
 
 To get specific type from the object use the following methods, `getString`, `getBoolean`, `getLong`, `getFloat` and `getInt`. 
 
-```js
-konfiger.getString("String")
-konfiger.getLong("Long")
-konfiger.getBoolean("Boolean")
-konfiger.getFloat("Float")
+```java
+konfiger.getString("String");
+konfiger.getLong("Long");
+konfiger.getBoolean("Boolean");
+konfiger.getFloat("Float");
 ```
 
 If the requested entrr does not exist a null/undefined value is returned, to prevent that a fallback value should be sent as second parameter incase the key is not found the second parameter will be returned.
 
-```js
-konfiger.get("String", "Default Value")
-konfiger.getBoolean("Boolean", false)
+```java
+konfiger.get("String", "Default Value");
+konfiger.getBoolean("Boolean", false);
 ```
 
 If the konfiger is initialized with lazy loading enabled if the get method is called the stream will start reading until the key is found and the stream is paused again, if the key is not found the stream will read to end. 
@@ -381,39 +418,37 @@ If the konfiger is initialized with lazy loading enabled if the get method is ca
 
 The `put` method can be used to add new entry or to update an already existing entry in the object. The `updateAt` method is usefull for updating a value using it index instead of key
 
-```js
-konfiger.updateAt(0, "This is an updated string")
+```java
+konfiger.updateAt(0, "This is an updated string");
 ```
 
 ### Removing
 
 The `remove` method removes a key value entry from the konfiger, it returns true if an entry is removed and false if no entry is removed. The `remove` method accept either key(string) or index(int) of the entry.
 
-```js
-konfiger.remove("String")
-konfiger.remove(0)
+```java
+konfiger.remove("String");
+konfiger.remove(0);
 ```
 
 ### Saving to disk
 
 Every operation on the konfiger object is done in memory to save the updated entries in a file call the `save` method with the file path to save the entry. If the konfiger is initiated from file then there is no need to add the file path to the `save` method, the entries will be saved to the file path used during initialization.
 
-```js
-konfiger.save("test/test.config.ini")
+```java
+konfiger.save("test/test.config.ini");
 ```
 
 in case of load from file, the save will write the entries to *test/test.config.ini*.
 
-```js
+```java
 //...
-var konfiger = Konfiger.fromFile('test/test.config.ini', true)
+Konfiger konfiger = new Konfiger(new File("test/test.config.ini"), true);
 //...
-konfiger.save()
+konfiger.save();
 ```
 
 ## API Documentations
-
-Even though JavaScript is weakly type the package does type checking to ensure wrong datatype is not passed into the functions.
 
 ### KonfigerStream
 
