@@ -31,10 +31,10 @@ class TestStream_Scala {
   @throws[IOException]
   @throws[InvalidEntryException]
   def Validate_The_String_Stream_Key(): Unit = {
-    val ks = new KonfigerStream("Name=Adewale Azeez,Project=konfiger, Date=April 24 2020", '=', ',')
+    val ks = new KonfigerStream(" Name =Adewale Azeez,Project =konfiger, Date=April 24 2020", '=', ',')
     Assert.assertEquals(ks.next()(0), "Name")
     Assert.assertEquals(ks.next()(0), "Project")
-    Assert.assertEquals(ks.next()(0), " Date")
+    Assert.assertEquals(ks.next()(0), "Date")
   }
 
   @Test
@@ -52,12 +52,12 @@ class TestStream_Scala {
   @throws[InvalidEntryException]
   def Test_String_Stream_Key_Trimming(): Unit = {
     val ks = new KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':')
-    Assert.assertFalse(ks.isTrimming)
-    ks.setTrimming(true)
     Assert.assertTrue(ks.isTrimming)
-    Assert.assertEquals(ks.next()(0), "Name")
-    Assert.assertEquals(ks.next()(0), "Project")
-    Assert.assertEquals(ks.next()(0), "Date")
+    ks.setTrimming(false)
+    Assert.assertFalse(ks.isTrimming)
+    Assert.assertEquals(ks.next()(0), " Name ")
+    Assert.assertEquals(ks.next()(0), "Project ")
+    Assert.assertEquals(ks.next()(0), " Date")
   }
 
   @Test

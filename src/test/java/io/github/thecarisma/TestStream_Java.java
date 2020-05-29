@@ -32,10 +32,10 @@ public class TestStream_Java {
 
     @Test
     public void Validate_The_String_Stream_Key() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("Name=Adewale Azeez,Project=konfiger, Date=April 24 2020", '=', ',');
+        KonfigerStream ks = new KonfigerStream(" Name =Adewale Azeez,Project =konfiger, Date=April 24 2020", '=', ',');
         Assert.assertEquals(ks.next()[0], "Name");
         Assert.assertEquals(ks.next()[0], "Project");
-        Assert.assertEquals(ks.next()[0], " Date");
+        Assert.assertEquals(ks.next()[0], "Date");
     }
 
     @Test
@@ -49,12 +49,12 @@ public class TestStream_Java {
     @Test
     public void Test_String_Stream_Key_Trimming() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':');
-        Assert.assertFalse(ks.isTrimming());
-        ks.setTrimming(true);
         Assert.assertTrue(ks.isTrimming());
-        Assert.assertEquals(ks.next()[0], "Name");
-        Assert.assertEquals(ks.next()[0], "Project");
-        Assert.assertEquals(ks.next()[0], "Date");
+        ks.setTrimming(false);
+        Assert.assertFalse(ks.isTrimming());
+        Assert.assertEquals(ks.next()[0], " Name ");
+        Assert.assertEquals(ks.next()[0], "Project ");
+        Assert.assertEquals(ks.next()[0], " Date");
     }
 
     @Test

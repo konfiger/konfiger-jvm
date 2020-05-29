@@ -33,10 +33,10 @@ class TestStream_Kotlin {
     @Test
     @Throws(IOException::class, InvalidEntryException::class)
     fun Validate_The_String_Stream_Key() {
-        val ks = KonfigerStream("Name=Adewale Azeez,Project=konfiger, Date=April 24 2020", '=', ',')
+        val ks = KonfigerStream(" Name =Adewale Azeez,Project =konfiger, Date=April 24 2020", '=', ',')
         Assert.assertEquals(ks.next()[0], "Name")
         Assert.assertEquals(ks.next()[0], "Project")
-        Assert.assertEquals(ks.next()[0], " Date")
+        Assert.assertEquals(ks.next()[0], "Date")
     }
 
     @Test
@@ -52,12 +52,12 @@ class TestStream_Kotlin {
     @Throws(IOException::class, InvalidEntryException::class)
     fun Test_String_Stream_Key_Trimming() {
         val ks = KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':')
-        Assert.assertFalse(ks.isTrimming)
-        ks.isTrimming = true
         Assert.assertTrue(ks.isTrimming)
-        Assert.assertEquals(ks.next()[0], "Name")
-        Assert.assertEquals(ks.next()[0], "Project")
-        Assert.assertEquals(ks.next()[0], "Date")
+        ks.isTrimming = false
+        Assert.assertFalse(ks.isTrimming)
+        Assert.assertEquals(ks.next()[0], " Name ")
+        Assert.assertEquals(ks.next()[0], "Project ")
+        Assert.assertEquals(ks.next()[0], " Date")
     }
 
     @Test

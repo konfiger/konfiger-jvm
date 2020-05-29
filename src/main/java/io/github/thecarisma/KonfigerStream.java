@@ -13,7 +13,7 @@ public class KonfigerStream {
     String filePath = "";
     private int readPosition = 0;
     private boolean hasNext_ = false;
-    private boolean trimming = false;
+    private boolean trimming = true;
     private boolean doneReading_ = false;
     private int i = -1;
     private String commentPrefix = "//";
