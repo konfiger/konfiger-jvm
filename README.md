@@ -458,8 +458,8 @@ konfiger.save();
 | public KonfigerStream(String rawString, char delimeter, char seperator, boolean errTolerance)  | Initialize a new KonfigerStream object from a string. It throws en exception if the rawString is not a string or if the delimeter or seperator is not a single character. The last parameter is boolean if true the stream is error tolerant and does not throw any exception on invalid entry, only the first parameter is cumpulsory.
 | public boolean hasNext() throws IOException  | Check if the KonfigerStream still has a key value entry, returns true if there is still entry, returns false if there is no more entry in the KonfigerStream
 | public String[] next() throws InvalidEntryException, IOException  | Get the next Key Value array from the KonfigerStream is it still has an entry. Throws an error if there is no more entry. Always use `hasNext()` to check if there is still an entry in the stream.
-| public boolean isTrimming() | Check if the stream is configured to trim key
-| public void setTrimming(boolean trimming) | Change the stream to enable/disable key trimming
+| public boolean isTrimmingKey() | Check if the stream is configured to trim key
+| public void setTrimmingKey(boolean trimming) | Change the stream to enable/disable key trimming
 | public String getCommentPrefix() | Get the prefix string that indicate a pair entry if commented
 | public void setCommentPrefix(String commentPrefix) | Change the stream comment prefix, any entry starting with the comment prefix will be skipped. Comment in KonfigerStream is relative to the key value entry and not relative to a line.
 

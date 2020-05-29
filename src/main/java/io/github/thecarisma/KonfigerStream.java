@@ -57,11 +57,11 @@ public class KonfigerStream {
         this.isFile = true;
     }
 
-    public boolean isTrimming() {
+    public boolean isTrimmingKey() {
         return trimming;
     }
 
-    public void setTrimming(boolean trimming) {
+    public void setTrimmingKey(boolean trimming) {
         this.trimming = trimming;
     }
 

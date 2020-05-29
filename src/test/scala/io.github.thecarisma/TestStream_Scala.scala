@@ -52,9 +52,9 @@ class TestStream_Scala {
   @throws[InvalidEntryException]
   def Test_String_Stream_Key_Trimming(): Unit = {
     val ks = new KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':')
-    Assert.assertTrue(ks.isTrimming)
-    ks.setTrimming(false)
-    Assert.assertFalse(ks.isTrimming)
+    Assert.assertTrue(ks.isTrimmingKey)
+    ks.setTrimmingKey(false)
+    Assert.assertFalse(ks.isTrimmingKey)
     Assert.assertEquals(ks.next()(0), " Name ")
     Assert.assertEquals(ks.next()(0), "Project ")
     Assert.assertEquals(ks.next()(0), " Date")

@@ -52,9 +52,9 @@ class TestStream_Kotlin {
     @Throws(IOException::class, InvalidEntryException::class)
     fun Test_String_Stream_Key_Trimming() {
         val ks = KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':')
-        Assert.assertTrue(ks.isTrimming)
-        ks.isTrimming = false
-        Assert.assertFalse(ks.isTrimming)
+        Assert.assertTrue(ks.isTrimmingKey)
+        ks.isTrimmingKey = false
+        Assert.assertFalse(ks.isTrimmingKey)
         Assert.assertEquals(ks.next()[0], " Name ")
         Assert.assertEquals(ks.next()[0], "Project ")
         Assert.assertEquals(ks.next()[0], " Date")

@@ -49,9 +49,9 @@ public class TestStream_Java {
     @Test
     public void Test_String_Stream_Key_Trimming() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':');
-        Assert.assertTrue(ks.isTrimming());
-        ks.setTrimming(false);
-        Assert.assertFalse(ks.isTrimming());
+        Assert.assertTrue(ks.isTrimmingKey());
+        ks.setTrimmingKey(false);
+        Assert.assertFalse(ks.isTrimmingKey());
         Assert.assertEquals(ks.next()[0], " Name ");
         Assert.assertEquals(ks.next()[0], "Project ");
         Assert.assertEquals(ks.next()[0], " Date");
