@@ -82,4 +82,31 @@ public class TestStream_Java {
         }
     }
 
+    @Test
+    public void Test_String_Stream_Value_Trimming() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(" Name =Adewale Azeez :Project = konfiger: Date= April 24 2020 :Language = Multiple Languages", '=', ':');
+        Assert.assertNotEquals(ks.isTrimmingValue(), false);
+        Assert.assertTrue(ks.isTrimmingValue());
+        Assert.assertEquals(ks.next()[1], "Adewale Azeez");
+        Assert.assertEquals(ks.next()[1], "konfiger");
+        Assert.assertEquals(ks.next()[1], "April 24 2020");
+        Assert.assertEquals(ks.next()[1], "Multiple Languages");
+    }
+
+    @Test
+    public void Test_String_Stream_Key_Value_Trimming() throws IOException, InvalidEntryException {
+        String entriesStr = " Name =Adewale Azeez :Project = konfiger: Date= April 24 2020 :Language = Multiple Languages";
+        KonfigerStream ks = new KonfigerStream(entriesStr, '=', ':');
+        KonfigerStream ks1 = new KonfigerStream(entriesStr, '=', ':');
+        Assert.assertEquals(ks.next()[0], "Name");
+        Assert.assertEquals(ks.next()[0], "Project");
+        Assert.assertEquals(ks.next()[0], "Date");
+        Assert.assertEquals(ks.next()[0], "Language");
+
+        Assert.assertEquals(ks1.next()[1], "Adewale Azeez");
+        Assert.assertEquals(ks1.next()[1], "konfiger");
+        Assert.assertEquals(ks1.next()[1], "April 24 2020");
+        Assert.assertEquals(ks1.next()[1], "Multiple Languages");
+    }
+
 }

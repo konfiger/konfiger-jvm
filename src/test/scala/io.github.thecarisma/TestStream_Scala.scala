@@ -90,4 +90,36 @@ class TestStream_Scala {
       ks.hasNext
     }) Assert.assertFalse(ks.next()(0).startsWith("//"))
   }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Test_String_Stream_Value_Trimming(): Unit = {
+    val ks = new KonfigerStream(" Name =Adewale Azeez :Project = konfiger: Date= April 24 2020 :Language = Multiple Languages", '=', ':')
+    Assert.assertNotEquals(ks.isTrimmingValue, false)
+    Assert.assertTrue(ks.isTrimmingValue)
+    Assert.assertEquals(ks.next()(1), "Adewale Azeez")
+    Assert.assertEquals(ks.next()(1), "konfiger")
+    Assert.assertEquals(ks.next()(1), "April 24 2020")
+    Assert.assertEquals(ks.next()(1), "Multiple Languages")
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Test_String_Stream_Key_Value_Trimming(): Unit = {
+    val entriesStr = " Name =Adewale Azeez :Project = konfiger: Date= April 24 2020 :Language = Multiple Languages"
+    val ks = new KonfigerStream(entriesStr, '=', ':')
+    val ks1 = new KonfigerStream(entriesStr, '=', ':')
+    Assert.assertEquals(ks.next()(0), "Name")
+    Assert.assertEquals(ks.next()(0), "Project")
+    Assert.assertEquals(ks.next()(0), "Date")
+    Assert.assertEquals(ks.next()(0), "Language")
+
+    Assert.assertEquals(ks1.next()(1), "Adewale Azeez")
+    Assert.assertEquals(ks1.next()(1), "konfiger")
+    Assert.assertEquals(ks1.next()(1), "April 24 2020")
+    Assert.assertEquals(ks1.next()(1), "Multiple Languages")
+  }
+
 }

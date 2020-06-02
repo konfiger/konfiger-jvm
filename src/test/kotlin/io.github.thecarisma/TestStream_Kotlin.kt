@@ -1,7 +1,5 @@
 package io.github.thecarisma
 
-import io.github.thecarisma.InvalidEntryException
-import io.github.thecarisma.KonfigerStream
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -87,4 +85,34 @@ class TestStream_Kotlin {
             Assert.assertFalse(ks.next()[0].startsWith("//"))
         }
     }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Test_String_Stream_Value_Trimming() {
+        val ks = KonfigerStream(" Name =Adewale Azeez :Project = konfiger: Date= April 24 2020 :Language = Multiple Languages", '=', ':')
+        Assert.assertNotEquals(ks.isTrimmingValue, false)
+        Assert.assertTrue(ks.isTrimmingValue)
+        Assert.assertEquals(ks.next()[1], "Adewale Azeez")
+        Assert.assertEquals(ks.next()[1], "konfiger")
+        Assert.assertEquals(ks.next()[1], "April 24 2020")
+        Assert.assertEquals(ks.next()[1], "Multiple Languages")
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Test_String_Stream_Key_Value_Trimming() {
+        val entriesStr = " Name =Adewale Azeez :Project = konfiger: Date= April 24 2020 :Language = Multiple Languages"
+        val ks = KonfigerStream(entriesStr, '=', ':')
+        val ks1 = KonfigerStream(entriesStr, '=', ':')
+        Assert.assertEquals(ks.next()[0], "Name")
+        Assert.assertEquals(ks.next()[0], "Project")
+        Assert.assertEquals(ks.next()[0], "Date")
+        Assert.assertEquals(ks.next()[0], "Language")
+
+        Assert.assertEquals(ks1.next()[1], "Adewale Azeez")
+        Assert.assertEquals(ks1.next()[1], "konfiger")
+        Assert.assertEquals(ks1.next()[1], "April 24 2020")
+        Assert.assertEquals(ks1.next()[1], "Multiple Languages")
+    }
+
 }

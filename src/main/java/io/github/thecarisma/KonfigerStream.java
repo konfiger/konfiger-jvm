@@ -13,7 +13,8 @@ public class KonfigerStream {
     String filePath = "";
     private int readPosition = 0;
     private boolean hasNext_ = false;
-    private boolean trimming = true;
+    private boolean trimmingKey = true;
+    private boolean trimmingValue = true;
     private boolean doneReading_ = false;
     private int i = -1;
     private String commentPrefix = "//";
@@ -58,11 +59,19 @@ public class KonfigerStream {
     }
 
     public boolean isTrimmingKey() {
-        return trimming;
+        return trimmingKey;
     }
 
     public void setTrimmingKey(boolean trimming) {
-        this.trimming = trimming;
+        this.trimmingKey = trimming;
+    }
+
+    public boolean isTrimmingValue() {
+        return trimmingValue;
+    }
+
+    public void setTrimmingValue(boolean trimming) {
+        this.trimmingValue = trimming;
     }
 
     public String getCommentPrefix() {
@@ -213,8 +222,8 @@ public class KonfigerStream {
             }
             ++readPosition;
         }
-        ret[0] = (trimming ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
-        ret[1] = KonfigerUtil.unEscapeString(value.toString(), this.seperator);
+        ret[0] = (trimmingKey ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
+        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.seperator).trim() : KonfigerUtil.unEscapeString(value.toString(), this.seperator));
         return ret;
     }
 
