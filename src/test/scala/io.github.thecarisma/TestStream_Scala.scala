@@ -122,4 +122,31 @@ class TestStream_Scala {
     Assert.assertEquals(ks1.next()(1), "Multiple Languages")
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Read_Multiline_Entry_And_Test_Continuation_Char_In_File_Stream(): Unit = {
+    val ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"))
+    while ( {
+      ks.hasNext
+    }) Assert.assertFalse(ks.next()(1).contains("\n"))
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Read_Multiline_Entry_And_Test_Continuation_Char_In_String_Stream(): Unit = {
+    val ks = new KonfigerStream("Description = This project is the closest thing to Android +\n" +
+      "              [Shared Preference](https://developer.android.com/reference/android/content/SharedPreferences) +\n" +
+      "              in other languages and off the Android platform.\n" + "ProjectName = konfiger\n" +
+      "ProgrammingLanguages = C, C++, C#, Dart, Elixr, Erlang, Go, +\n" +
+      "               Haskell, Java, Kotlin, NodeJS, Powershell, +\n" +
+      "               Python, Ring, Rust, Scala, Visual Basic, +\n" +
+      "               and whatever language possible in the future")
+    ks.setContinuationChar('+')
+    while ( {
+      ks.hasNext
+    }) Assert.assertFalse(ks.next()(1).contains("\n"))
+  }
+
 }

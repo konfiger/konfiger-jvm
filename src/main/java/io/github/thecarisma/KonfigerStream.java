@@ -18,6 +18,7 @@ public class KonfigerStream {
     private boolean doneReading_ = false;
     private int i = -1;
     private String commentPrefix = "//";
+    private char continuationChar = '\\';
     private String patchkey = "";
     int line = 0;
     int column = 0;
@@ -80,6 +81,14 @@ public class KonfigerStream {
 
     public void setCommentPrefix(String commentPrefix) {
         this.commentPrefix = commentPrefix;
+    }
+
+    public char getContinuationChar() {
+        return continuationChar;
+    }
+
+    public void setContinuationChar(char continuationChar) {
+        this.continuationChar = continuationChar;
     }
 
     public boolean hasNext() throws IOException {
@@ -150,6 +159,7 @@ public class KonfigerStream {
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
         boolean parseKey = true;
+        boolean isMultiline = false;
         char prevChar = '\0';
         line |= 1;
 
@@ -160,6 +170,20 @@ public class KonfigerStream {
                 if (c == '\n') {
                     ++line;
                     column = 0;
+                    if (!parseKey && prevChar == this.continuationChar) {
+                        String tmpValue = value.toString();
+                        value = new StringBuilder();
+                        if (tmpValue.charAt(tmpValue.length()-1) == '\r') {
+                            tmpValue = tmpValue.substring(0, tmpValue.length() - 2);
+                        } else {
+                            tmpValue = tmpValue.substring(0, tmpValue.length() - 1);
+                        }
+                        value.append(tmpValue);
+                        do {
+                            c = (char)i;
+                        } while ((i = in.read()) != -1 && (""+c).trim().isEmpty());
+                        isMultiline = true;
+                    }
                 }
                 if (c == this.seperator && prevChar != '/') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
@@ -179,8 +203,14 @@ public class KonfigerStream {
                     key.append(c);
                 } else {
                     value.append(c);
+                    if (isMultiline) {
+                        value.append((char)i);
+                        isMultiline = false;
+                    }
                 }
-                prevChar = c;
+                if (c != '\r') {
+                    prevChar = c;
+                }
             } while ((i = in.read()) != -1);
         } else {
             for (;this.readPosition <= this.strStream.length(); ++this.readPosition) {
@@ -198,6 +228,20 @@ public class KonfigerStream {
                 if (c == '\n') {
                     ++line;
                     column = 0;
+                    if (!parseKey && prevChar == this.continuationChar) {
+                        String tmpValue = value.toString();
+                        value = new StringBuilder();
+                        if (tmpValue.charAt(tmpValue.length()-1) == '\r') {
+                            tmpValue = tmpValue.substring(0, tmpValue.length() - 2);
+                        } else {
+                            tmpValue = tmpValue.substring(0, tmpValue.length() - 1);
+                        }
+                        value.append(tmpValue);
+                        do {
+                            ++this.readPosition;
+                            c = this.strStream.charAt(this.readPosition);
+                        } while((""+c).trim().isEmpty());
+                    }
                 }
                 if (c == this.seperator && prevChar != '/') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
@@ -218,7 +262,9 @@ public class KonfigerStream {
                 } else {
                     value.append(c);
                 }
-                prevChar = c;
+                if (c != '\r') {
+                    prevChar = c;
+                }
             }
             ++readPosition;
         }
