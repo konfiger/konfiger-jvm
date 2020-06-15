@@ -1,14 +1,11 @@
 package io.github.thecarisma;
 
-import io.github.thecarisma.InvalidEntryException;
-import io.github.thecarisma.KonfigerStream;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class TestStream_Java {
 
