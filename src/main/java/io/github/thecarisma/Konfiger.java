@@ -130,6 +130,7 @@ public class Konfiger {
                 }
                 Field f = attachedResolveObj.getClass().getDeclaredField(findKey);
                 if (f.getType() == String.class) {
+                    f.setAccessible(true); // kotlin is a knuckle head here
                     f.set(attachedResolveObj, value);
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -561,6 +562,7 @@ public class Konfiger {
                     findKey = f.getName();
                 }
                 if (contains(findKey)) {
+                    f.setAccessible(true); // kotlin is a knuckle head here
                     f.set(object, get(findKey));
                 }
 
@@ -587,6 +589,7 @@ public class Konfiger {
 
                     findKey = f.getName();
                 }
+                f.setAccessible(true); // kotlin is a knuckle head here
                 Object v = f.get(object);
                 this.konfigerObjects.put(findKey, v.toString());
             }
