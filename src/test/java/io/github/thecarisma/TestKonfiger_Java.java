@@ -221,4 +221,25 @@ public class TestKonfiger_Java {
         Assert.assertEquals(kon.size(), 2);
     }
 
+    @Test
+    public void Test_Contains_With_Lazy_Load() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        ks.setCommentPrefix("[");
+        Konfiger kon = new Konfiger(ks, true);
+
+        Assert.assertTrue(kon.contains("File"));
+        Assert.assertTrue(kon.contains("Project"));
+        Assert.assertTrue(kon.contains("Author"));
+    }
+
+    @Test
+    public void Read_Multiline_Entry_From_File_Stream() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        Konfiger kon = new Konfiger(ks, true);
+
+        Assert.assertTrue(kon.getString("ProgrammingLanguages").indexOf("Kotlin, NodeJS, Powershell, Python, Ring, Rust") > 0);
+        Assert.assertEquals(kon.get("ProjectName"), "konfiger");
+        Assert.assertTrue(kon.getString("Description").endsWith(" in other languages and off the Android platform."));
+    }
+
 }

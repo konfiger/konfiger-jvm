@@ -60,6 +60,10 @@ public class Konfiger {
         this(new KonfigerStream(file, '=', '\n', false), lazyLoad);
     }
 
+    public Konfiger(KonfigerStream konfigerStream) throws IOException, InvalidEntryException {
+        this(konfigerStream, true);
+    }
+
     public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad) throws IOException, InvalidEntryException {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
@@ -70,15 +74,6 @@ public class Konfiger {
         if (!this.lazyLoad) {
             this.lazyLoader();
         }
-    }
-
-    public Konfiger(KonfigerStream konfigerStream) throws IOException, InvalidEntryException {
-        this.stream = konfigerStream;
-        this.filePath = konfigerStream.filePath;
-        this.seperator = konfigerStream.seperator;
-        this.delimeter = konfigerStream.delimeter;
-
-        this.lazyLoader();
     }
 
     public void put(String key, Object value) {
@@ -100,13 +95,13 @@ public class Konfiger {
     }
 
     public void putString(String key, String value) {
-        if (lazyLoad && !loadingEnds && contains(key)) {
+        if (lazyLoad && !loadingEnds && konfigerObjects.containsKey(key)) {
             String _value = getString(key);
             if (_value.equals(value)) {
                 return;
             }
         }
-        if (!contains(key)) {
+        if (!konfigerObjects.containsKey(key)) {
             if (konfigerObjects.size() == MAX_CAPACITY) {
                 try {
                     throw new MaxCapacityException();
@@ -151,31 +146,11 @@ public class Konfiger {
                 return prevCachedObject[1];
             }
         }
-        if (!contains(key) && lazyLoad) {
-            if (!loadingEnds) {
-                try {
-                    while (stream.hasNext()) {
-                        String[] obj = stream.next();
-                        putString(obj[0], obj[1]);
-                        changesOccur = true;
-                        if (obj[0].equals(key)) {
-                            if (enableCache_) {
-                                shiftCache(obj[0], obj[1]);
-                            }
-                            return obj[1];
-                        }
-                    }
-                    loadingEnds = true;
-                } catch (IOException | InvalidEntryException ex) {
-                    if (!stream.errTolerance) {
-                        ex.printStackTrace();
-                    }
-                    return null;
-                }
-            }
+        if (!contains(key)) {
+            return null;
         }
         String value = konfigerObjects.get(key);
-        if (enableCache_ && konfigerObjects.containsKey(key)) {
+        if (enableCache_) {
             shiftCache(key, value);
         }
         return value;
@@ -357,7 +332,31 @@ public class Konfiger {
     }
 
     public boolean contains(String key) {
-        return konfigerObjects.containsKey(key);
+        if (konfigerObjects.containsKey(key)) {
+            return true;
+        }
+        if (!loadingEnds && this.lazyLoad) {
+            try {
+                while (stream.hasNext()) {
+                    String[] obj = stream.next();
+                    putString(obj[0], obj[1]);
+                    changesOccur = true;
+                    if (obj[0].equals(key)) {
+                        if (enableCache_) {
+                            shiftCache(obj[0], obj[1]);
+                        }
+                        return true;
+                    }
+                }
+                loadingEnds = true;
+            } catch (IOException | InvalidEntryException ex) {
+                if (!stream.errTolerance) {
+                    ex.printStackTrace();
+                }
+                return false;
+            }
+        }
+        return false;
     }
 
     public void clear() {
