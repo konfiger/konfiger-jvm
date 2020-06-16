@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -511,6 +514,33 @@ public class Konfiger {
         prevCachedObject[1] = currentCachedObject[1];
         currentCachedObject[0] = key;
         currentCachedObject[1] = value;
+    }
+
+    public void resolve(Object object) throws IllegalAccessException, InvocationTargetException {
+        Method matchGetKey = null;
+        Method[] methods = object.getClass().getDeclaredMethods();
+        Field[] fields = object.getClass().getDeclaredFields();
+        for(Method method : methods){
+            if (method.getName().equals("matchGetKey")) {
+                matchGetKey = method;
+            }
+        }
+        for(Field f : fields){
+            Object v = f.get(object); // for put
+            if (f.getType() == String.class) {
+                String findKey = "";
+                if (matchGetKey == null ||
+                        ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
+                                findKey.equals(""))) {
+
+                    findKey = f.getName();
+                }
+                if (contains(findKey)) {
+                    f.set(object, get(findKey));
+                }
+
+            }
+        }
     }
 
 }
