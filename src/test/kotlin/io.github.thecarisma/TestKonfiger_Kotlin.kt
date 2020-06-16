@@ -213,4 +213,25 @@ class TestKonfiger_Kotlin {
         }
         Assert.assertEquals(kon.size().toLong(), 2)
     }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Test_Contains_With_Lazy_Load() {
+        val ks = KonfigerStream(File("src/test/resources/test.comment.inf"))
+        ks.commentPrefix = "["
+        val kon = Konfiger(ks, true)
+        Assert.assertTrue(kon.contains("File"))
+        Assert.assertTrue(kon.contains("Project"))
+        Assert.assertTrue(kon.contains("Author"))
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Read_Multiline_Entry_From_File_Stream() {
+        val ks = KonfigerStream(File("src/test/resources/test.contd.conf"))
+        val kon = Konfiger(ks, true)
+        Assert.assertTrue(kon.getString("ProgrammingLanguages").indexOf("Kotlin, NodeJS, Powershell, Python, Ring, Rust") > 0)
+        Assert.assertEquals(kon["ProjectName"], "konfiger")
+        Assert.assertTrue(kon.getString("Description").endsWith(" in other languages and off the Android platform."))
+    }
 }

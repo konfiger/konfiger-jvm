@@ -27,6 +27,7 @@ public class Konfiger {
     private char delimeter = '=';
     private char seperator = '\n';
     private String stringValue = "";
+    private Object attachedResolveObj;
 
     public Konfiger(String rawString, boolean lazyLoad, char delimeter, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
         this(new KonfigerStream(rawString, delimeter, seperator, errTolerance), lazyLoad);
@@ -111,6 +112,32 @@ public class Konfiger {
             }
         }
         konfigerObjects.put(key, value);
+        if (attachedResolveObj != null) {
+            Method matchPutKey = null;
+            Method[] methods = attachedResolveObj.getClass().getDeclaredMethods();
+            for(Method method : methods){
+                if (method.getName().equals("matchPutKey")) {
+                    matchPutKey = method;
+                }
+            }
+            String findKey = "";
+            try {
+                if (matchPutKey == null ||
+                        ((findKey = (String) matchPutKey.invoke(attachedResolveObj, key)) == null ||
+                                findKey.equals(""))) {
+
+                    findKey = key;
+                }
+                Field f = attachedResolveObj.getClass().getDeclaredField(findKey);
+                if (f.getType() == String.class) {
+                    f.set(attachedResolveObj, value);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                if (!stream.errTolerance) {
+                    e.printStackTrace();
+                }
+            } catch (NoSuchFieldException ignored) { }
+        }
         changesOccur = true;
         if (enableCache_) {
             shiftCache(key, value);
@@ -525,7 +552,6 @@ public class Konfiger {
             }
         }
         for(Field f : fields){
-            Object v = f.get(object); // for put
             if (f.getType() == String.class) {
                 String findKey = "";
                 if (matchGetKey == null ||
@@ -540,6 +566,37 @@ public class Konfiger {
 
             }
         }
+        this.attachedResolveObj = object;
+    }
+
+    public void dissolve(Object object) throws IllegalAccessException, InvocationTargetException {
+        Method matchGetKey = null;
+        Method[] methods = object.getClass().getDeclaredMethods();
+        Field[] fields = object.getClass().getDeclaredFields();
+        for(Method method : methods){
+            if (method.getName().equals("matchGetKey")) {
+                matchGetKey = method;
+            }
+        }
+        for(Field f : fields){
+            if (f.getType() == String.class) {
+                String findKey = "";
+                if (matchGetKey == null ||
+                        ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
+                                findKey.equals(""))) {
+
+                    findKey = f.getName();
+                }
+                Object v = f.get(object);
+                this.konfigerObjects.put(findKey, v.toString());
+            }
+        }
+    }
+
+    public Object detach() {
+        Object tmpObj = attachedResolveObj;
+        attachedResolveObj = null;
+        return tmpObj;
     }
 
 }

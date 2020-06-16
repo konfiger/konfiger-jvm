@@ -222,4 +222,27 @@ class TestKonfiger_Scala {
     Assert.assertEquals(kon.size, 2)
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Test_Contains_With_Lazy_Load(): Unit = {
+    val ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
+    ks.setCommentPrefix("[")
+    val kon = new Konfiger(ks, true)
+    Assert.assertTrue(kon.contains("File"))
+    Assert.assertTrue(kon.contains("Project"))
+    Assert.assertTrue(kon.contains("Author"))
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Read_Multiline_Entry_From_File_Stream(): Unit = {
+    val ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"))
+    val kon = new Konfiger(ks, true)
+    Assert.assertTrue(kon.getString("ProgrammingLanguages").indexOf("Kotlin, NodeJS, Powershell, Python, Ring, Rust") > 0)
+    Assert.assertEquals(kon.get("ProjectName"), "konfiger")
+    Assert.assertTrue(kon.getString("Description").endsWith(" in other languages and off the Android platform."))
+  }
+
 }

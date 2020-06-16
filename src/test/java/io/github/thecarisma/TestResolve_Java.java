@@ -4,20 +4,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 public class TestResolve_Java {
 
-    class TextsFlat {
+    static class TextsFlat {
         String project;
         String author;
         String Platform;
         String File;
     }
 
-    class Texts {
+    static class Texts {
         String project;
         String author;
         String Platform;
@@ -48,7 +47,14 @@ public class TestResolve_Java {
         }
     }
 
-    @Test(expected = IllegalAccessException.class)
+    static class Entries {
+        String project = "konfiger";
+        String author = "Adewale Azeez";
+        String platform = "Cross Platform";
+        String file = "test.comment.inf";
+    }
+
+    @Test
     public void Invalid_Argument_Type_To_Konfiger_Resolve() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
         Konfiger kon = new Konfiger(new File("src/test/resources/test.comment.inf"), true);
         kon.resolve(123);
@@ -108,6 +114,46 @@ public class TestResolve_Java {
 
         kon.put("author", "Adewale");
         Assert.assertEquals(texts.author, "Adewale");
+    }
+
+    @Test
+    public void Dissolve_An_Object_Into_Konfiger() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(new Entries());
+
+        Assert.assertEquals(kon.get("project"), "konfiger");
+        Assert.assertEquals(kon.get("platform"), "Cross Platform");
+        Assert.assertEquals(kon.get("file"), "test.comment.inf");
+        Assert.assertEquals(kon.get("author"), "Adewale Azeez");
+    }
+
+    @Test
+    public void Detach_An_Object_From_Konfiger() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        Texts texts = new Texts();
+        KonfigerStream kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        kStream.setCommentPrefix("[");
+        Konfiger kon = new Konfiger(kStream);
+        kon.resolve(texts);
+
+        Assert.assertEquals(texts.project, "konfiger");
+        Assert.assertEquals(texts.Platform, "Cross Platform");
+        Assert.assertEquals(texts.file, "test.comment.inf");
+        Assert.assertEquals(texts.author, "Adewale Azeez");
+        Assert.assertEquals(texts, kon.detach());
+
+        kon.put("Project", "konfiger-nodejs");
+        kon.put("Platform", "Windows, Linux, Mac, Raspberry");
+        kon.put("author", "Thecarisma");
+
+        Assert.assertNotEquals(texts.project, "konfiger-nodejs");
+        Assert.assertFalse(texts.Platform.contains("Windows"));
+        Assert.assertFalse(texts.Platform.contains("Linux"));
+        Assert.assertFalse(texts.Platform.contains("Mac"));
+        Assert.assertFalse(texts.Platform.contains("Raspberry"));
+        Assert.assertNotEquals(texts.author, "Thecarisma");
+
+        kon.put("author", "Adewale");
+        Assert.assertNotEquals(texts.author, "Adewale");
     }
 
 }
