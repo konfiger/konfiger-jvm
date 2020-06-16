@@ -6,45 +6,45 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
-class TextsFlat {
-    var project: String? = null
-    var author: String? = null
-    var Platform: String? = null
-    var File: String? = null
-}
-
-class Texts {
-    var project: String? = null
-    var author: String? = null
-    var Platform: String? = null
-    var file: String? = null
-    fun matchGetKey(key: String?): String {
-        when (key) {
-            "project" -> return "Project"
-            "author" -> return "Author"
-            "file" -> return "File"
-        }
-        return ""
-    }
-
-    fun matchPutKey(key: String?): String {
-        when (key) {
-            "Project" -> return "project"
-            "Author" -> return "author"
-            "File" -> return "file"
-        }
-        return ""
-    }
-}
-
-class Entries {
-    var project = "konfiger"
-    var author = "Adewale Azeez"
-    var platform = "Cross Platform"
-    var file = "test.comment.inf"
-}
-
 class TestResolve_Kotlin {
+
+    internal class TextsFlat {
+        var project: String? = null
+        var author: String? = null
+        var Platform: String? = null
+        var File: String? = null
+    }
+
+    internal class Texts {
+        var project: String? = null
+        var author: String? = null
+        var Platform: String? = null
+        var file: String? = null
+        fun matchGetKey(key: String?): String {
+            when (key) {
+                "project" -> return "Project"
+                "author" -> return "Author"
+                "file" -> return "File"
+            }
+            return ""
+        }
+
+        fun matchPutKey(key: String?): String {
+            when (key) {
+                "Project" -> return "project"
+                "Author" -> return "author"
+                "File" -> return "file"
+            }
+            return ""
+        }
+    }
+
+    internal class Entries {
+        var project = "konfiger"
+        var author = "Adewale Azeez"
+        var platform = "Cross Platform"
+        var file = "test.comment.inf"
+    }
 
     @Test
     @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
