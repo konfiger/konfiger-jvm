@@ -118,6 +118,7 @@ public class Konfiger {
             for(Method method : methods){
                 if (method.getName().equals("matchPutKey")) {
                     matchPutKey = method;
+                    matchPutKey.setAccessible(true);
                 }
             }
             String findKey = "";
@@ -550,6 +551,7 @@ public class Konfiger {
         for(Method method : methods){
             if (method.getName().equals("matchGetKey")) {
                 matchGetKey = method;
+                matchGetKey.setAccessible(true);
             }
         }
         for(Field f : fields){
@@ -578,6 +580,7 @@ public class Konfiger {
         for(Method method : methods){
             if (method.getName().equals("matchGetKey")) {
                 matchGetKey = method;
+                matchGetKey.setAccessible(true);
             }
         }
         for(Field f : fields){

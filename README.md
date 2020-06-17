@@ -352,7 +352,7 @@ public class Test_Java {
         String author;
     }
     public static void main(String[] args) throws IOException, InvalidEntryException, InvocationTargetException, IllegalAccessException {
-        
+
         Properties properties = new Properties();
         Konfiger konfiger = new Konfiger(new File("test/properties.conf"), true);
         konfiger.resolve(properties);
@@ -370,18 +370,24 @@ public class Test_Java {
 The following snippet reads the value of a javascript object into the konfiger object, the object is not attached to konfiger unlike resolve function.
 
 ```java
-const { Konfiger } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
-var properties = {
-    project: "konfiger",
-    author: "Adewale"
+public class Test_Java {
+    static class Properties {
+        String project = "konfiger";
+        String author = "Adewale";
+    }
+    public static void main(String[] args) throws IOException, InvalidEntryException, InvocationTargetException, IllegalAccessException {
+        Properties properties = new Properties();
+        Konfiger konfiger = new Konfiger("");
+        konfiger.dissolve(properties);
+
+        System.out.println(konfiger.get("project")); // konfiger
+        System.out.println(konfiger.get("author")); // Adewale Azeez
+    }
 }
-
-var kon = Konfiger.fromString('')
-kon.dissolve(properties)
-
-console.log(kon.get("project")) // konfiger
-console.log(kon.get("author")) // Adewale Azeez
 ```
 
 ### Multiline value
@@ -390,7 +396,7 @@ Konfiger stream allow multiline value. If the line ends with `\` the next line w
 
 for the file test.contd.conf
 
-```java
+```
 Description = This project is the closest thing to Android +
               Shared Preference in other languages +
               and off the Android platform.
@@ -398,12 +404,18 @@ ProjectName = konfiger
 ```
 
 ```java
-const { KonfigerStream } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
 
-var ks = KonfigerStream.fileStream("test.contd.conf")
-ks.setContinuationChar('+')
-console.log(ks.next()[1])
-console.log(ks.next()[1])
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("test/test.contd.conf"));
+        ks.setContinuationChar('+');
+
+        System.out.println(ks.next()[1]);
+        System.out.println(ks.next()[1]);
+    }
+}
 ```
 
 ## Native Object Attachement
@@ -416,7 +428,7 @@ In a case where the object keys are different from the entries keys in the konfi
 
 For the file English.lang
 
-```java
+```
 LoginTitle = Login Page
 AgeInstruction = You must me 18 years or above to register
 NewsletterOptin = Signup for our weekly news letter
@@ -425,33 +437,53 @@ NewsletterOptin = Signup for our weekly news letter
 For an object which as the same key as the konfiger entries above there is no need to declare the matchGetKey or matchPutKey in the object. Resolve example
 
 ```java
-const { Konfiger } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
-var pageProps = {
-    LoginTitle: "",
-    AgeInstruction: "",
-    NewsletterOptin: ""
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+        
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger(new File("test/English.lang"));
+        kon.resolve(pageProps);
+        System.out.println(pageProps.toString());
+    }
+    static class PageProps {
+        String LoginTitle;
+        String AgeInstruction;
+        String NewsletterOptin;
+        @Override public String toString() {
+            return "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction +
+                    ",NewsletterOptin=" + NewsletterOptin;
+        }
+    }
 }
-
-var kon = Konfiger.fromFile('English.lang')
-kon.resolve(pageProps)
-console.log(pageProps)
 ```
 
 Dissolve example
 
 ```java
-const { Konfiger } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
-var pageProps = {
-    LoginTitle: "Login Page",
-    AgeInstruction: "You must me 18 years or above to register",
-    NewsletterOptin: "Signup for our weekly news letter"
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(pageProps);
+        System.out.println(kon);
+    }
+    static class PageProps {
+        String LoginTitle = "Login Page";
+        String AgeInstruction = "You must me 18 years or above to register";
+        String NewsletterOptin = "Signup for our weekly news letter";
+    }
 }
-
-var kon = Konfiger.fromString('')
-kon.dissolve(pageProps)
-console.log(kon.toString())
 ```
 
 ### matchGetKey
@@ -459,25 +491,37 @@ console.log(kon.toString())
 If the identifier in the object keys does not match the above entries key the object will not be resolved. For example loginTitle does not match LoginTitle, the matchGetKey can be used to map the variable key to the konfiger entry key. The following example map the object key to konfiger entries key.
 
 ```java
-const { Konfiger } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
-var pageProps = {
-    loginTitle: "",
-    ageInstruct: "",
-    NewsletterOptin: "",
-    matchGetKey: function(key) {
-        switch (key) {
-            case "loginTitle":
-                return "LoginTitle"
-            case "ageInstruct":
-                return "AgeInstruction"
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger(new File("test/English.lang"));
+        kon.resolve(pageProps);
+        System.out.println(pageProps.toString());
+    }
+    static class PageProps {
+        String loginTitle;
+        String ageInstruct;
+        String NewsletterOptin;
+        String matchGetKey(String key) {
+            if ("loginTitle".equals(key)) {
+                return "LoginTitle";
+            } else if ("ageInstruct".equals(key)) {
+                return "AgeInstruction";
+            }
+            return "";
+        }
+        @Override public String toString() {
+            return "loginTitle=" + loginTitle + ",ageInstruct=" + ageInstruct +
+                    ",NewsletterOptin=" + NewsletterOptin;
         }
     }
 }
-
-var kon = Konfiger.fromFile('English.lang')
-kon.resolve(pageProps)
-console.log(pageProps)
 ```
 
 The way the above code snippet works is that when iterating the object keys if check if the function matchGetKey is present in the object if it is present the key is sent as parameter to the matchGetKey and the returned value is used to get the value from konfiger, if the matchGetKey does not return anything the object key is used to get the value from konfiger (as in the case of NewsletterOptin).
@@ -487,25 +531,33 @@ The way the above code snippet works is that when iterating the object keys if c
 For dissolving an object the method matchGetKey is invoked to find the actual key to use to add the entry in konfiger, if the object does not declare the matchGetKey function the entries will be added to konfiger as it is declared. The following example similar to the one above but dissolves an object into konfiger.
 
 ```java
-const { Konfiger } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
-var pageProps = {
-    loginTitle: "Login Page",
-    ageInstruct: "You must me 18 years or above to register",
-    NewsletterOptin: "Signup for our weekly news letter",
-    matchGetKey: function(key) {
-        switch (key) {
-            case "loginTitle":
-                return "LoginTitle"
-            case "ageInstruct":
-                return "AgeInstruction"
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(pageProps);
+        System.out.println(kon);
+    }
+    static class PageProps {
+        String loginTitle = "Login Page";
+        String ageInstruct = "You must me 18 years or above to register";
+        String NewsletterOptin = "Signup for our weekly news letter";
+        String matchGetKey(String key) {
+            if ("loginTitle".equals(key)) {
+                return "LoginTitle";
+            } else if ("ageInstruct".equals(key)) {
+                return "AgeInstruction";
+            }
+            return "";
         }
     }
 }
-
-var kon = Konfiger.fromFile('English.lang')
-kon.dissolve(pageProps)
-console.log(kon.toString())
 ```
 
 ### matchPutKey
@@ -513,31 +565,38 @@ console.log(kon.toString())
 The matchPutKey is invoked when an entry value is changed or when a new entry is added to konfiger. The matchPutKey is invoked with the new entry key and checked in the object matchPutKey (if decalred), the returned value is what is set in the object. E.g. if an entry `[Name, Thecarisma]` is added to konfiger the object matchPutKey is invoked with the parameter `Name` the returned value is used to set the corresponding object entry. 
 
 ```java
-const { Konfiger } = require("konfiger")
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
-var pageProps = {
-    loginTitle: "",
-    ageInstruct: "",
-    NewsletterOptin: "",
-    matchPutKey: function(key) {
-        switch (key) {
-            case "LoginTitle":
-                return "loginTitle"
-            case "AgeInstruction":
-                return "ageInstruct"
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.resolve(pageProps);
+
+        kon.put("LoginTitle", "Login Page");
+        kon.put("AgeInstruction", "You must me 18 years or above to register");
+        kon.put("NewsletterOptin", "Signup for our weekly news letter");
+        System.out.println(pageProps.loginTitle);
+        System.out.println(pageProps.ageInstruct);
+        System.out.println(pageProps.NewsletterOptin);
+    }
+    static class PageProps {
+        String loginTitle;
+        String ageInstruct;
+        String NewsletterOptin;
+        String matchPutKey(String key) {
+            if ("LoginTitle".equals(key)) {
+                return "loginTitle";
+            } else if ("AgeInstruction".equals(key)) {
+                return "ageInstruct";
+            }
+            return "";
         }
     }
 }
-
-var kon = Konfiger.fromString('')
-kon.resolve(pageProps)
-
-kon.put("LoginTitle", "Login Page")
-kon.put("AgeInstruction", "You must me 18 years or above to register")
-kon.put("NewsletterOptin", "Signup for our weekly news letter")
-console.log(pageProps.loginTitle)
-console.log(pageProps.ageInstruct)
-console.log(pageProps.NewsletterOptin)
 ```
 
 Konfiger does not create new entry in an object it just set existing values. Konfiger only change the value in an object if the key is defined
