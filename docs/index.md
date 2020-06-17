@@ -20,6 +20,18 @@ ___
     - [Seperator and delimeter](#seperator-and-delimeter)
     - [Read file with Stream](#read-file-with-stream)
     - [Read String with Stream](#read-string-with-stream)
+    - [Skip Comment entries](#Skip-comment-entries)
+    - [Resolve Object](#resolve-object)
+    - [Dissolve Object](#dissolve-object)
+    - [Multiline value](#multiline-value)
+- [Native Object Attachement](#native-object-attachement)
+    - [matchGetKey](#matchgetkey)
+    - [matchPutKey](#matchputkey)
+- [API Documentations](#api-documentations)
+    - [KonfigerStream](#konfigerstream)
+    - [Konfiger](#konfiger)
+        - [Fields](#fields)
+        - [Functions](#functions)
 - [Usage](#usage)
 	- [Initialization](#initialization)
 	- [Inserting](#inserting)
@@ -27,11 +39,6 @@ ___
 	- [Updating](#updating)
 	- [Removing](#removing)
     - [Saving to disk](#saving-to-disk)
-- [API Documentations](#api-documentations)
-    - [KonfigerStream](#konfigerstream)
-    - [Konfiger](#konfiger)
-        - [Fields](#fields)
-        - [Functions](#functions)
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [Support](#support)
@@ -323,6 +330,282 @@ public class Test_Java {
 }
 ```
 
+### Resolve Object
+
+The example below attach a javascript object to a konfiger object, whenever the value of the konfiger object changes the attached object entries is also updated.
+
+For the file properties.conf
+
+```
+project = konfiger
+author = Adewale Azeez
+```
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    static class Properties {
+        String project;
+        String author;
+    }
+    public static void main(String[] args) throws IOException, InvalidEntryException, InvocationTargetException, IllegalAccessException {
+
+        Properties properties = new Properties();
+        Konfiger konfiger = new Konfiger(new File("test/properties.conf"), true);
+        konfiger.resolve(properties);
+
+        System.out.println(properties.project); // konfiger
+        System.out.println(properties.author); // Adewale Azeez
+        konfiger.put("project", "konfiger-nodejs");
+        System.out.println(properties.project); // konfiger-nodejs
+    }
+}
+```
+
+### Dissolve Object
+
+The following snippet reads the value of a javascript object into the konfiger object, the object is not attached to konfiger unlike resolve function.
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    static class Properties {
+        String project = "konfiger";
+        String author = "Adewale";
+    }
+    public static void main(String[] args) throws IOException, InvalidEntryException, InvocationTargetException, IllegalAccessException {
+        Properties properties = new Properties();
+        Konfiger konfiger = new Konfiger("");
+        konfiger.dissolve(properties);
+
+        System.out.println(konfiger.get("project")); // konfiger
+        System.out.println(konfiger.get("author")); // Adewale Azeez
+    }
+}
+```
+
+### Multiline value
+
+Konfiger stream allow multiline value. If the line ends with `\` the next line will be parse as the continuation and the leading spaces will be trimmed. The continuation character chan be changed like the example below the continuation character is changed from `\` to `+`.
+
+for the file test.contd.conf
+
+```
+Description = This project is the closest thing to Android +
+              Shared Preference in other languages +
+              and off the Android platform.
+ProjectName = konfiger
+```
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("test/test.contd.conf"));
+        ks.setContinuationChar('+');
+
+        System.out.println(ks.next()[1]);
+        System.out.println(ks.next()[1]);
+    }
+}
+```
+
+## Native Object Attachement
+
+This feature of the project allow seamless integration with the konfiger entries by eliminating the need for writing `Konfiger.get*("")` everytime to read a value into a variable or writing lot of `Konfiger.put*()` to add an entry. 
+
+The two function `resolve` is used to attach an object. resolve function integrate the object such that the entries in konfiger will be assigned to the matching key in the object. See the [resolve](#object-attachement-get) and [dissolve](#object-attachement-put) examples above.
+
+In a case where the object keys are different from the entries keys in the konfiger object the function `matchGetKey` can be declared in the object to match the key when setting the object entries values, and the function `matchPutKey` is called when setting the konfiger entries from the object.
+
+For the file English.lang
+
+```
+LoginTitle = Login Page
+AgeInstruction = You must me 18 years or above to register
+NewsletterOptin = Signup for our weekly news letter
+```
+
+For an object which as the same key as the konfiger entries above there is no need to declare the matchGetKey or matchPutKey in the object. Resolve example
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+        
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger(new File("test/English.lang"));
+        kon.resolve(pageProps);
+        System.out.println(pageProps.toString());
+    }
+    static class PageProps {
+        String LoginTitle;
+        String AgeInstruction;
+        String NewsletterOptin;
+        @Override public String toString() {
+            return "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction +
+                    ",NewsletterOptin=" + NewsletterOptin;
+        }
+    }
+}
+```
+
+Dissolve example
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(pageProps);
+        System.out.println(kon);
+    }
+    static class PageProps {
+        String LoginTitle = "Login Page";
+        String AgeInstruction = "You must me 18 years or above to register";
+        String NewsletterOptin = "Signup for our weekly news letter";
+    }
+}
+```
+
+### matchGetKey
+
+If the identifier in the object keys does not match the above entries key the object will not be resolved. For example loginTitle does not match LoginTitle, the matchGetKey can be used to map the variable key to the konfiger entry key. The following example map the object key to konfiger entries key.
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger(new File("test/English.lang"));
+        kon.resolve(pageProps);
+        System.out.println(pageProps.toString());
+    }
+    static class PageProps {
+        String loginTitle;
+        String ageInstruct;
+        String NewsletterOptin;
+        String matchGetKey(String key) {
+            if ("loginTitle".equals(key)) {
+                return "LoginTitle";
+            } else if ("ageInstruct".equals(key)) {
+                return "AgeInstruction";
+            }
+            return "";
+        }
+        @Override public String toString() {
+            return "loginTitle=" + loginTitle + ",ageInstruct=" + ageInstruct +
+                    ",NewsletterOptin=" + NewsletterOptin;
+        }
+    }
+}
+```
+
+The way the above code snippet works is that when iterating the object keys if check if the function matchGetKey is present in the object if it is present the key is sent as parameter to the matchGetKey and the returned value is used to get the value from konfiger, if the matchGetKey does not return anything the object key is used to get the value from konfiger (as in the case of NewsletterOptin).
+
+> During the resolve or dissolve process if the entry value is function it is skipped even if it key matches
+
+For dissolving an object the method matchGetKey is invoked to find the actual key to use to add the entry in konfiger, if the object does not declare the matchGetKey function the entries will be added to konfiger as it is declared. The following example similar to the one above but dissolves an object into konfiger.
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(pageProps);
+        System.out.println(kon);
+    }
+    static class PageProps {
+        String loginTitle = "Login Page";
+        String ageInstruct = "You must me 18 years or above to register";
+        String NewsletterOptin = "Signup for our weekly news letter";
+        String matchGetKey(String key) {
+            if ("loginTitle".equals(key)) {
+                return "LoginTitle";
+            } else if ("ageInstruct".equals(key)) {
+                return "AgeInstruction";
+            }
+            return "";
+        }
+    }
+}
+```
+
+### matchPutKey
+
+The matchPutKey is invoked when an entry value is changed or when a new entry is added to konfiger. The matchPutKey is invoked with the new entry key and checked in the object matchPutKey (if decalred), the returned value is what is set in the object. E.g. if an entry `[Name, Thecarisma]` is added to konfiger the object matchPutKey is invoked with the parameter `Name` the returned value is used to set the corresponding object entry. 
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.resolve(pageProps);
+
+        kon.put("LoginTitle", "Login Page");
+        kon.put("AgeInstruction", "You must me 18 years or above to register");
+        kon.put("NewsletterOptin", "Signup for our weekly news letter");
+        System.out.println(pageProps.loginTitle);
+        System.out.println(pageProps.ageInstruct);
+        System.out.println(pageProps.NewsletterOptin);
+    }
+    static class PageProps {
+        String loginTitle;
+        String ageInstruct;
+        String NewsletterOptin;
+        String matchPutKey(String key) {
+            if ("LoginTitle".equals(key)) {
+                return "loginTitle";
+            } else if ("AgeInstruction".equals(key)) {
+                return "ageInstruct";
+            }
+            return "";
+        }
+    }
+}
+```
+
+Konfiger does not create new entry in an object it just set existing values. Konfiger only change the value in an object if the key is defined
+
+> Warning!!!
+The values resolved is not typed so if the entry initial value is an integer the resolved value will be a string. All resolved value is string, you will need to do the type conversion by your self.
+
+If your entry keys is the same as the object keys you don't need to declare the matchGetKey or matchPutKey function in the object.
+
 ## Usage
 
 ### Initialization
@@ -463,7 +746,9 @@ konfiger.save();
 | public boolean isTrimmingValue() | Check if the stream is configured to trim entry value, true by default
 | public void setTrimmingValue(boolean trimming) | Change the stream to enable/disable entry value trimming
 | public String getCommentPrefix() | Get the prefix string that indicate a pair entry if commented
-| public void setCommentPrefix(String commentPrefix) | Change the stream comment prefix, any entry starting with the comment prefix will be skipped. Comment in KonfigerStream is relative to the key value entry and not relative to a line.
+| public void setCommentPrefix(String commentPrefix) | Change the stream comment prefix, any entry starting with the comment prefix will be skipped. Comment in KonfigerStream is relative to the key value entry and not relative to a line.he key value entry and not relative to a line.
+| public void setContinuationChar(char continuationChar) | Set the character that indicates to the stream to continue reading for the entry value on the next line. The follwoing line leading spaces is trimmed. The default is `\`
+| public char getContinuationChar() | Get the continuation character used in the stream.
 
 ### Konfiger
 
@@ -519,6 +804,9 @@ konfiger.save();
 | public void errorTolerance(boolean errTolerance)           | Enable or disable the error tolerancy property of the konfiger, if enabled no exception will be throw even when it suppose to there for it a bad idea but useful in a fail safe environment.
 | public boolean isErrorTolerant() | Check if the konfiger object errTolerance is set to true.
 | @Override public String toString()           | All the kofiger datas are parsed into valid string with regards to the delimeter and seprator, the result of this method is what get written to file in the `save` method. The result is cached and calling the method while the no entry is added, deleted or updated just return the last result instead of parsing the entries again.
+| public void resolve(Object object) throws IllegalAccessException, InvocationTargetException           | Attach an object to konfiger, on attachment the values of the entries in the object will be set to the coresponding value in konfiger. The object can have the `matchGetKey` function which is called with a key in konfiger to get the value to map to the entry and the function `matchPutKey` to check which value to fetch from the object to put into konfiger.
+| public void dissolve(Object object) throws IllegalAccessException, InvocationTargetException | Each string fields in the object will be put into konfiger. The object can have the `matchGetKey` function which is called with a key in konfiger to get the value to map to the entry. This does not attach the object.
+| public Object detach() | Detach the object attached to konfiger when the resolve function is called. The detached object is returned.
 
 ## How it works
 

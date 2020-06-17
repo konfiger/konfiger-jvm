@@ -20,6 +20,14 @@ ___
     - [Seperator and delimeter](#seperator-and-delimeter)
     - [Read file with Stream](#read-file-with-stream)
     - [Read String with Stream](#read-string-with-stream)
+    - [Skip Comment entries](#Skip-comment-entries)
+    - [Resolve Object](#resolve-object)
+    - [Dissolve Object](#dissolve-object)
+    - [Multiline value](#multiline-value)
+- [Native Object Attachement](#native-object-attachement)
+    - [matchGetKey](#matchgetkey)
+    - [matchPutKey](#matchputkey)
+- [API Documentations](#api-documentations)
 - [Usage](#usage)
 	- [Initialization](#initialization)
 	- [Inserting](#inserting)
@@ -27,7 +35,6 @@ ___
 	- [Updating](#updating)
 	- [Removing](#removing)
     - [Saving to disk](#saving-to-disk)
-- [API Documentations](#api-documentations)
 - [How it works](#how-it-works)
 - [Contributing](#contributing)
 - [Support](#support)
@@ -339,6 +346,334 @@ object Test_Kotlin {
     }
 }
 ```
+
+### Resolve Object
+
+The example below attach a javascript object to a konfiger object, whenever the value of the konfiger object changes the attached object entries is also updated.
+
+For the file properties.conf
+
+```
+project = konfiger
+author = Adewale Azeez
+```
+
+```kotlin
+import io.github.thecarisma.*
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class,
+        IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val properties = Properties()
+        val konfiger = Konfiger(File("test/properties.conf"), true)
+        konfiger.resolve(properties)
+        println(properties.project) // konfiger
+        println(properties.author) // Adewale Azeez
+        konfiger.put("project", "konfiger-nodejs")
+        println(properties.project) // konfiger-nodejs
+    }
+
+    internal class Properties {
+        var project: String? = null
+        var author: String? = null
+    }
+}
+```
+
+### Dissolve Object
+
+The following snippet reads the value of a javascript object into the konfiger object, the object is not attached to konfiger unlike resolve function.
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.Konfiger
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    internal class Properties {
+        var project = "konfiger"
+        var author = "Adewale"
+    }
+
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class,
+        IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val properties = Properties()
+        val konfiger = Konfiger("")
+        konfiger.dissolve(properties)
+        println(konfiger["project"]) // konfiger
+        println(konfiger["author"]) // Adewale Azeez
+    }
+}
+```
+
+### Multiline value
+
+Konfiger stream allow multiline value. If the line ends with `\` the next line will be parse as the continuation and the leading spaces will be trimmed. The continuation character chan be changed like the example below the continuation character is changed from `\` to `+`.
+
+for the file test.contd.conf
+
+```kotlin
+Description = This project is the closest thing to Android +
+              Shared Preference in other languages +
+              and off the Android platform.
+ProjectName = konfiger
+```
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.KonfigerStream
+import java.io.File
+import java.io.IOException
+
+object Test_Kotlin {
+    @Throws(IOException::class, InvalidEntryException::class)
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val ks = KonfigerStream(File("test/test.contd.conf"))
+        ks.continuationChar = '+'
+        println(ks.next()[1])
+        println(ks.next()[1])
+    }
+}
+```
+
+## Native Object Attachement
+
+This feature of the project allow seamless integration with the konfiger entries by eliminating the need for writing `Konfiger.get*("")` everytime to read a value into a variable or writing lot of `Konfiger.put*()` to add an entry. 
+
+The two function `resolve` is used to attach an object. resolve function integrate the object such that the entries in konfiger will be assigned to the matching key in the object. See the [resolve](#object-attachement-get) and [dissolve](#object-attachement-put) examples above.
+
+In a case where the object keys are different from the entries keys in the konfiger object the function `matchGetKey` can be declared in the object to match the key when setting the object entries values, and the function `matchPutKey` is called when setting the konfiger entries from the object.
+
+For the file English.lang
+
+```kotlin
+LoginTitle = Login Page
+AgeInstruction = You must me 18 years or above to register
+NewsletterOptin = Signup for our weekly news letter
+```
+
+For an object which as the same key as the konfiger entries above there is no need to declare the matchGetKey or matchPutKey in the object. Resolve example
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.Konfiger
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class, IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val pageProps = PageProps()
+        val kon = Konfiger(File("test/English.lang"))
+        kon.resolve(pageProps)
+        println(pageProps.toString())
+    }
+
+    internal class PageProps {
+        var LoginTitle: String? = null
+        var AgeInstruction: String? = null
+        var NewsletterOptin: String? = null
+        override fun toString(): String {
+            return "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction +
+                    ",NewsletterOptin=" + NewsletterOptin
+        }
+    }
+}
+```
+
+Dissolve example
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.Konfiger
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class, IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val pageProps = PageProps()
+        val kon = Konfiger("")
+        kon.dissolve(pageProps)
+        println(kon)
+    }
+
+    internal class PageProps {
+        var LoginTitle = "Login Page"
+        var AgeInstruction = "You must me 18 years or above to register"
+        var NewsletterOptin = "Signup for our weekly news letter"
+    }
+}
+```
+
+### matchGetKey
+
+If the identifier in the object keys does not match the above entries key the object will not be resolved. For example loginTitle does not match LoginTitle, the matchGetKey can be used to map the variable key to the konfiger entry key. The following example map the object key to konfiger entries key.
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.Konfiger
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class, IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val pageProps = PageProps()
+        val kon = Konfiger(File("test/English.lang"))
+        kon.resolve(pageProps)
+        println(pageProps.toString())
+    }
+
+    internal class PageProps {
+        var loginTitle: String? = null
+        var ageInstruct: String? = null
+        var NewsletterOptin: String? = null
+        fun matchGetKey(key: String): String {
+            if ("loginTitle" == key) {
+                return "LoginTitle"
+            } else if ("ageInstruct" == key) {
+                return "AgeInstruction"
+            }
+            return ""
+        }
+
+        override fun toString(): String {
+            return "loginTitle=" + loginTitle + ",ageInstruct=" + ageInstruct +
+                    ",NewsletterOptin=" + NewsletterOptin
+        }
+    }
+}
+```
+
+The way the above code snippet works is that when iterating the object keys if check if the function matchGetKey is present in the object if it is present the key is sent as parameter to the matchGetKey and the returned value is used to get the value from konfiger, if the matchGetKey does not return anything the object key is used to get the value from konfiger (as in the case of NewsletterOptin).
+
+> During the resolve or dissolve process if the entry value is function it is skipped even if it key matches
+
+For dissolving an object the method matchGetKey is invoked to find the actual key to use to add the entry in konfiger, if the object does not declare the matchGetKey function the entries will be added to konfiger as it is declared. The following example similar to the one above but dissolves an object into konfiger.
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.Konfiger
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class, IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val pageProps = PageProps()
+        val kon = Konfiger("")
+        kon.dissolve(pageProps)
+        println(kon)
+    }
+
+    internal class PageProps {
+        var loginTitle = "Login Page"
+        var ageInstruct = "You must me 18 years or above to register"
+        var NewsletterOptin = "Signup for our weekly news letter"
+        fun matchGetKey(key: String): String {
+            if ("loginTitle" == key) {
+                return "LoginTitle"
+            } else if ("ageInstruct" == key) {
+                return "AgeInstruction"
+            }
+            return ""
+        }
+    }
+}
+```
+
+### matchPutKey
+
+The matchPutKey is invoked when an entry value is changed or when a new entry is added to konfiger. The matchPutKey is invoked with the new entry key and checked in the object matchPutKey (if decalred), the returned value is what is set in the object. E.g. if an entry `[Name, Thecarisma]` is added to konfiger the object matchPutKey is invoked with the parameter `Name` the returned value is used to set the corresponding object entry. 
+
+```kotlin
+import io.github.thecarisma.InvalidEntryException
+import io.github.thecarisma.Konfiger
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+
+object Test_Kotlin {
+    @Throws(
+        IOException::class,
+        InvalidEntryException::class,
+        InvocationTargetException::class, IllegalAccessException::class
+    )
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val pageProps = PageProps()
+        val kon = Konfiger("")
+        kon.resolve(pageProps)
+
+        kon.put("LoginTitle", "Login Page")
+        kon.put("AgeInstruction", "You must me 18 years or above to register")
+        kon.put("NewsletterOptin", "Signup for our weekly news letter")
+        println(pageProps.loginTitle)
+        println(pageProps.ageInstruct)
+        println(pageProps.NewsletterOptin)
+    }
+
+    internal class PageProps {
+        var loginTitle: String? = null
+        var ageInstruct: String? = null
+        var NewsletterOptin: String? = null
+        fun matchPutKey(key: String): String {
+            if ("LoginTitle" == key) {
+                return "loginTitle"
+            } else if ("AgeInstruction" == key) {
+                return "ageInstruct"
+            }
+            return ""
+        }
+    }
+}
+```
+
+Konfiger does not create new entry in an object it just set existing values. Konfiger only change the value in an object if the key is defined
+
+> Warning!!!
+The values resolved is not typed so if the entry initial value is an integer the resolved value will be a string. All resolved value is string, you will need to do the type conversion by your self.
+
+If your entry keys is the same as the object keys you don't need to declare the matchGetKey or matchPutKey function in the object.
 
 ## Usage
 
