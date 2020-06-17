@@ -273,7 +273,10 @@ public class KonfigerStream {
         return ret;
     }
 
-    private void doneReading() {
+    private void doneReading() throws IOException {
+        if (this.isFile) {
+            in.close();
+        }
         this.doneReading_ = true;
         this.hasNext_ = false;
     }
