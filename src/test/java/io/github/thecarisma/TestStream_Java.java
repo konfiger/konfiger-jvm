@@ -146,7 +146,7 @@ public class TestStream_Java {
 
     @Test
     public void Test_Escape_Slash_Ending() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\public\\sansportal\\rideon\\\n" +
+        KonfigerStream ks = new KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\public\\sansportal\\rideon\\\r\n" +
                 "boarding-link = https://boarding.thecarisma.com/konfiger\r\n" +
                 "ussd.uri = thecarisma.com\\");
 

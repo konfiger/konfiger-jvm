@@ -209,7 +209,8 @@ public class KonfigerStream {
                         isMultiline = false;
                     }
                 }
-                prevPrevChar = (c == '\r' ? (prevPrevChar == '\\' ? '\0' : prevPrevChar) : prevChar);
+                prevPrevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : prevChar);
+                //prevPrevChar = (c == '\r' ? (prevPrevChar == '\\' ? '\0' : prevPrevChar) : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             } while ((i = in.read()) != -1);
         } else {
@@ -263,7 +264,7 @@ public class KonfigerStream {
                     value.append(c);
                 }
                 // whatever is happening here, well
-                prevPrevChar = prevChar;
+                prevPrevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             }
             ++readPosition;
