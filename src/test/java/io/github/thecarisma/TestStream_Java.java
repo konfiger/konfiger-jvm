@@ -144,4 +144,18 @@ public class TestStream_Java {
         Assert.assertEquals(count, 3);
     }
 
+    @Test
+    public void Test_Escape_Slash_Ending() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\public\\sansportal\\rideon\\\n" +
+                "boarding-link = https://boarding.thecarisma.com/konfiger\r\n" +
+                "ussd.uri = thecarisma.com\\");
+
+        int count = 0;
+        while(ks.hasNext()) {
+            Assert.assertFalse(ks.next()[1].isEmpty());
+            count++;
+        }
+        Assert.assertEquals(count, 3);
+    }
+
 }

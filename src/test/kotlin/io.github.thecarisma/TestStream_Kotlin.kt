@@ -155,4 +155,18 @@ class TestStream_Kotlin {
         Assert.assertEquals(count.toLong(), 3)
     }
 
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Test_Escape_Slash_Ending() {
+        val ks = KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\public\\sansportal\\rideon\\\r\n" +
+                "boarding-link = https://boarding.thecarisma.com/konfiger\r\n" +
+                "ussd.uri = thecarisma.com\\")
+        var count = 0
+        while (ks.hasNext()) {
+            Assert.assertFalse(ks.next()[1].isEmpty())
+            count++
+        }
+        Assert.assertEquals(count.toLong(), 3)
+    }
+
 }

@@ -161,6 +161,7 @@ public class KonfigerStream {
         boolean parseKey = true;
         boolean isMultiline = false;
         char prevChar = '\0';
+        char prevPrevChar = '\0';
         line |= 1;
 
         if (this.isFile) {
@@ -170,7 +171,7 @@ public class KonfigerStream {
                 if (c == '\n') {
                     ++line;
                     column = 0;
-                    if (!parseKey && prevChar == this.continuationChar) {
+                    if (!parseKey && prevChar == this.continuationChar && prevPrevChar != '\\') {
                         String tmpValue = value.toString();
                         value = new StringBuilder();
                         if (tmpValue.charAt(tmpValue.length()-1) == '\r') {
@@ -208,6 +209,7 @@ public class KonfigerStream {
                         isMultiline = false;
                     }
                 }
+                prevPrevChar = (c == '\r' ? (prevPrevChar == '\\' ? '\0' : prevPrevChar) : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             } while ((i = in.read()) != -1);
         } else {
@@ -226,7 +228,7 @@ public class KonfigerStream {
                 if (c == '\n') {
                     ++line;
                     column = 0;
-                    if (!parseKey && prevChar == this.continuationChar) {
+                    if (!parseKey && prevChar == this.continuationChar && prevPrevChar != '\\') {
                         String tmpValue = value.toString();
                         value = new StringBuilder();
                         if (tmpValue.charAt(tmpValue.length()-1) == '\r') {
@@ -260,6 +262,8 @@ public class KonfigerStream {
                 } else {
                     value.append(c);
                 }
+                // whatever is happening here, well
+                prevPrevChar = prevChar;
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             }
             ++readPosition;
