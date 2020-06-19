@@ -426,11 +426,14 @@ public class Konfiger {
     }
 
     public int size() {
+        if (!loadingEnds && this.lazyLoad) {
+            String tmp = toString();
+        }
         return konfigerObjects.size();
     }
 
     public boolean isEmpty() {
-        return konfigerObjects.isEmpty();
+        return size() == 0;
     }
 
     public char getDelimeter() {

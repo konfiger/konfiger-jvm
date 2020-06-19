@@ -245,4 +245,19 @@ class TestKonfiger_Scala {
     Assert.assertTrue(kon.getString("Description").endsWith(" in other languages and off the Android platform."))
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Check_Size_In_LazyLoad_And_No_LazyLoad(): Unit = {
+    val ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"))
+    val kon = new Konfiger(ks, false)
+    val ks1 = new KonfigerStream(new File("src/test/resources/test.contd.conf"))
+    val kon1 = new Konfiger(ks1, true)
+    Assert.assertTrue(kon.size > 0)
+    Assert.assertTrue(kon1.size > 0)
+    Assert.assertFalse(kon.isEmpty)
+    Assert.assertFalse(kon1.isEmpty)
+    Assert.assertEquals(kon1.size, kon1.size)
+  }
+
 }

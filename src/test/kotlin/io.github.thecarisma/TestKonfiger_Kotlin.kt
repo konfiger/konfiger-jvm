@@ -234,4 +234,18 @@ class TestKonfiger_Kotlin {
         Assert.assertEquals(kon["ProjectName"], "konfiger")
         Assert.assertTrue(kon.getString("Description").endsWith(" in other languages and off the Android platform."))
     }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Check_Size_In_LazyLoad_And_No_LazyLoad() {
+        val ks = KonfigerStream(File("src/test/resources/test.contd.conf"))
+        val kon = Konfiger(ks, false)
+        val ks1 = KonfigerStream(File("src/test/resources/test.contd.conf"))
+        val kon1 = Konfiger(ks1, true)
+        Assert.assertTrue(kon.size() > 0)
+        Assert.assertTrue(kon1.size() > 0)
+        Assert.assertFalse(kon.isEmpty)
+        Assert.assertFalse(kon1.isEmpty)
+        Assert.assertEquals(kon1.size().toLong(), kon1.size().toLong())
+    }
 }

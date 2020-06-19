@@ -130,4 +130,18 @@ public class TestStream_Java {
         }
     }
 
+    @Test
+    public void Test_Backward_Slash_Ending_Value() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("uri1 = http://uri1.thecarisma.com/core/api/v1/\r\n" +
+                "uri2 = http://uri2.thecarisma.com/core/api/v2/\r\n" +
+                "ussd.uri = https://ussd.thecarisma.com/");
+
+        int count = 0;
+        while(ks.hasNext()) {
+            Assert.assertTrue(ks.next()[1].endsWith("/"));
+            count++;
+        }
+        Assert.assertEquals(count, 3);
+    }
+
 }

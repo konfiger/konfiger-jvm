@@ -149,4 +149,21 @@ class TestStream_Scala {
     }) Assert.assertFalse(ks.next()(1).contains("\n"))
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Test_Backward_Slash_Ending_Value(): Unit = {
+    val ks = new KonfigerStream("uri1 = http://uri1.thecarisma.com/core/api/v1/\r\n" +
+      "uri2 = http://uri2.thecarisma.com/core/api/v2/\r\n" +
+      "ussd.uri = https://ussd.thecarisma.com/")
+    var count = 0
+    while ( {
+      ks.hasNext
+    }) {
+      Assert.assertTrue(ks.next()(1).endsWith("/"))
+      count += 1
+    }
+    Assert.assertEquals(count, 3)
+  }
+
 }

@@ -208,9 +208,7 @@ public class KonfigerStream {
                         isMultiline = false;
                     }
                 }
-                if (c != '\r') {
-                    prevChar = c;
-                }
+                prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             } while ((i = in.read()) != -1);
         } else {
             for (;this.readPosition <= this.strStream.length(); ++this.readPosition) {
@@ -262,9 +260,7 @@ public class KonfigerStream {
                 } else {
                     value.append(c);
                 }
-                if (c != '\r') {
-                    prevChar = c;
-                }
+                prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             }
             ++readPosition;
         }
