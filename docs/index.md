@@ -27,6 +27,7 @@ ___
 - [Native Object Attachement](#native-object-attachement)
     - [matchGetKey](#matchgetkey)
     - [matchPutKey](#matchputkey)
+    - [Annotation](#annotation)
 - [API Documentations](#api-documentations)
     - [KonfigerStream](#konfigerstream)
     - [Konfiger](#konfiger)
@@ -595,6 +596,39 @@ public class Test_Java {
             }
             return "";
         }
+    }
+}
+```
+
+### Annotation
+
+A more cleaner way to map an entry key to a field in an object is to use the KonfigerValue anotation. The annotation accept the key value to map to the field in konfiger.
+
+The annotation is used for lookup when resolving or disolving an object and when changing the value of the field by updating it in konfiger. In short the anotation value is used to lookup the field instead of the verbose `matchGetKey` and `matchPutKey` methods.
+
+```java
+import io.github.thecarisma.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class Test_Java {
+    public static void main(String[] args) throws IOException, InvalidEntryException,
+            InvocationTargetException, IllegalAccessException {
+        PageProps pageProps = new PageProps();
+        Konfiger kon = new Konfiger("");
+        kon.resolve(pageProps);
+
+        kon.put("LoginTitle", "Login Page");
+        kon.put("AgeInstruction", "You must me 18 years or above to register");
+        kon.put("NewsletterOptin", "Signup for our weekly news letter");
+        System.out.println(pageProps.loginTitle);
+        System.out.println(pageProps.ageInstruct);
+        System.out.println(pageProps.NewsletterOptin);
+    }
+    static class PageProps {
+        @KonfigerValue("LoginTitle") String loginTitle;
+        @KonfigerValue("AgeInstruction") String ageInstruct;
+        String NewsletterOptin;
     }
 }
 ```

@@ -27,6 +27,7 @@ ___
 - [Native Object Attachement](#native-object-attachement)
     - [matchGetKey](#matchgetkey)
     - [matchPutKey](#matchputkey)
+    - [Annotation](#annotation)
 - [API Documentations](#api-documentations)
 - [Usage](#usage)
     - [Initialization](#initialization)
@@ -638,6 +639,43 @@ object Test_Scala {
       else if ("AgeInstruction" == key) return "ageInstruct"
       ""
     }
+  }
+
+}
+```
+
+### Annotation
+
+A more cleaner way to map an entry key to a field in an object is to use the KonfigerValue anotation. The annotation accept the key value to map to the field in konfiger.
+
+The annotation is used for lookup when resolving or disolving an object and when changing the value of the field by updating it in konfiger. In short the anotation value is used to lookup the field instead of the verbose `matchGetKey` and `matchPutKey` methods.
+
+```scala
+import io.github.thecarisma._
+import java.io._
+import java.lang.reflect.InvocationTargetException
+
+object Test_Scala {
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[InvocationTargetException]
+  @throws[IllegalAccessException]
+  def main(args: Array[String]): Unit = {
+    val pageProps = new Test_Java.PageProps
+    val kon = new Konfiger("")
+    kon.resolve(pageProps)
+    kon.put("LoginTitle", "Login Page")
+    kon.put("AgeInstruction", "You must me 18 years or above to register")
+    kon.put("NewsletterOptin", "Signup for our weekly news letter")
+    System.out.println(pageProps.loginTitle)
+    System.out.println(pageProps.ageInstruct)
+    System.out.println(pageProps.NewsletterOptin)
+  }
+
+  class PageProps {
+    @KonfigerValue("LoginTitle") val loginTitle: String = null
+    @KonfigerValue("AgeInstruction") val ageInstruct: String = null
+    val NewsletterOptin: String = null
   }
 
 }
