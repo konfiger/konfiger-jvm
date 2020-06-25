@@ -170,7 +170,7 @@ class TestStream_Scala {
   @throws[IOException]
   @throws[InvalidEntryException]
   def Test_Escape_Slash_Ending(): Unit = {
-    val ks = new KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\public\\sansportal\\rideon\\\r\n" +
+    val ks = new KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\\\public\\sansportal\\rideon\\\\\r\n" +
       "boarding-link = https://boarding.thecarisma.com/konfiger\r\n" +
       "ussd.uri = thecarisma.com\\")
     var count = 0

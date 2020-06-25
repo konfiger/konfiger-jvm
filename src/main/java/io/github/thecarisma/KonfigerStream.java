@@ -209,8 +209,7 @@ public class KonfigerStream {
                         isMultiline = false;
                     }
                 }
-                prevPrevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : prevChar);
-                //prevPrevChar = (c == '\r' ? (prevPrevChar == '\\' ? '\0' : prevPrevChar) : prevChar);
+                prevPrevChar = (c == '\r' ? prevPrevChar : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             } while ((i = in.read()) != -1);
         } else {
@@ -244,7 +243,7 @@ public class KonfigerStream {
                         } while((""+c).trim().isEmpty());
                     }
                 }
-                if (c == this.seperator && prevChar != '/') {
+                if (c == this.seperator && prevChar != '/' ) {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
@@ -263,8 +262,7 @@ public class KonfigerStream {
                 } else {
                     value.append(c);
                 }
-                // whatever is happening here, well
-                prevPrevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : prevChar);
+                prevPrevChar = (c == '\r' ? prevPrevChar : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             }
             ++readPosition;

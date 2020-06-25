@@ -158,7 +158,7 @@ class TestStream_Kotlin {
     @Test
     @Throws(IOException::class, InvalidEntryException::class)
     fun Test_Escape_Slash_Ending() {
-        val ks = KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\public\\sansportal\\rideon\\\r\n" +
+        val ks = KonfigerStream("external-resource-location = \\\\988.43.13.9\\testing\\\\public\\sansportal\\rideon\\\\\r\n" +
                 "boarding-link = https://boarding.thecarisma.com/konfiger\r\n" +
                 "ussd.uri = thecarisma.com\\")
         var count = 0
