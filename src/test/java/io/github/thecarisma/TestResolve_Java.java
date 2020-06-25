@@ -47,11 +47,25 @@ public class TestResolve_Java {
         }
     }
 
+    static class TextsAnnotated {
+        @KonfigerValue("Project") String project;
+        @KonfigerValue("Author") String author;
+        String Platform;
+        @KonfigerValue("File") String file;
+    }
+
     static class Entries {
         String project = "konfiger";
         String author = "Adewale Azeez";
         String platform = "Cross Platform";
         String file = "test.comment.inf";
+    }
+
+    static class EntriesAnnotated {
+        @KonfigerValue("Project") String project = "konfiger";
+        @KonfigerValue("Author") String author = "Adewale Azeez";
+        String Platform = "Cross Platform";
+        @KonfigerValue("File") String file = "test.comment.inf";
     }
 
     @Test
@@ -117,6 +131,34 @@ public class TestResolve_Java {
     }
 
     @Test
+    public void Resolve_With_Changing_Values_And_Map_Key_With_matchPutKey_Using_Annotation() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        TextsAnnotated texts = new TextsAnnotated();
+        KonfigerStream kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        kStream.setCommentPrefix("[");
+        Konfiger kon = new Konfiger(kStream);
+        kon.resolve(texts);
+
+        Assert.assertEquals(texts.project, "konfiger");
+        Assert.assertEquals(texts.Platform, "Cross Platform");
+        Assert.assertEquals(texts.file, "test.comment.inf");
+        Assert.assertEquals(texts.author, "Adewale Azeez");
+
+        kon.put("Project", "konfiger-nodejs");
+        kon.put("Platform", "Windows, Linux, Mac, Raspberry");
+        kon.put("author", "Thecarisma");
+
+        Assert.assertEquals(texts.project, "konfiger-nodejs");
+        Assert.assertTrue(texts.Platform.contains("Windows"));
+        Assert.assertTrue(texts.Platform.contains("Linux"));
+        Assert.assertTrue(texts.Platform.contains("Mac"));
+        Assert.assertTrue(texts.Platform.contains("Raspberry"));
+        Assert.assertEquals(texts.author, "Thecarisma");
+
+        kon.put("author", "Adewale");
+        Assert.assertEquals(texts.author, "Adewale");
+    }
+
+    @Test
     public void Dissolve_An_Object_Into_Konfiger() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
         Konfiger kon = new Konfiger("");
         kon.dissolve(new Entries());
@@ -125,6 +167,17 @@ public class TestResolve_Java {
         Assert.assertEquals(kon.get("platform"), "Cross Platform");
         Assert.assertEquals(kon.get("file"), "test.comment.inf");
         Assert.assertEquals(kon.get("author"), "Adewale Azeez");
+    }
+
+    @Test
+    public void Dissolve_An_Object_Into_Konfiger_Using_Annotation() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(new EntriesAnnotated());
+
+        Assert.assertEquals(kon.get("Project"), "konfiger");
+        Assert.assertEquals(kon.get("Platform"), "Cross Platform");
+        Assert.assertEquals(kon.get("File"), "test.comment.inf");
+        Assert.assertEquals(kon.get("Author"), "Adewale Azeez");
     }
 
     @Test

@@ -27,6 +27,7 @@ ___
 - [Native Object Attachement](#native-object-attachement)
     - [matchGetKey](#matchgetkey)
     - [matchPutKey](#matchputkey)
+    - [Annotation](#annotation)
 - [API Documentations](#api-documentations)
     - [KonfigerStream](#konfigerstream)
     - [Konfiger](#konfiger)
@@ -598,6 +599,12 @@ public class Test_Java {
     }
 }
 ```
+
+### Annotation
+
+A more cleaner way to map an entry key to a field in an object is to use the KonfigerValue anotation. The annotation accept the key value to map to the field in konfiger.
+
+The annotation is used for lookup when resolving or disolving an object and when changing the value of the field by updating it in konfiger. In short the anotation value is used to lookup the field instead of the verbose `matchGetKey` and `matchPutKey` methods.
 
 Konfiger does not create new entry in an object it just set existing values. Konfiger only change the value in an object if the key is defined
 

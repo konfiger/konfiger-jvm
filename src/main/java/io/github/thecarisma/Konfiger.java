@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -115,6 +116,7 @@ public class Konfiger {
         if (attachedResolveObj != null) {
             Method matchPutKey = null;
             Method[] methods = attachedResolveObj.getClass().getDeclaredMethods();
+            Field[] fields = attachedResolveObj.getClass().getDeclaredFields();
             for(Method method : methods){
                 if (method.getName().equals("matchPutKey")) {
                     matchPutKey = method;
@@ -122,10 +124,23 @@ public class Konfiger {
                 }
             }
             String findKey = "";
+            boolean isAnnotated = false;
+            for(Field f : fields) {
+                if (f.getType() == String.class) {
+                    if (f.isAnnotationPresent(KonfigerValue.class)) {
+                        KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                        if (annotation.value().equals(key)) {
+                            isAnnotated = true;
+                            findKey = f.getName();
+                            break;
+                        }
+                    }
+                }
+            }
             try {
-                if (matchPutKey == null ||
+                if (!isAnnotated && (matchPutKey == null ||
                         ((findKey = (String) matchPutKey.invoke(attachedResolveObj, key)) == null ||
-                                findKey.equals(""))) {
+                                findKey.equals("")))) {
 
                     findKey = key;
                 }
@@ -560,9 +575,17 @@ public class Konfiger {
         for(Field f : fields){
             if (f.getType() == String.class) {
                 String findKey = "";
-                if (matchGetKey == null ||
+                boolean isAnnotated = false;
+                if (f.isAnnotationPresent(KonfigerValue.class)) {
+                    isAnnotated = true;
+                    KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                    if (!annotation.value().isEmpty()) {
+                        findKey = annotation.value();
+                    }
+                }
+                if (!isAnnotated && (matchGetKey == null ||
                         ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
-                                findKey.equals(""))) {
+                                findKey.equals("")))) {
 
                     findKey = f.getName();
                 }
@@ -589,9 +612,17 @@ public class Konfiger {
         for(Field f : fields){
             if (f.getType() == String.class) {
                 String findKey = "";
-                if (matchGetKey == null ||
+                boolean isAnnotated = false;
+                if (f.isAnnotationPresent(KonfigerValue.class)) {
+                    isAnnotated = true;
+                    KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                    if (!annotation.value().isEmpty()) {
+                        findKey = annotation.value();
+                    }
+                }
+                if (!isAnnotated && (matchGetKey == null ||
                         ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
-                                findKey.equals(""))) {
+                                findKey.equals("")))) {
 
                     findKey = f.getName();
                 }

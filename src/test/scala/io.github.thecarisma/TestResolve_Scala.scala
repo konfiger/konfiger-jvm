@@ -7,49 +7,57 @@ import org.junit.{Assert, Test}
 
 class TestResolve_Scala {
 
-  private class TextsFlat {
-    private val project = null
-    private val author = null
-    private val Platform = null
-    private val File = null
+  class TextsFlat {
+    val project: String = null
+    val author: String = null
+    val Platform: String = null
+    val File: String = null
   }
 
-  private class Texts {
-    private val project = null
-    private val author = null
-    private val Platform = null
-    private val file = null
+  class Texts {
+    val project = ""
+    val author = ""
+    val Platform = ""
+    val file = ""
 
-    private def matchGetKey(key: String): String = {
+    def matchGetKey(key: String): String = {
       key match {
-        case "project" =>
-          return "Project"
-        case "author" =>
-          return "Author"
-        case "file" =>
-          return "File"
+        case "project" => "Project"
+        case "author" => "Author"
+        case "file" => "File"
+        case _ => ""
       }
-      ""
     }
 
-    private def matchPutKey(key: String): String = {
+    def matchPutKey(key: String): String = {
       key match {
-        case "Project" =>
-          return "project"
-        case "Author" =>
-          return "author"
-        case "File" =>
-          return "file"
+        case "Project" => "project"
+        case "Author" => "author"
+        case "File" => "file"
+        case _ => ""
       }
-      ""
     }
   }
 
-  private class Entries {
-    private val project = "konfiger"
-    private val author = "Adewale Azeez"
-    private val platform = "Cross Platform"
-    private val file = "test.comment.inf"
+  class TextsAnnotated {
+    @KonfigerValue("Project") val project: String = ""
+    @KonfigerValue("Author")  val author: String = ""
+    val Platform: String = ""
+    @KonfigerValue("File") val file: String = ""
+  }
+
+  class Entries {
+    val project = "konfiger"
+    val author = "Adewale Azeez"
+    val platform = "Cross Platform"
+    val file = "test.comment.inf"
+  }
+
+  class EntriesAnnotated {
+    @KonfigerValue("Project") val project = "konfiger"
+    @KonfigerValue("Author") val author = "Adewale Azeez"
+    private[thecarisma] val Platform = "Cross Platform"
+    @KonfigerValue("File") val file = "test.comment.inf"
   }
 
   @Test
@@ -68,7 +76,7 @@ class TestResolve_Scala {
   @throws[IllegalAccessException]
   @throws[InvocationTargetException]
   def Resolve_Without_matchGetKey_Function(): Unit = {
-    val textsFlat = new TestResolve_Java.TextsFlat
+    val textsFlat = new TextsFlat
     val kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
     kStream.setCommentPrefix("[")
     val kon = new Konfiger(kStream)
@@ -85,7 +93,7 @@ class TestResolve_Scala {
   @throws[IllegalAccessException]
   @throws[InvocationTargetException]
   def Resolve_With_matchGetKey_Function(): Unit = {
-    val texts = new TestResolve_Java.Texts
+    val texts = new Texts
     val kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
     kStream.setCommentPrefix("[")
     val kon = new Konfiger(kStream)
@@ -102,7 +110,35 @@ class TestResolve_Scala {
   @throws[IllegalAccessException]
   @throws[InvocationTargetException]
   def Resolve_With_Changing_Values_And_Map_Key_With_matchPutKey(): Unit = {
-    val texts = new TestResolve_Java.Texts
+    val texts = new Texts
+    val kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
+    kStream.setCommentPrefix("[")
+    val kon = new Konfiger(kStream)
+    kon.resolve(texts)
+    Assert.assertEquals(texts.project, "konfiger")
+    Assert.assertEquals(texts.Platform, "Cross Platform")
+    Assert.assertEquals(texts.file, "test.comment.inf")
+    Assert.assertEquals(texts.author, "Adewale Azeez")
+    kon.put("Project", "konfiger-nodejs")
+    kon.put("Platform", "Windows, Linux, Mac, Raspberry")
+    kon.put("author", "Thecarisma")
+    Assert.assertEquals(texts.project, "konfiger-nodejs")
+    Assert.assertTrue(texts.Platform.contains("Windows"))
+    Assert.assertTrue(texts.Platform.contains("Linux"))
+    Assert.assertTrue(texts.Platform.contains("Mac"))
+    Assert.assertTrue(texts.Platform.contains("Raspberry"))
+    Assert.assertEquals(texts.author, "Thecarisma")
+    kon.put("author", "Adewale")
+    Assert.assertEquals(texts.author, "Adewale")
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[IllegalAccessException]
+  @throws[InvocationTargetException]
+  def Resolve_With_Changing_Values_And_Map_Key_With_matchPutKey_Using_Annotation(): Unit = {
+    val texts = new TextsAnnotated
     val kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
     kStream.setCommentPrefix("[")
     val kon = new Konfiger(kStream)
@@ -131,7 +167,7 @@ class TestResolve_Scala {
   @throws[InvocationTargetException]
   def Dissolve_An_Object_Into_Konfiger(): Unit = {
     val kon = new Konfiger("")
-    kon.dissolve(new TestResolve_Java.Entries)
+    kon.dissolve(new Entries)
     Assert.assertEquals(kon.get("project"), "konfiger")
     Assert.assertEquals(kon.get("platform"), "Cross Platform")
     Assert.assertEquals(kon.get("file"), "test.comment.inf")
@@ -143,8 +179,22 @@ class TestResolve_Scala {
   @throws[InvalidEntryException]
   @throws[IllegalAccessException]
   @throws[InvocationTargetException]
+  def Dissolve_An_Object_Into_Konfiger_Using_Annotation(): Unit = {
+    val kon = new Konfiger("")
+    kon.dissolve(new EntriesAnnotated)
+    Assert.assertEquals(kon.get("Project"), "konfiger")
+    Assert.assertEquals(kon.get("Platform"), "Cross Platform")
+    Assert.assertEquals(kon.get("File"), "test.comment.inf")
+    Assert.assertEquals(kon.get("Author"), "Adewale Azeez")
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[IllegalAccessException]
+  @throws[InvocationTargetException]
   def Detach_An_Object_From_Konfiger(): Unit = {
-    val texts = new TestResolve_Java.Texts
+    val texts = new Texts
     val kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
     kStream.setCommentPrefix("[")
     val kon = new Konfiger(kStream)
