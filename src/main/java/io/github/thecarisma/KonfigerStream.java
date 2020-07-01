@@ -186,7 +186,7 @@ public class KonfigerStream {
                         isMultiline = true;
                     }
                 }
-                if (c == this.seperator && prevChar != '/') {
+                if (c == this.seperator && prevChar != '^') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
@@ -243,7 +243,7 @@ public class KonfigerStream {
                         } while((""+c).trim().isEmpty());
                     }
                 }
-                if (c == this.seperator && prevChar != '/' ) {
+                if (c == this.seperator && prevChar != '^' ) {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);

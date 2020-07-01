@@ -150,17 +150,17 @@ public class TestKonfiger_Java {
 
     @Test
     public void Test_Complex_And_Confusing_Seperator() throws IOException, InvalidEntryException {
-        Konfiger konfiger = new Konfiger("Occupation=Software En/gineergLocation=Ni/geriagState=La/gos", false, '=', 'g');
+        Konfiger konfiger = new Konfiger("Occupation=Software En^gineergLocation=Ni^geriagState=La^gos", false, '=', 'g');
 
         Assert.assertEquals(konfiger.size(), 3);
-        Assert.assertTrue(konfiger.toString().contains("/g"));
+        Assert.assertTrue(konfiger.toString().contains("^g"));
         for (Map.Entry<String, String> entry : konfiger.entries()) {
-            Assert.assertFalse(entry.getValue().contains("/g"));
+            Assert.assertFalse(entry.getValue().contains("^g"));
         }
         konfiger.setSeperator('f');
         Assert.assertEquals(konfiger.get("Occupation"), "Software Engineer");
         konfiger.setSeperator('\n');
-        Assert.assertFalse(konfiger.toString().contains("/g"));
+        Assert.assertFalse(konfiger.toString().contains("^g"));
         Assert.assertEquals(konfiger.size(), 3);
         for (Map.Entry<String, String> entry : konfiger.entries()) {
             Assert.assertFalse(entry.getValue().contains("\\g"));

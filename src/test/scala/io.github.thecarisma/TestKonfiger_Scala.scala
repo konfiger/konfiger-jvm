@@ -150,16 +150,16 @@ class TestKonfiger_Scala {
   @throws[IOException]
   @throws[InvalidEntryException]
   def Test_Complex_And_Confusing_Seperator(): Unit = {
-    val konfiger = new Konfiger("Occupation=Software En/gineergLocation=Ni/geriagState=La/gos", false, '=', 'g')
+    val konfiger = new Konfiger("Occupation=Software En^gineergLocation=Ni^geriagState=La^gos", false, '=', 'g')
     Assert.assertEquals(konfiger.size, 3)
-    Assert.assertTrue(konfiger.toString.contains("/g"))
+    Assert.assertTrue(konfiger.toString.contains("^g"))
     for (entry <- konfiger.entries.asScala) {
-      Assert.assertFalse(entry.getValue.contains("/g"))
+      Assert.assertFalse(entry.getValue.contains("^g"))
     }
     konfiger.setSeperator('f')
     Assert.assertEquals(konfiger.get("Occupation"), "Software Engineer")
     konfiger.setSeperator('\n')
-    Assert.assertFalse(konfiger.toString.contains("/g"))
+    Assert.assertFalse(konfiger.toString.contains("^g"))
     Assert.assertEquals(konfiger.size, 3)
     for (entry <- konfiger.entries.asScala) {
       Assert.assertFalse(entry.getValue.contains("\\g"))

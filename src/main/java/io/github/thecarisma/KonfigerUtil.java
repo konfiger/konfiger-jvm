@@ -9,7 +9,7 @@ class KonfigerUtil {
             if (extraEscapes.length > 0) {
                 for (char extra : extraEscapes) {
                     if (c == extra) {
-                        finalValue.append('/');
+                        finalValue.append('^');
                         break;
                     }
                 }
@@ -23,7 +23,7 @@ class KonfigerUtil {
         StringBuilder finalValue = new StringBuilder();
         for (int i = 0; i < value.length(); ++i) {
             char c = value.charAt(i);
-            if (c=='/') {
+            if (c=='^') {
                 if (i==value.length() - 1) {
                     finalValue.append(c);
                     break;
@@ -42,7 +42,7 @@ class KonfigerUtil {
                         continue;
                     }
                 }
-                finalValue.append('/');
+                finalValue.append('^');
                 finalValue.append(value.charAt(d));
                 continue;
             }

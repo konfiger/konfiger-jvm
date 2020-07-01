@@ -9,7 +9,7 @@ class TestUtil_Scala {
         val t1 = KonfigerUtil.escapeString(actualStr, '¬')
         val t2 = KonfigerUtil.escapeString(actualStr)
         Assert.assertNotEquals(actualStr, t1)
-        Assert.assertEquals(t1, "\\,Hello/¬W\n-\t-\torld")
+        Assert.assertEquals(t1, "\\,Hello^¬W\n-\t-\torld")
         Assert.assertNotEquals(t1, KonfigerUtil.unEscapeString(t1, '¬'))
         Assert.assertNotEquals(actualStr, KonfigerUtil.unEscapeString(t1))
         Assert.assertEquals(KonfigerUtil.unEscapeString(t1, '¬'), actualStr)

@@ -145,16 +145,16 @@ class TestKonfiger_Kotlin {
     @Test
     @Throws(IOException::class, InvalidEntryException::class)
     fun Test_Complex_And_Confusing_Seperator() {
-        val konfiger = Konfiger("Occupation=Software En/gineergLocation=Ni/geriagState=La/gos", false, '=', 'g')
+        val konfiger = Konfiger("Occupation=Software En^gineergLocation=Ni^geriagState=La^gos", false, '=', 'g')
         Assert.assertEquals(konfiger.size().toLong(), 3)
-        Assert.assertTrue(konfiger.toString().contains("/g"))
+        Assert.assertTrue(konfiger.toString().contains("^g"))
         for (entry in konfiger.entries()) {
-            Assert.assertFalse(entry.value.contains("/g"))
+            Assert.assertFalse(entry.value.contains("^g"))
         }
         konfiger.seperator = 'f'
         Assert.assertEquals(konfiger["Occupation"], "Software Engineer")
         konfiger.seperator = '\n'
-        Assert.assertFalse(konfiger.toString().contains("/g"))
+        Assert.assertFalse(konfiger.toString().contains("^g"))
         Assert.assertEquals(konfiger.size().toLong(), 3)
         for (entry in konfiger.entries()) {
             Assert.assertFalse(entry.value.contains("\\g"))
