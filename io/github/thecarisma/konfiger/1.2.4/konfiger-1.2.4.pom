@@ -16,14 +16,6 @@
         <kotlin.version>1.3.61</kotlin.version>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>Konfiger Maven Packages</name>
-            <url>https://maven.pkg.github.com/konfiger</url>
-        </repository>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
