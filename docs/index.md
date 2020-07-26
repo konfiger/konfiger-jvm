@@ -462,7 +462,7 @@ public class Test_Java {
         String LoginTitle;
         String AgeInstruction;
         String NewsletterOptin;
-        booelean ShouldUpdate;
+        boolean ShouldUpdate;
         @Override public String toString() {
             return "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction +
                     ",NewsletterOptin=" + NewsletterOptin + ",ShouldUpdate=" + ShouldUpdate;
