@@ -85,7 +85,7 @@ class TestResolve_Scala {
   @throws[IllegalAccessException]
   @throws[InvocationTargetException]
   def Invalid_Argument_Type_To_Konfiger_Resolve(): Unit = {
-    val kon = new Konfiger(new File("src/test/resources/test.comment.inf"), true)
+    val kon = new Konfiger(new File("src/test/resources/test.config.ini"), true)
     kon.resolve(123)
   }
 

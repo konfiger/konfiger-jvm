@@ -89,7 +89,7 @@ public class TestResolve_Java {
 
     @Test
     public void Invalid_Argument_Type_To_Konfiger_Resolve() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
-        Konfiger kon = new Konfiger(new File("src/test/resources/test.comment.inf"), true);
+        Konfiger kon = new Konfiger(new File("src/test/resources/test.config.ini"), true);
         kon.resolve(123);
     }
 

@@ -84,7 +84,7 @@ class TestResolve_Kotlin {
     @Test
     @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
     fun Invalid_Argument_Type_To_Konfiger_Resolve() {
-        val kon = Konfiger(File("src/test/resources/test.comment.inf"), true)
+        val kon = Konfiger(File("src/test/resources/test.config.ini"), true)
         kon.resolve(123)
     }
 
