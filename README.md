@@ -340,6 +340,7 @@ For the file properties.conf
 ```
 project = konfiger
 author = Adewale Azeez
+islibrary = true
 ```
 
 ```java
@@ -351,6 +352,7 @@ public class Test_Java {
     static class Properties {
         String project;
         String author;
+        boolean islibrary;
     }
     public static void main(String[] args) throws IOException, InvalidEntryException, InvocationTargetException, IllegalAccessException {
 
@@ -360,6 +362,7 @@ public class Test_Java {
 
         System.out.println(properties.project); // konfiger
         System.out.println(properties.author); // Adewale Azeez
+        System.out.println(properties.islibrary); // true
         konfiger.put("project", "konfiger-nodejs");
         System.out.println(properties.project); // konfiger-nodejs
     }
@@ -379,6 +382,7 @@ public class Test_Java {
     static class Properties {
         String project = "konfiger";
         String author = "Adewale";
+        boolean islibrary = true;
     }
     public static void main(String[] args) throws IOException, InvalidEntryException, InvocationTargetException, IllegalAccessException {
         Properties properties = new Properties();
@@ -387,6 +391,7 @@ public class Test_Java {
 
         System.out.println(konfiger.get("project")); // konfiger
         System.out.println(konfiger.get("author")); // Adewale Azeez
+        System.out.println(konfiger.getBoolean("islibrary")); // true
     }
 }
 ```
@@ -427,12 +432,15 @@ The two function `resolve` is used to attach an object. resolve function integra
 
 In a case where the object keys are different from the entries keys in the konfiger object the function `matchGetKey` can be declared in the object to match the key when setting the object entries values, and the function `matchPutKey` is called when setting the konfiger entries from the object.
 
+Konfiger is aware of the type of an object field, if the type of a field is boolean the entry value will be parsed as boolean and assigned to the field. 
+
 For the file English.lang
 
 ```
 LoginTitle = Login Page
 AgeInstruction = You must me 18 years or above to register
 NewsletterOptin = Signup for our weekly news letter
+ShouldUpdate = true
 ```
 
 For an object which as the same key as the konfiger entries above there is no need to declare the matchGetKey or matchPutKey in the object. Resolve example
@@ -455,9 +463,10 @@ public class Test_Java {
         String LoginTitle;
         String AgeInstruction;
         String NewsletterOptin;
+        booelean ShouldUpdate;
         @Override public String toString() {
             return "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction +
-                    ",NewsletterOptin=" + NewsletterOptin;
+                    ",NewsletterOptin=" + NewsletterOptin + ",ShouldUpdate=" + ShouldUpdate;
         }
     }
 }
@@ -483,6 +492,7 @@ public class Test_Java {
         String LoginTitle = "Login Page";
         String AgeInstruction = "You must me 18 years or above to register";
         String NewsletterOptin = "Signup for our weekly news letter";
+        boolean ShouldUpdate = true;
     }
 }
 ```

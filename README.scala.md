@@ -358,6 +358,7 @@ For the file properties.conf
 ```
 project = konfiger
 author = Adewale Azeez
+islibrary = true
 ```
 
 ```scala
@@ -370,6 +371,7 @@ object Test_Scala {
   class Properties {
     val project: String = null
     val author: String = null
+    val islibrary: Boolean = false
   }
 
   @throws[IOException]
@@ -383,6 +385,7 @@ object Test_Scala {
 
     System.out.println(properties.project) // konfiger
     System.out.println(properties.author) // Adewale Azeez
+    System.out.println(properties.islibrary) // true
     konfiger.put("project", "konfiger-nodejs")
     System.out.println(properties.project) // konfiger-nodejs
   }
@@ -403,6 +406,7 @@ object Test_Scala {
   class Properties {
     val project = "konfiger"
     val author = "Adewale"
+    val islibrary: Boolean = true
   }
 
   @throws[IOException]
@@ -416,6 +420,7 @@ object Test_Scala {
     
     System.out.println(konfiger.get("project")) // konfiger
     System.out.println(konfiger.get("author")) // Adewale Azeez
+    System.out.println(konfiger.getBoolean("islibrary")) // true
 
   }
 }
@@ -458,12 +463,15 @@ The two function `resolve` is used to attach an object. resolve function integra
 
 In a case where the object keys are different from the entries keys in the konfiger object the function `matchGetKey` can be declared in the object to match the key when setting the object entries values, and the function `matchPutKey` is called when setting the konfiger entries from the object.
 
+Konfiger is aware of the type of an object field, if the type of a field is boolean the entry value will be parsed as boolean and assigned to the field. 
+
 For the file English.lang
 
-```scala
+```
 LoginTitle = Login Page
 AgeInstruction = You must me 18 years or above to register
 NewsletterOptin = Signup for our weekly news letter
+ShouldUpdate = true
 ```
 
 For an object which as the same key as the konfiger entries above there is no need to declare the matchGetKey or matchPutKey in the object. Resolve example
@@ -490,8 +498,9 @@ object Test_Scala {
     val LoginTitle: String = null
     val AgeInstruction: String = null
     val NewsletterOptin: String = null
+    val ShouldUpdate: Boolean = false
 
-    override def toString: String = "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction + ",NewsletterOptin=" + NewsletterOptin
+    override def toString: String = "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction + ",NewsletterOptin=" + NewsletterOptin + ",ShouldUpdate=" + ShouldUpdate
   }
 
 }
@@ -521,6 +530,7 @@ object Test_Scala {
     val LoginTitle = "Login Page"
     val AgeInstruction = "You must me 18 years or above to register"
     val NewsletterOptin = "Signup for our weekly news letter"
+    val ShouldUpdate = false
   }
 
 }

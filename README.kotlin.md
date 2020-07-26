@@ -357,6 +357,7 @@ For the file properties.conf
 ```
 project = konfiger
 author = Adewale Azeez
+islibrary = true
 ```
 
 ```kotlin
@@ -379,6 +380,7 @@ object Test_Kotlin {
         konfiger.resolve(properties)
         println(properties.project) // konfiger
         println(properties.author) // Adewale Azeez
+        println(properties.islibrary) // true
         konfiger.put("project", "konfiger-nodejs")
         println(properties.project) // konfiger-nodejs
     }
@@ -386,6 +388,7 @@ object Test_Kotlin {
     internal class Properties {
         var project: String? = null
         var author: String? = null
+        var islibrary = false
     }
 }
 ```
@@ -404,6 +407,7 @@ object Test_Kotlin {
     internal class Properties {
         var project = "konfiger"
         var author = "Adewale"
+        var islibrary = true
     }
 
     @Throws(
@@ -419,6 +423,7 @@ object Test_Kotlin {
         konfiger.dissolve(properties)
         println(konfiger["project"]) // konfiger
         println(konfiger["author"]) // Adewale Azeez
+        println(konfiger["islibrary"]) // true
     }
 }
 ```
@@ -462,12 +467,15 @@ The two function `resolve` is used to attach an object. resolve function integra
 
 In a case where the object keys are different from the entries keys in the konfiger object the function `matchGetKey` can be declared in the object to match the key when setting the object entries values, and the function `matchPutKey` is called when setting the konfiger entries from the object.
 
+Konfiger is aware of the type of an object field, if the type of a field is boolean the entry value will be parsed as boolean and assigned to the field. 
+
 For the file English.lang
 
-```kotlin
+```
 LoginTitle = Login Page
 AgeInstruction = You must me 18 years or above to register
 NewsletterOptin = Signup for our weekly news letter
+ShouldUpdate = true
 ```
 
 For an object which as the same key as the konfiger entries above there is no need to declare the matchGetKey or matchPutKey in the object. Resolve example
@@ -497,9 +505,10 @@ object Test_Kotlin {
         var LoginTitle: String? = null
         var AgeInstruction: String? = null
         var NewsletterOptin: String? = null
+        var ShouldUpdate = false
         override fun toString(): String {
             return "LoginTitle=" + LoginTitle + ",AgeInstruction=" + AgeInstruction +
-                    ",NewsletterOptin=" + NewsletterOptin
+                    ",NewsletterOptin=" + NewsletterOptin + ",ShouldUpdate=" + ShouldUpdate
         }
     }
 }
@@ -531,6 +540,7 @@ object Test_Kotlin {
         var LoginTitle = "Login Page"
         var AgeInstruction = "You must me 18 years or above to register"
         var NewsletterOptin = "Signup for our weekly news letter"
+        var ShouldUpdate = false
     }
 }
 ```
