@@ -18,11 +18,18 @@
 
     <distributionManagement>
         <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
+    <!--<distributionManagement>
+        <repository>
             <id>github</id>
             <name>Konfiger Maven Packages</name>
             <url>https://maven.pkg.github.com/konfiger/konfiger-jvm</url>
         </repository>
-    </distributionManagement>
+    </distributionManagement>-->
 
     <build>
         <plugins>
