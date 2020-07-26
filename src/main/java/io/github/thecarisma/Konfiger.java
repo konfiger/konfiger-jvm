@@ -126,14 +126,12 @@ public class Konfiger {
             String findKey = "";
             boolean isAnnotated = false;
             for(Field f : fields) {
-                if (f.getType() == String.class) {
-                    if (f.isAnnotationPresent(KonfigerValue.class)) {
-                        KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
-                        if (annotation.value().equals(key)) {
-                            isAnnotated = true;
-                            findKey = f.getName();
-                            break;
-                        }
+                if (f.isAnnotationPresent(KonfigerValue.class)) {
+                    KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                    if (annotation.value().equals(key)) {
+                        isAnnotated = true;
+                        findKey = f.getName();
+                        break;
                     }
                 }
             }
@@ -145,9 +143,25 @@ public class Konfiger {
                     findKey = key;
                 }
                 Field f = attachedResolveObj.getClass().getDeclaredField(findKey);
+                f.setAccessible(true);
                 if (f.getType() == String.class) {
-                    f.setAccessible(true); // kotlin is a knuckle head here
                     f.set(attachedResolveObj, value);
+
+                } else if (f.getType() == Boolean.class || f.getType() == boolean.class) {
+                    f.setBoolean(attachedResolveObj, Boolean.parseBoolean(value));
+
+                } else if (f.getType() == Long.class || f.getType() == long.class) {
+                    f.setLong(attachedResolveObj, Long.parseLong(value));
+
+                } else if (f.getType() == Integer.class || f.getType() == int.class) {
+                    f.setInt(attachedResolveObj, Integer.parseInt(value));
+
+                } else if (f.getType() == Float.class || f.getType() == float.class) {
+                    f.setFloat(attachedResolveObj, Float.parseFloat(value));
+
+                } else if (f.getType() == Double.class || f.getType() == double.class) {
+                    f.setDouble(attachedResolveObj, Double.parseDouble(value));
+
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 if (!stream.errTolerance) {
@@ -572,28 +586,43 @@ public class Konfiger {
                 matchGetKey.setAccessible(true);
             }
         }
-        for(Field f : fields){
-            if (f.getType() == String.class) {
-                String findKey = "";
-                boolean isAnnotated = false;
-                if (f.isAnnotationPresent(KonfigerValue.class)) {
-                    isAnnotated = true;
-                    KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
-                    if (!annotation.value().isEmpty()) {
-                        findKey = annotation.value();
-                    }
+        for(Field f : fields) {
+            String findKey = "";
+            boolean isAnnotated = false;
+            if (f.isAnnotationPresent(KonfigerValue.class)) {
+                isAnnotated = true;
+                KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                if (!annotation.value().isEmpty()) {
+                    findKey = annotation.value();
                 }
-                if (!isAnnotated && (matchGetKey == null ||
-                        ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
-                                findKey.equals("")))) {
+            }
+            if (!isAnnotated && (matchGetKey == null ||
+                    ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
+                            findKey.equals("")))) {
 
-                    findKey = f.getName();
-                }
-                if (contains(findKey)) {
-                    f.setAccessible(true); // kotlin is a knuckle head here
+                findKey = f.getName();
+            }
+            if (contains(findKey)) {
+                f.setAccessible(true);
+                if (f.getType() == String.class) {
                     f.set(object, get(findKey));
-                }
 
+                } else if (f.getType() == Boolean.class || f.getType() == boolean.class) {
+                    f.set(object, getBoolean(findKey));
+
+                } else if (f.getType() == Long.class || f.getType() == long.class) {
+                    f.set(object, getLong(findKey));
+
+                } else if (f.getType() == Integer.class || f.getType() == int.class) {
+                    f.set(object, getInt(findKey));
+
+                } else if (f.getType() == Float.class || f.getType() == float.class) {
+                    f.set(object, getFloat(findKey));
+
+                } else if (f.getType() == Double.class || f.getType() == double.class) {
+                    f.set(object, getDouble(findKey));
+
+                }
             }
         }
         this.attachedResolveObj = object;
@@ -610,26 +639,24 @@ public class Konfiger {
             }
         }
         for(Field f : fields){
-            if (f.getType() == String.class) {
-                String findKey = "";
-                boolean isAnnotated = false;
-                if (f.isAnnotationPresent(KonfigerValue.class)) {
-                    isAnnotated = true;
-                    KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
-                    if (!annotation.value().isEmpty()) {
-                        findKey = annotation.value();
-                    }
+            String findKey = "";
+            boolean isAnnotated = false;
+            if (f.isAnnotationPresent(KonfigerValue.class)) {
+                isAnnotated = true;
+                KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                if (!annotation.value().isEmpty()) {
+                    findKey = annotation.value();
                 }
-                if (!isAnnotated && (matchGetKey == null ||
-                        ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
-                                findKey.equals("")))) {
-
-                    findKey = f.getName();
-                }
-                f.setAccessible(true); // kotlin is a knuckle head here
-                Object v = f.get(object);
-                this.konfigerObjects.put(findKey, v.toString());
             }
+            if (!isAnnotated && (matchGetKey == null ||
+                    ((findKey = (String) matchGetKey.invoke(object, f.getName())) == null ||
+                            findKey.equals("")))) {
+
+                findKey = f.getName();
+            }
+            f.setAccessible(true); // kotlin is a knuckle head here
+            Object v = f.get(object);
+            this.konfigerObjects.put(findKey, v.toString());
         }
     }
 

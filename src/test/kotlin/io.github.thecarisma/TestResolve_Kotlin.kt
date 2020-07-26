@@ -60,6 +60,27 @@ class TestResolve_Kotlin {
         @KonfigerValue("File") var file = "test.comment.inf"
     }
 
+    internal class MixedTypes {
+        var project: String? = null
+        var weAllCake = false
+        var ageOfEarth: Long = 0
+        var lengthOfRiverNile = 0
+        var pi = 0f
+        var pie = 0.0
+
+        @KonfigerValue("AnnotatedEntry")
+        var annotatedEntry = false
+    }
+
+    internal class MixedTypesEntries {
+        var project = "konfiger"
+        var weAllCake = true
+        var ageOfEarth = 121526156252322L
+        var lengthOfRiverNile = 45454545
+        var pi = 3.14f
+        var pie = 1.1121
+    }
+
     @Test
     @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
     fun Invalid_Argument_Type_To_Konfiger_Resolve() {
@@ -191,6 +212,69 @@ class TestResolve_Kotlin {
         Assert.assertNotEquals(texts.author, "Thecarisma")
         kon.put("author", "Adewale")
         Assert.assertNotEquals(texts.author, "Adewale")
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
+    fun Resolve_With_matchGetKey_Function_MixedTypes() {
+        val entries = MixedTypes()
+        val kon = Konfiger(java.io.File("src/test/resources/mixed.types"))
+        kon.resolve(entries)
+        Assert.assertEquals(entries.project, "konfiger")
+        Assert.assertNotEquals(entries.weAllCake, "true")
+        Assert.assertTrue(entries.weAllCake)
+        Assert.assertTrue(entries.annotatedEntry)
+        Assert.assertNotEquals(entries.ageOfEarth, "121526156252322")
+        Assert.assertEquals(entries.ageOfEarth, 121526156252322L)
+        Assert.assertNotEquals(entries.lengthOfRiverNile, "45454545")
+        Assert.assertEquals(entries.lengthOfRiverNile.toLong(), 45454545)
+        Assert.assertNotEquals(entries.pi, "3.14")
+        Assert.assertEquals(entries.pi.toDouble(), 3.14, 1.0)
+        Assert.assertNotEquals(entries.pie, "1.1121")
+        Assert.assertEquals(entries.pie, 1.1121, 1.0)
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
+    fun Dissolve_An_MixedTypes_Object_Into_Konfiger() {
+        val kon = Konfiger("")
+        kon.dissolve(MixedTypesEntries())
+        Assert.assertEquals(kon.get("project"), "konfiger")
+        Assert.assertEquals(kon.get("weAllCake"), "true")
+        Assert.assertTrue(kon.getBoolean("weAllCake"))
+        Assert.assertEquals(kon.get("ageOfEarth"), "121526156252322")
+        Assert.assertEquals(kon.getLong("ageOfEarth"), 121526156252322L)
+        Assert.assertEquals(kon.get("lengthOfRiverNile"), "45454545")
+        Assert.assertEquals(kon.getInt("lengthOfRiverNile").toLong(), 45454545)
+        Assert.assertEquals(kon.get("pi"), "3.14")
+        Assert.assertEquals(kon.getFloat("pi").toDouble(), 3.14, 1.0)
+        Assert.assertEquals(kon.get("pie"), "1.1121")
+        Assert.assertEquals(kon.getDouble("pie"), 1.1121, 1.0)
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
+    fun Resolve_With_Changing_Values_For_MixedTypes() {
+        val texts = MixedTypes()
+        val kon = Konfiger(java.io.File("src/test/resources/mixed.types"))
+        kon.resolve(texts)
+        Assert.assertEquals(texts.project, "konfiger")
+        Assert.assertTrue(texts.weAllCake)
+        Assert.assertEquals(texts.ageOfEarth, 121526156252322L)
+        Assert.assertEquals(texts.lengthOfRiverNile.toLong(), 45454545)
+        Assert.assertEquals(texts.pi, 3.14f, 1f)
+        Assert.assertEquals(texts.pie, 1.1121, 1.0)
+        Assert.assertTrue(texts.annotatedEntry)
+        kon.put("project", "konfiger-nodejs")
+        kon.put("AnnotatedEntry", false)
+        kon.put("ageOfEarth", 121323L)
+        kon.put("pie", 2.1212)
+        Assert.assertEquals(texts.project, "konfiger-nodejs")
+        Assert.assertFalse(texts.annotatedEntry)
+        Assert.assertEquals(texts.ageOfEarth, 121323L)
+        Assert.assertEquals(texts.pie, 2.1212, 1.0)
+        kon.put("AnnotatedEntry", true)
+        Assert.assertTrue(texts.annotatedEntry)
     }
 
 }

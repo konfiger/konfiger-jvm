@@ -60,6 +60,25 @@ class TestResolve_Scala {
     @KonfigerValue("File") val file = "test.comment.inf"
   }
 
+  class MixedTypes {
+    val project = ""
+    val weAllCake = false
+    val ageOfEarth = 0L
+    val lengthOfRiverNile = 0
+    val pi = .0
+    val pie = .0
+    @KonfigerValue("AnnotatedEntry") val annotatedEntry = false
+  }
+
+  class MixedTypesEntries {
+    val project = "konfiger"
+    val weAllCake = true
+    val ageOfEarth = 121526156252322L
+    val lengthOfRiverNile = 45454545
+    val pi = 3.14F
+    val pie = 1.1121
+  }
+
   @Test
   @throws[IOException]
   @throws[InvalidEntryException]
@@ -215,6 +234,78 @@ class TestResolve_Scala {
     Assert.assertNotEquals(texts.author, "Thecarisma")
     kon.put("author", "Adewale")
     Assert.assertNotEquals(texts.author, "Adewale")
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[IllegalAccessException]
+  @throws[InvocationTargetException]
+  def Resolve_With_matchGetKey_Function_MixedTypes(): Unit = {
+    val entries = new MixedTypes
+    val kon = new Konfiger(new File("src/test/resources/mixed.types"))
+    kon.resolve(entries)
+    Assert.assertEquals(entries.project, "konfiger")
+    Assert.assertNotEquals(entries.weAllCake, "true")
+    Assert.assertTrue(entries.weAllCake)
+    Assert.assertTrue(entries.annotatedEntry)
+    Assert.assertNotEquals(entries.ageOfEarth, "121526156252322")
+    Assert.assertEquals(entries.ageOfEarth, 121526156252322L)
+    Assert.assertNotEquals(entries.lengthOfRiverNile, "45454545")
+    Assert.assertEquals(entries.lengthOfRiverNile, 45454545)
+    Assert.assertNotEquals(entries.pi, "3.14")
+    Assert.assertEquals(entries.pi, 3.14, 1)
+    Assert.assertNotEquals(entries.pie, "1.1121")
+    Assert.assertEquals(entries.pie, 1.1121, 1)
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[IllegalAccessException]
+  @throws[InvocationTargetException]
+  def Dissolve_An_MixedTypes_Object_Into_Konfiger(): Unit = {
+    val kon = new Konfiger("")
+    kon.dissolve(new MixedTypesEntries)
+    Assert.assertEquals(kon.get("project"), "konfiger")
+    Assert.assertEquals(kon.get("weAllCake"), "true")
+    Assert.assertTrue(kon.getBoolean("weAllCake"))
+    Assert.assertEquals(kon.get("ageOfEarth"), "121526156252322")
+    Assert.assertEquals(kon.getLong("ageOfEarth"), 121526156252322L)
+    Assert.assertEquals(kon.get("lengthOfRiverNile"), "45454545")
+    Assert.assertEquals(kon.getInt("lengthOfRiverNile"), 45454545)
+    Assert.assertEquals(kon.get("pi"), "3.14")
+    Assert.assertEquals(kon.getFloat("pi"), 3.14, 1)
+    Assert.assertEquals(kon.get("pie"), "1.1121")
+    Assert.assertEquals(kon.getDouble("pie"), 1.1121, 1)
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[IllegalAccessException]
+  @throws[InvocationTargetException]
+  def Resolve_With_Changing_Values_For_MixedTypes(): Unit = {
+    val texts = new MixedTypes
+    val kon = new Konfiger(new File("src/test/resources/mixed.types"))
+    kon.resolve(texts)
+    Assert.assertEquals(texts.project, "konfiger")
+    Assert.assertTrue(texts.weAllCake)
+    Assert.assertEquals(texts.ageOfEarth, 121526156252322L)
+    Assert.assertEquals(texts.lengthOfRiverNile, 45454545)
+    Assert.assertEquals(texts.pi, 3.14F, 1)
+    Assert.assertEquals(texts.pie, 1.1121, 1)
+    Assert.assertTrue(texts.annotatedEntry)
+    kon.put("project", "konfiger-nodejs")
+    kon.put("AnnotatedEntry", false)
+    kon.put("ageOfEarth", 121323L)
+    kon.put("pie", 2.1212)
+    Assert.assertEquals(texts.project, "konfiger-nodejs")
+    Assert.assertFalse(texts.annotatedEntry)
+    Assert.assertEquals(texts.ageOfEarth, 121323L)
+    Assert.assertEquals(texts.pie, 2.1212, 1)
+    kon.put("AnnotatedEntry", true)
+    Assert.assertTrue(texts.annotatedEntry)
   }
 
 }

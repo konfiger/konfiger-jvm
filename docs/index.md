@@ -53,7 +53,7 @@ Download the jar file from the [releases](https://github.com/konfiger/konfiger-j
 
 Add the following repository and dependency detail to your pom.xml
 
-Using Github Registry:
+Using mvn-repo:
 
 ```xml
 <dependencies>
@@ -66,8 +66,8 @@ Using Github Registry:
 
 <repositories>
     <repository>
-        <id>github</id>
-        <url>https://maven.pkg.github.com/konfiger/konfiger-jvm</url>
+        <id>konfiger</id>
+        <url>https://raw.github.com/konfiger/konfiger-jvm/mvn-repo/</url>
     </repository>
 </repositories>
 ```

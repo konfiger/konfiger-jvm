@@ -68,6 +68,25 @@ public class TestResolve_Java {
         @KonfigerValue("File") String file = "test.comment.inf";
     }
 
+    static class MixedTypes {
+        String project;
+        boolean weAllCake;
+        long ageOfEarth;
+        int lengthOfRiverNile;
+        float pi;
+        double pie;
+        @KonfigerValue("AnnotatedEntry") boolean annotatedEntry;
+    }
+
+    static class MixedTypesEntries {
+        String project = "konfiger";
+        boolean weAllCake = true;
+        long ageOfEarth = 121526156252322L;
+        int lengthOfRiverNile = 45454545;
+        float pi = 3.14F;
+        double pie = 1.1121;
+    }
+
     @Test
     public void Invalid_Argument_Type_To_Konfiger_Resolve() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
         Konfiger kon = new Konfiger(new File("src/test/resources/test.comment.inf"), true);
@@ -207,6 +226,72 @@ public class TestResolve_Java {
 
         kon.put("author", "Adewale");
         Assert.assertNotEquals(texts.author, "Adewale");
+    }
+
+    @Test
+    public void Resolve_With_matchGetKey_Function_MixedTypes() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        MixedTypes entries = new MixedTypes();
+        Konfiger kon = new Konfiger(new File("src/test/resources/mixed.types"));
+        kon.resolve(entries);
+
+        Assert.assertEquals(entries.project, "konfiger");
+        Assert.assertNotEquals(entries.weAllCake, "true");
+        Assert.assertTrue(entries.weAllCake);
+        Assert.assertTrue(entries.annotatedEntry);
+        Assert.assertNotEquals(entries.ageOfEarth, "121526156252322");
+        Assert.assertEquals(entries.ageOfEarth, 121526156252322L);
+        Assert.assertNotEquals(entries.lengthOfRiverNile, "45454545");
+        Assert.assertEquals(entries.lengthOfRiverNile, 45454545);
+        Assert.assertNotEquals(entries.pi, "3.14");
+        Assert.assertEquals(entries.pi, 3.14, 1);
+        Assert.assertNotEquals(entries.pie, "1.1121");
+        Assert.assertEquals(entries.pie, 1.1121, 1);
+    }
+
+    @Test
+    public void Dissolve_An_MixedTypes_Object_Into_Konfiger() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        Konfiger kon = new Konfiger("");
+        kon.dissolve(new MixedTypesEntries());
+
+        Assert.assertEquals(kon.get("project"), "konfiger");
+        Assert.assertEquals(kon.get("weAllCake"), "true");
+        Assert.assertTrue(kon.getBoolean("weAllCake"));
+        Assert.assertEquals(kon.get("ageOfEarth"), "121526156252322");
+        Assert.assertEquals(kon.getLong("ageOfEarth"), 121526156252322L);
+        Assert.assertEquals(kon.get("lengthOfRiverNile"), "45454545");
+        Assert.assertEquals(kon.getInt("lengthOfRiverNile"), 45454545);
+        Assert.assertEquals(kon.get("pi"), "3.14");
+        Assert.assertEquals(kon.getFloat("pi"), 3.14, 1);
+        Assert.assertEquals(kon.get("pie"), "1.1121");
+        Assert.assertEquals(kon.getDouble("pie"), 1.1121, 1);
+    }
+
+    @Test
+    public void Resolve_With_Changing_Values_For_MixedTypes() throws IOException, InvalidEntryException, IllegalAccessException, InvocationTargetException {
+        MixedTypes texts = new MixedTypes();
+        Konfiger kon = new Konfiger(new File("src/test/resources/mixed.types"));
+        kon.resolve(texts);
+
+        Assert.assertEquals(texts.project, "konfiger");
+        Assert.assertTrue(texts.weAllCake);
+        Assert.assertEquals(texts.ageOfEarth, 121526156252322L);
+        Assert.assertEquals(texts.lengthOfRiverNile, 45454545);
+        Assert.assertEquals(texts.pi, 3.14F, 1);
+        Assert.assertEquals(texts.pie, 1.1121, 1);
+        Assert.assertTrue(texts.annotatedEntry);
+
+        kon.put("project", "konfiger-nodejs");
+        kon.put("AnnotatedEntry", false);
+        kon.put("ageOfEarth", 121323L);
+        kon.put("pie", 2.1212);
+
+        Assert.assertEquals(texts.project, "konfiger-nodejs");
+        Assert.assertFalse(texts.annotatedEntry);
+        Assert.assertEquals(texts.ageOfEarth, 121323L);
+        Assert.assertEquals(texts.pie, 2.1212, 1);
+
+        kon.put("AnnotatedEntry", true);
+        Assert.assertTrue(texts.annotatedEntry);
     }
 
 }
