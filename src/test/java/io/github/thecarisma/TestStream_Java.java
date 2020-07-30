@@ -110,7 +110,7 @@ public class TestStream_Java {
     public void Read_Multiline_Entry_And_Test_Continuation_Char_In_File_Stream() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
         while (ks.hasNext()) {
-            Assert.assertFalse(ks.next()[1].contains("\n"));
+            Assert.assertFalse(ks.next()[1].endsWith("\\"));
         }
     }
 
@@ -126,7 +126,7 @@ public class TestStream_Java {
                 "               and whatever language possible in the future");
         ks.setContinuationChar('+');
         while (ks.hasNext()) {
-            Assert.assertFalse(ks.next()[1].contains("\n"));
+            Assert.assertFalse(ks.next()[1].endsWith("\\"));
         }
     }
 

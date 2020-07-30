@@ -129,7 +129,7 @@ class TestStream_Scala {
     val ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"))
     while ( {
       ks.hasNext
-    }) Assert.assertFalse(ks.next()(1).contains("\n"))
+    }) Assert.assertFalse(ks.next()(1).endsWith("\\"))
   }
 
   @Test
@@ -146,7 +146,7 @@ class TestStream_Scala {
     ks.setContinuationChar('+')
     while ( {
       ks.hasNext
-    }) Assert.assertFalse(ks.next()(1).contains("\n"))
+    }) Assert.assertFalse(ks.next()(1).endsWith("\\"))
   }
 
   @Test

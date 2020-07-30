@@ -120,7 +120,7 @@ class TestStream_Kotlin {
     fun Read_Multiline_Entry_And_Test_Continuation_Char_In_File_Stream() {
         val ks = KonfigerStream(File("src/test/resources/test.contd.conf"))
         while (ks.hasNext()) {
-            Assert.assertFalse(ks.next()[1].contains("\n"))
+            Assert.assertFalse(ks.next()[1].endsWith("\\"))
         }
     }
 
@@ -137,7 +137,7 @@ class TestStream_Kotlin {
                 "               and whatever language possible in the future")
         ks.continuationChar = '+'
         while (ks.hasNext()) {
-            Assert.assertFalse(ks.next()[1].contains("\n"))
+            Assert.assertFalse(ks.next()[1].endsWith("\\"))
         }
     }
 
