@@ -817,6 +817,7 @@ konfiger.save();
 | public void putInt(String key, int value)           | Put a Int into the konfiger, alias for `public void putLong(String key, long value)`.
 | public void putFloat(String key, float value)           | Put a Float into the konfiger, the second parameter must be a Float
 | public void putDouble(String key, double value)           | Put a Double into the konfiger, the second parameter must be a Double
+| public void putComment(String theComment)           | Put a literal comment into the konfiger, it simply add the comment prefix as key and value to the entries e.g. `kon.putComment("Hello World")` add the entry `//:Hello World`
 | public Set<String> keys()           | Get all the keys entries in the konfiger object in iterable array list
 | public Collection<String> values()           | Get all the values entries in the konfiger object in iterable array list
 | public Set<Map.Entry<String, String>> entries()           | Get all the entries in the konfiger in a `Set<Map.Entry<String, String>>`
