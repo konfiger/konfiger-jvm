@@ -260,4 +260,13 @@ class TestKonfiger_Scala {
     Assert.assertEquals(kon1.size, kon1.size)
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Check_putComment_In_The_Konfiger_Object(): Unit = {
+    val kon = new Konfiger("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", false, ':', ',')
+    kon.putComment("A comment at the end")
+    Assert.assertTrue(kon.toString.contains("//:A comment"))
+  }
+
 }

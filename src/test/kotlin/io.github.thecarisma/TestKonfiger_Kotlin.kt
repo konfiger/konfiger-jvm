@@ -248,4 +248,12 @@ class TestKonfiger_Kotlin {
         Assert.assertFalse(kon1.isEmpty)
         Assert.assertEquals(kon1.size().toLong(), kon1.size().toLong())
     }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Check_putComment_In_The_Konfiger_Object() {
+        val kon = Konfiger("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", false, ':', ',')
+        kon.putComment("A comment at the end")
+        Assert.assertTrue(kon.toString().contains("//:A comment"))
+    }
 }

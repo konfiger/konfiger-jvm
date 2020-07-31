@@ -195,6 +195,10 @@ public class Konfiger {
         putString(key, Double.toString(value));
     }
 
+    public void putComment(String theComment) {
+        putString(this.stream.getCommentPrefix(), theComment);
+    }
+
     public Object get(String key) {
         if (enableCache_) {
             if (currentCachedObject[0].equals(key)) {
