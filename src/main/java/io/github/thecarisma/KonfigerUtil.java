@@ -1,5 +1,8 @@
 package io.github.thecarisma;
 
+/**
+ * @author Adewale Azeez <azeezadewale98@gmail.com>
+ */
 class KonfigerUtil {
 
     public static String escapeString(String value, char... extraEscapes) {

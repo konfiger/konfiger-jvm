@@ -2,6 +2,9 @@ package io.github.thecarisma;
 
 import java.io.*;
 
+/**
+ * @author Adewale Azeez <azeezadewale98@gmail.com>
+ */
 public class KonfigerStream {
 
     char delimeter;

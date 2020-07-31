@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Adewale Azeez <azeezadewale98@gmail.com>
+ */
 public class Konfiger {
 
     public static int MAX_CAPACITY = 10000000;
