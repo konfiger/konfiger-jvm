@@ -256,4 +256,18 @@ public class TestKonfiger_Java {
         Assert.assertEquals(kon1.size(), kon1.size());
     }
 
+    @Test
+    public void Check_Size_In_LazyLoad_And_No_LazyLoad() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        Konfiger kon = new Konfiger(ks, false);
+        KonfigerStream ks1 = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        Konfiger kon1 = new Konfiger(ks1, true);
+
+        Assert.assertTrue(kon.size() > 0);
+        Assert.assertTrue(kon1.size() > 0);
+        Assert.assertFalse(kon.isEmpty());
+        Assert.assertFalse(kon1.isEmpty());
+        Assert.assertEquals(kon1.size(), kon1.size());
+    }
+
 }
