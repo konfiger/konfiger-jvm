@@ -842,6 +842,8 @@ konfiger.save();
 | public char getDelimeter()           | Get delimeter char that seperated the key from it value, default is `=`.
 | public void setSeperator(char seperator)           | Change seperator char that seperate the datas, note that the file is not updates, to change the file call the `save()` function. If the new seperator is different from the old one all the entries values will be re parsed to get the new proper values, this process can take time if the entries is much.
 | public void setDelimeter(char delimeter)           | Change delimeter char that seperated the key from object, note that the file is not updates, to change the file call the `save()` function 
+| public void setCaseSensitivity(boolean caseSensitive) | change the case sensitivity of the konfiger object, if true `get("Key")` and `get("key")` will return different value, if false same value will be returned.
+| public boolean isCaseSensitive() | Return true if the konfiger object is case sensitive and false if it not case sensitive
 | public int size()           | Get the total size of key value entries in the konfiger
 | public void clear()           | clear all the key value entries in the konfiger. This does not update the file call the `save` method to update the file
 | public boolean isEmpty()           | Check if the konfiger does not have an key value entry.
