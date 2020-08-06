@@ -19,11 +19,12 @@ import java.util.Set;
 public class Konfiger {
 
     public static int MAX_CAPACITY = 10000000;
-    private KonfigerStream stream;
+    private final KonfigerStream stream;
     private boolean lazyLoad = false;
     private String filePath = "";
     private boolean enableCache_ = true;
-    private Map<String, String> konfigerObjects = new HashMap<>();
+    private boolean caseSensitive = true;
+    private final Map<String, String> konfigerObjects = new HashMap<>();
     String[] prevCachedObject = {"", ""};
     String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
@@ -211,6 +212,14 @@ public class Konfiger {
                 return prevCachedObject[1];
             }
         }
+        if (!caseSensitive) {
+            for (String entryKey : keys()) {
+                if (entryKey.toLowerCase().equals(key.toLowerCase())) {
+                    key = entryKey;
+                    break;
+                }
+            }
+        }
         if (!contains(key)) {
             return null;
         }
@@ -222,68 +231,27 @@ public class Konfiger {
     }
 
     public String getString(String key) {
-        Object ret = get(key);
-        return (ret != null ? ret.toString() : "");
+        return getString(key, "");
     }
 
     public boolean getBoolean(String key) {
-        boolean ret = false;
-        try {
-            ret = Boolean.parseBoolean(getString(key));
-        } catch (Exception ex) {
-            if (!stream.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
+        return getBoolean(key, false);
     }
 
     public long getLong(String key) {
-        long ret = 0;
-        try {
-            ret = Long.parseLong(getString(key));
-        } catch (Exception ex) {
-            if (!stream.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
+        return getLong(key, 0L);
     }
 
     public int getInt(String key) {
-        int ret = 0;
-        try {
-            ret = Integer.parseInt(getString(key));
-        } catch (Exception ex) {
-            if (!stream.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
+        return getInt(key, 0);
     }
 
     public float getFloat(String key) {
-        float ret = 0;
-        try {
-            ret = Float.parseFloat(getString(key));
-        } catch (Exception ex) {
-            if (!stream.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
+        return getFloat(key, 0F);
     }
 
     public double getDouble(String key) {
-        double ret = 0;
-        try {
-            ret = Double.parseDouble(getString(key));
-        } catch (Exception ex) {
-            if (!stream.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
+        return getDouble(key, 0.0);
     }
 
     public Object get(String key, Object fallbackValue) {
@@ -496,6 +464,14 @@ public class Konfiger {
                 konfigerObjects.put(key, KonfigerUtil.unEscapeString(konfigerObjects.get(key), oldSeperator));
             }
         }
+    }
+
+    public void setCaseSensitivity(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
     }
 
     @Override

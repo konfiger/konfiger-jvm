@@ -267,4 +267,31 @@ class TestKonfiger_Scala {
     Assert.assertTrue(kon.toString.contains("//:A comment"))
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Validate_Konfiger_Entries_With_Case_Sensitivity(): Unit = {
+    val kon = new Konfiger("String=This is a string\n" + "Number=215415245")
+    kon.setCaseSensitivity(true)
+    Assert.assertTrue(kon.isCaseSensitive)
+    try {
+      Assert.assertEquals(kon.get("STRING"), "This is a string")
+      Assert.assertEquals(kon.get("NUMBER"), "215415245")
+      Assert.assertEquals(1, 0)
+    } catch {
+      case ex: AssertionError =>
+        Assert.assertTrue(true)
+    }
+    kon.setCaseSensitivity(false)
+    Assert.assertFalse(kon.isCaseSensitive)
+    Assert.assertEquals(kon.get("STRING"), "This is a string")
+    Assert.assertEquals(kon.get("NUMBER"), "215415245")
+    Assert.assertEquals(kon.get("strING"), "This is a string")
+    Assert.assertEquals(kon.get("nuMBer"), "215415245")
+    Assert.assertEquals(kon.get("STRiNg"), "This is a string")
+    Assert.assertEquals(kon.get("nUMbeR"), "215415245")
+    Assert.assertEquals(kon.get("string"), "This is a string")
+    Assert.assertEquals(kon.get("number"), "215415245")
+  }
+
 }

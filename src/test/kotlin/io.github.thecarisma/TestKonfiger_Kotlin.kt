@@ -254,4 +254,32 @@ class TestKonfiger_Kotlin {
         kon.putComment("A comment at the end")
         Assert.assertTrue(kon.toString().contains("//:A comment"))
     }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Validate_Konfiger_Entries_With_Case_Sensitivity() {
+        val kon = Konfiger("""
+    String=This is a string
+    Number=215415245
+    """.trimIndent())
+        kon.setCaseSensitivity(true)
+        Assert.assertTrue(kon.isCaseSensitive)
+        try {
+            Assert.assertEquals(kon["STRING"], "This is a string")
+            Assert.assertEquals(kon["NUMBER"], "215415245")
+            Assert.assertEquals(1, 0)
+        } catch (ex: AssertionError) {
+            Assert.assertTrue(true)
+        }
+        kon.setCaseSensitivity(false)
+        Assert.assertFalse(kon.isCaseSensitive)
+        Assert.assertEquals(kon["STRING"], "This is a string")
+        Assert.assertEquals(kon["NUMBER"], "215415245")
+        Assert.assertEquals(kon["strING"], "This is a string")
+        Assert.assertEquals(kon["nuMBer"], "215415245")
+        Assert.assertEquals(kon["STRiNg"], "This is a string")
+        Assert.assertEquals(kon["nUMbeR"], "215415245")
+        Assert.assertEquals(kon["string"], "This is a string")
+        Assert.assertEquals(kon["number"], "215415245")
+    }
 }
