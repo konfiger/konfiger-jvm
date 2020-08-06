@@ -169,4 +169,33 @@ class TestStream_Kotlin {
         Assert.assertEquals(count.toLong(), 3)
     }
 
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Test_Error_Tolerancy_In_String_Stream() {
+        val ks = KonfigerStream("Firt=1st", '-', '$', true)
+        Assert.assertTrue(ks.isErrorTolerant)
+        while (ks.hasNext()) {
+            Assert.assertTrue(ks.next()[1].isEmpty())
+        }
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Test_Error_Tolerancy_In_File_Stream() {
+        val ks = KonfigerStream(File("src/test/resources/test.comment.inf"))
+        Assert.assertFalse(ks.isErrorTolerant)
+        while (ks.hasNext()) {
+            try {
+                Assert.assertFalse(ks.next()[1].isEmpty())
+            } catch (ex: InvalidEntryException) {
+                break
+            }
+        }
+        ks.errorTolerance(true)
+        Assert.assertTrue(ks.isErrorTolerant)
+        while (ks.hasNext()) {
+            Assert.assertNotEquals(ks.next(), null)
+        }
+    }
+
 }

@@ -82,7 +82,6 @@ class TestKonfiger_Scala {
   @throws[InvalidEntryException]
   def Validate_Konfiger_Default_Value_For_Non_Existing_Key(): Unit = {
     val konfiger = new Konfiger("")
-    konfiger.errorTolerance(true)
     Assert.assertNull(konfiger.get("Name"))
     Assert.assertNotEquals(konfiger.getString("Name"), null)
     Assert.assertEquals(konfiger.getString("Name"), "")
@@ -101,7 +100,6 @@ class TestKonfiger_Scala {
   @throws[InvalidEntryException]
   def Remove_Entry_And_Validate_Size(): Unit = {
     val konfiger = new Konfiger("One=111,Two=222,Three=333", false, '=', ',')
-    konfiger.errorTolerance(true)
     Assert.assertEquals(konfiger.size, 3)
     Assert.assertNotEquals(konfiger.get("Two"), null)
     Assert.assertEquals(konfiger.remove("Two"), "222")

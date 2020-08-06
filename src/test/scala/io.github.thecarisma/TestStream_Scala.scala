@@ -1,5 +1,6 @@
 package io.github.thecarisma
 
+import scala.util.control.Breaks._
 import java.io.{File, FileNotFoundException, IOException}
 
 import org.junit.{Assert, Test}
@@ -181,6 +182,40 @@ class TestStream_Scala {
       count += 1
     }
     Assert.assertEquals(count, 3)
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Test_Error_Tolerancy_In_String_Stream(): Unit = {
+    val ks = new KonfigerStream("Firt=1st", '-', '$', true)
+    Assert.assertTrue(ks.isErrorTolerant)
+    while ( {
+      ks.hasNext
+    }) Assert.assertTrue(ks.next()(1).isEmpty)
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def Test_Error_Tolerancy_In_File_Stream(): Unit = {
+    val ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
+    Assert.assertFalse(ks.isErrorTolerant)
+    breakable {
+      while ( {
+        ks.hasNext
+      }) try Assert.assertFalse(ks.next()(1).isEmpty)
+      catch {
+        case ex: InvalidEntryException =>
+          break
+
+      }
+    }
+    ks.errorTolerance(true)
+    Assert.assertTrue(ks.isErrorTolerant)
+    while ( {
+      ks.hasNext
+    }) Assert.assertNotEquals(ks.next, null)
   }
 
 }

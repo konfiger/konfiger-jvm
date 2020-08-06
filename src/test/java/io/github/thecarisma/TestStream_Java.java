@@ -158,4 +158,33 @@ public class TestStream_Java {
         Assert.assertEquals(count, 3);
     }
 
+    @Test
+    public void Test_Error_Tolerancy_In_String_Stream() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Firt=1st", '-', '$', true);
+
+        Assert.assertTrue(ks.isErrorTolerant());
+        while(ks.hasNext()) {
+            Assert.assertTrue(ks.next()[1].isEmpty());
+        }
+    }
+
+    @Test
+    public void Test_Error_Tolerancy_In_File_Stream() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+
+        Assert.assertFalse(ks.isErrorTolerant());
+        while(ks.hasNext()) {
+            try {
+                Assert.assertFalse(ks.next()[1].isEmpty());
+            } catch (InvalidEntryException ex) {
+                break;
+            }
+        }
+        ks.errorTolerance(true);
+        Assert.assertTrue(ks.isErrorTolerant());
+        while(ks.hasNext()) {
+            Assert.assertNotEquals(ks.next(), null);
+        }
+    }
+
 }

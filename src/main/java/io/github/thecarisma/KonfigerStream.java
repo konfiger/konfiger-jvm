@@ -94,6 +94,14 @@ public class KonfigerStream {
         this.continuationChar = continuationChar;
     }
 
+    public void errorTolerance(boolean errTolerance) {
+        this.errTolerance = errTolerance;
+    }
+
+    public boolean isErrorTolerant() {
+        return this.errTolerance;
+    }
+
     public boolean hasNext() throws IOException {
         int subCount = 0;
         int commetPrefixSize = commentPrefix.length();

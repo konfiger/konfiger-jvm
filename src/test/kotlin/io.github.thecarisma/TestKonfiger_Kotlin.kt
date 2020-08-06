@@ -81,7 +81,6 @@ class TestKonfiger_Kotlin {
     @Throws(IOException::class, InvalidEntryException::class)
     fun Validate_Konfiger_Default_Value_For_Non_Existing_Key() {
         val konfiger = Konfiger("")
-        konfiger.errorTolerance(true)
         Assert.assertNull(konfiger["Name"])
         Assert.assertNotEquals(konfiger.getString("Name"), null)
         Assert.assertEquals(konfiger.getString("Name"), "")
@@ -99,7 +98,6 @@ class TestKonfiger_Kotlin {
     @Throws(IOException::class, InvalidEntryException::class)
     fun Remove_Entry_And_Validate_Size() {
         val konfiger = Konfiger("One=111,Two=222,Three=333", false, '=', ',')
-        konfiger.errorTolerance(true)
         Assert.assertEquals(konfiger.size().toLong(), 3)
         Assert.assertNotEquals(konfiger["Two"], null)
         Assert.assertEquals(konfiger.remove("Two"), "222")

@@ -498,14 +498,6 @@ public class Konfiger {
         }
     }
 
-    public void errorTolerance(boolean errTolerance) {
-        this.stream.errTolerance = errTolerance;
-    }
-
-    public boolean isErrorTolerant() {
-        return this.stream.errTolerance;
-    }
-
     @Override
     public String toString() {
         if (changesOccur) {
