@@ -792,6 +792,8 @@ konfiger.save();
 | public void setCommentPrefix(String commentPrefix) | Change the stream comment prefix, any entry starting with the comment prefix will be skipped. Comment in KonfigerStream is relative to the key value entry and not relative to a line.he key value entry and not relative to a line.
 | public void setContinuationChar(char continuationChar) | Set the character that indicates to the stream to continue reading for the entry value on the next line. The follwoing line leading spaces is trimmed. The default is `\`
 | public char getContinuationChar() | Get the continuation character used in the stream.
+| public void errorTolerance(boolean errTolerance)           | Enable or disable the error tolerancy property of the konfiger, if enabled no exception will be throw even when it suppose to there for it a bad idea but useful in a fail safe environment.
+| public boolean isErrorTolerant() | Check if the konfiger object errTolerance is set to true.
 
 ### Konfiger
 
@@ -845,8 +847,6 @@ konfiger.save();
 | public void updateAt(int index, String value)           | Update the value at the specified index with the new string value, throws an error if the index is OutOfRange 
 | public boolean contains(String key)           | Check if the konfiger contains a key 
 | public void enableCache(boolean enableCache_)           | Enable or disable caching, caching speeds up data search but can take up space in memory (very small though). Using `getString` method to fetch vallue **99999999999** times with cache disabled takes over 1hr and with cache enabled takes 20min.
-| public void errorTolerance(boolean errTolerance)           | Enable or disable the error tolerancy property of the konfiger, if enabled no exception will be throw even when it suppose to there for it a bad idea but useful in a fail safe environment.
-| public boolean isErrorTolerant() | Check if the konfiger object errTolerance is set to true.
 | @Override public String toString()           | All the kofiger datas are parsed into valid string with regards to the delimeter and seprator, the result of this method is what get written to file in the `save` method. The result is cached and calling the method while the no entry is added, deleted or updated just return the last result instead of parsing the entries again.
 | public void resolve(Object object) throws IllegalAccessException, InvocationTargetException           | Attach an object to konfiger, on attachment the values of the entries in the object will be set to the coresponding value in konfiger. The object can have the `matchGetKey` function which is called with a key in konfiger to get the value to map to the entry and the function `matchPutKey` to check which value to fetch from the object to put into konfiger.
 | public void dissolve(Object object) throws IllegalAccessException, InvocationTargetException | Each string fields in the object will be put into konfiger. The object can have the `matchGetKey` function which is called with a key in konfiger to get the value to map to the entry. This does not attach the object.
