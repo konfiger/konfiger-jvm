@@ -412,7 +412,7 @@ public class Konfiger {
                 return remove(key);
             }
         }
-        return "";
+        return null;
     }
 
     public void updateAt(int index, String value) {
