@@ -420,7 +420,7 @@ public class Konfiger {
                     this.changesOccur = true;
                     enableCache(enableCache_);
                     konfigerObjects.put(key, value);
-                    break
+                    break;
                 }
             }
         }
