@@ -282,4 +282,27 @@ class TestKonfiger_Kotlin {
         Assert.assertEquals(kon["string"], "This is a string")
         Assert.assertEquals(kon["number"], "215415245")
     }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Check_The_UpdateAt_Method() {
+        val kon = Konfiger("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", false, ':', ',')
+        Assert.assertEquals(kon["Date"], "April 24 2020")
+        Assert.assertEquals(kon["Name"], "Adewale Azeez")
+        kon.updateAt(1, "12 BC")
+        kon.updateAt(0, "Thecarisma")
+        Assert.assertEquals(kon["Date"], "12 BC")
+        Assert.assertEquals(kon["Name"], "Thecarisma")
+    }
+
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class)
+    fun Save_Content_And_Validate_Saved_Content() {
+        val kon = Konfiger("Name=Adewale Azeez,Date=April 24 2020,One=111,Two=222,Three=333", false, '=', ',')
+        Assert.assertEquals(kon.size().toLong(), 5)
+        kon.save("src/test/resources/konfiger.conf")
+        val kon2 = Konfiger(File("src/test/resources/konfiger.conf"), false, '=', ',')
+        Assert.assertEquals(kon.toString(), kon.toString())
+        Assert.assertEquals(kon2.size().toLong(), 5)
+    }
 }

@@ -23,3 +23,5 @@
 /target/
 /nbproject/
 /.idea/
+
+src/test/resources/konfiger.conf

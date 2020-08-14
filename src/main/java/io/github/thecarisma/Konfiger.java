@@ -4,14 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Adewale Azeez <azeezadewale98@gmail.com>
@@ -24,7 +20,7 @@ public class Konfiger {
     private String filePath = "";
     private boolean enableCache_ = true;
     private boolean caseSensitive = true;
-    private final Map<String, String> konfigerObjects = new HashMap<>();
+    private final Map<String, String> konfigerObjects = new LinkedHashMap<>();
     String[] prevCachedObject = {"", ""};
     String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
@@ -496,13 +492,17 @@ public class Konfiger {
         return stringValue;
     }
 
-    public void save() throws FileNotFoundException {
+    public void save() throws IOException {
         save(filePath);
     }
 
-    public void save(String filePath) throws FileNotFoundException {
+    public void save(String filePath) throws IOException {
         stringValue = toString();
-        try (PrintWriter out = new PrintWriter(filePath)) {
+        File file = new File(filePath);
+        if (!file.exists() && !file.createNewFile()) {
+            throw new IOException("Unable to create the file: " + file.getAbsolutePath());
+        }
+        try (PrintWriter out = new PrintWriter(file)) {
             out.write(stringValue);
         }
     }

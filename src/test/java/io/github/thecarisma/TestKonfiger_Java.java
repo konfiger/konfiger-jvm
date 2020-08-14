@@ -292,4 +292,27 @@ public class TestKonfiger_Java {
         Assert.assertEquals(kon.get("number"), "215415245");
     }
 
+    @Test
+    public void Check_The_UpdateAt_Method() throws IOException, InvalidEntryException {
+        Konfiger kon = new Konfiger("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", false, ':', ',');
+
+        Assert.assertEquals(kon.get("Date"), "April 24 2020");
+        Assert.assertEquals(kon.get("Name"), "Adewale Azeez");
+        kon.updateAt(1, "12 BC");
+        kon.updateAt(0, "Thecarisma");
+        Assert.assertEquals(kon.get("Date"), "12 BC");
+        Assert.assertEquals(kon.get("Name"), "Thecarisma");
+    }
+
+    @Test
+    public void Save_Content_And_Validate_Saved_Content() throws IOException, InvalidEntryException {
+        Konfiger kon = new Konfiger("Name=Adewale Azeez,Date=April 24 2020,One=111,Two=222,Three=333", false, '=', ',');
+
+        Assert.assertEquals(kon.size(), 5);
+        kon.save("src/test/resources/konfiger.conf");
+        Konfiger kon2 = new Konfiger(new File("src/test/resources/konfiger.conf"), false, '=', ',');
+        Assert.assertEquals(kon.toString(), kon.toString());
+        Assert.assertEquals(kon2.size(), 5);
+    }
+
 }
