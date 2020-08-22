@@ -277,4 +277,28 @@ class TestResolve_Kotlin {
         Assert.assertTrue(texts.annotatedEntry)
     }
 
+    @Test
+    @Throws(IOException::class, InvalidEntryException::class, IllegalAccessException::class, InvocationTargetException::class)
+    fun Resolve_With_Changing_Values_And_Map_Key_With_attach() {
+        val texts = TestResolve_Java.Texts()
+        val kStream = KonfigerStream(File("src/test/resources/test.comment.inf"))
+        kStream.commentPrefix = "["
+        val kon = Konfiger(kStream)
+        kon.attach(texts)
+        Assert.assertNotEquals(texts.project, "konfiger")
+        Assert.assertNotEquals(texts.Platform, "Cross Platform")
+        Assert.assertNotEquals(texts.author, "Adewale Azeez")
+        kon.put("Project", "konfiger-nodejs")
+        kon.put("Platform", "Windows, Linux, Mac, Raspberry")
+        kon.put("author", "Thecarisma")
+        Assert.assertEquals(texts.project, "konfiger-nodejs")
+        Assert.assertTrue(texts.Platform.contains("Windows"))
+        Assert.assertTrue(texts.Platform.contains("Linux"))
+        Assert.assertTrue(texts.Platform.contains("Mac"))
+        Assert.assertTrue(texts.Platform.contains("Raspberry"))
+        Assert.assertEquals(texts.author, "Thecarisma")
+        kon.put("author", "Adewale")
+        Assert.assertEquals(texts.author, "Adewale")
+    }
+
 }

@@ -308,4 +308,31 @@ class TestResolve_Scala {
     Assert.assertTrue(texts.annotatedEntry)
   }
 
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  @throws[IllegalAccessException]
+  @throws[InvocationTargetException]
+  def Resolve_With_Changing_Values_And_Map_Key_With_attach(): Unit = {
+    val texts = new TestResolve_Java.Texts
+    val kStream = new KonfigerStream(new File("src/test/resources/test.comment.inf"))
+    kStream.setCommentPrefix("[")
+    val kon = new Konfiger(kStream)
+    kon.attach(texts)
+    Assert.assertNotEquals(texts.project, "konfiger")
+    Assert.assertNotEquals(texts.Platform, "Cross Platform")
+    Assert.assertNotEquals(texts.author, "Adewale Azeez")
+    kon.put("Project", "konfiger-nodejs")
+    kon.put("Platform", "Windows, Linux, Mac, Raspberry")
+    kon.put("author", "Thecarisma")
+    Assert.assertEquals(texts.project, "konfiger-nodejs")
+    Assert.assertTrue(texts.Platform.contains("Windows"))
+    Assert.assertTrue(texts.Platform.contains("Linux"))
+    Assert.assertTrue(texts.Platform.contains("Mac"))
+    Assert.assertTrue(texts.Platform.contains("Raspberry"))
+    Assert.assertEquals(texts.author, "Thecarisma")
+    kon.put("author", "Adewale")
+    Assert.assertEquals(texts.author, "Adewale")
+  }
+
 }
