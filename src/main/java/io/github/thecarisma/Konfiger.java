@@ -636,6 +636,10 @@ public class Konfiger {
         }
     }
 
+    public void attach(Object object) {
+        attachedResolveObj = object;
+    }
+
     public Object detach() {
         Object tmpObj = attachedResolveObj;
         attachedResolveObj = null;
