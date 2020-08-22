@@ -228,14 +228,12 @@ object Test_Kotlin {
         //at this point nothing is read from the file
 
         //the size of konfiger is 0 even if the file contains over 1000 entries
-        println(konfiger.size())
 
         //the key 'Twos' is at the second line in the file, therefore two entry has
         //been read to get the value.
         println(konfiger["Twos"])
 
         //the size becomes 2,
-        println(konfiger.size())
 
         //to read all the entries simply call the toString() method
         println(konfiger.toString())
