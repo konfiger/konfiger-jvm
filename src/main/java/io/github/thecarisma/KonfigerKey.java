@@ -8,12 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @deprecated use {@link KonfigerKey} instead
- */
-@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface KonfigerValue {
+public @interface KonfigerKey {
     String value() default "";
 }

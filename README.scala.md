@@ -1,4 +1,4 @@
-# <p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/master/icons/konfiger-scala.png" alt="konfiger-scala" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-scala</p>
+# <p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/main/icons/konfiger-scala.png" alt="konfiger-scala" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-scala</p>
 
 <p style="text-align: center;" align="center">Light weight package to manage key value based configuration and data files.</p>
 
@@ -266,7 +266,7 @@ object Test_Scala {
 
 ### Read file with Stream
 
-Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/main/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
 ```scala
 import io.github.thecarisma._
@@ -290,7 +290,7 @@ object Test_Scala {
 
 ### Read String with Stream
 
-Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/main/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
 ```scala
 import io.github.thecarisma._
@@ -654,7 +654,7 @@ object Test_Scala {
 
 ### Annotation
 
-A more cleaner way to map an entry key to a field in an object is to use the KonfigerValue anotation. The annotation accept the key value to map to the field in konfiger.
+A more cleaner way to map an entry key to a field in an object is to use the KonfigerKey anotation. The annotation accept the key value to map to the field in konfiger.
 
 The annotation is used for lookup when resolving or disolving an object and when changing the value of the field by updating it in konfiger. In short the anotation value is used to lookup the field instead of the verbose `matchGetKey` and `matchPutKey` methods.
 
@@ -681,8 +681,8 @@ object Test_Scala {
   }
 
   class PageProps {
-    @KonfigerValue("LoginTitle") val loginTitle: String = null
-    @KonfigerValue("AgeInstruction") val ageInstruct: String = null
+    @KonfigerKey("LoginTitle") val loginTitle: String = null
+    @KonfigerKey("AgeInstruction") val ageInstruct: String = null
     val NewsletterOptin: String = null
   }
 
@@ -836,7 +836,7 @@ The `save` function write the current `Konfiger` to the file, if the file does n
 
 ## Contributing
 
-Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://github.com/konfiger/konfiger.github.io/blob/master/CONTRIBUTING.MD)
+Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://github.com/konfiger/konfiger.github.io/blob/main/CONTRIBUTING.MD)
 
 You can open issue or file a request that only address problems in this implementation on this repo, if the issue address the concepts of the package then create an issue or rfc [here](https://github.com/konfiger/konfiger.github.io/)
 

@@ -40,10 +40,10 @@ class TestResolve_Kotlin {
     }
 
     internal class TextsAnnotated {
-        @KonfigerValue("Project") var project: String = ""
-        @KonfigerValue("Author") var author: String = ""
+        @KonfigerKey("Project") var project: String = ""
+        @KonfigerKey("Author") var author: String = ""
         var Platform: String = ""
-        @KonfigerValue("File") var file: String = ""
+        @KonfigerKey("File") var file: String = ""
     }
 
     internal class Entries {
@@ -54,10 +54,10 @@ class TestResolve_Kotlin {
     }
 
     internal class EntriesAnnotated {
-        @KonfigerValue("Project") var project = "konfiger"
-        @KonfigerValue("Author") var author = "Adewale Azeez"
+        @KonfigerKey("Project") var project = "konfiger"
+        @KonfigerKey("Author") var author = "Adewale Azeez"
         var Platform = "Cross Platform"
-        @KonfigerValue("File") var file = "test.comment.inf"
+        @KonfigerKey("File") var file = "test.comment.inf"
     }
 
     internal class MixedTypes {
@@ -68,7 +68,7 @@ class TestResolve_Kotlin {
         var pi = 0f
         var pie = 0.0
 
-        @KonfigerValue("AnnotatedEntry")
+        @KonfigerKey("AnnotatedEntry")
         var annotatedEntry = false
     }
 

@@ -126,8 +126,8 @@ public class Konfiger {
             String findKey = "";
             boolean isAnnotated = false;
             for(Field f : fields) {
-                if (f.isAnnotationPresent(KonfigerValue.class)) {
-                    KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                if (f.isAnnotationPresent(KonfigerKey.class)) {
+                    KonfigerKey annotation = f.getAnnotation(KonfigerKey.class);
                     if (annotation.value().equals(key)) {
                         isAnnotated = true;
                         findKey = f.getName();
@@ -565,9 +565,9 @@ public class Konfiger {
         for(Field f : fields) {
             String findKey = "";
             boolean isAnnotated = false;
-            if (f.isAnnotationPresent(KonfigerValue.class)) {
+            if (f.isAnnotationPresent(KonfigerKey.class)) {
                 isAnnotated = true;
-                KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                KonfigerKey annotation = f.getAnnotation(KonfigerKey.class);
                 if (!annotation.value().isEmpty()) {
                     findKey = annotation.value();
                 }
@@ -617,9 +617,9 @@ public class Konfiger {
         for(Field f : fields){
             String findKey = "";
             boolean isAnnotated = false;
-            if (f.isAnnotationPresent(KonfigerValue.class)) {
+            if (f.isAnnotationPresent(KonfigerKey.class)) {
                 isAnnotated = true;
-                KonfigerValue annotation = f.getAnnotation(KonfigerValue.class);
+                KonfigerKey annotation = f.getAnnotation(KonfigerKey.class);
                 if (!annotation.value().isEmpty()) {
                     findKey = annotation.value();
                 }

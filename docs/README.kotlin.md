@@ -1,4 +1,4 @@
-# {::nomarkdown}<p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/master/icons/konfiger-kotlin.png" alt="konfiger-kotlin" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-kotlin</p>{:/}
+# {::nomarkdown}<p style="text-align: center;" align="center"><img src="https://github.com/konfiger/konfiger.github.io/raw/main/icons/konfiger-kotlin.png" alt="konfiger-kotlin" style="width:180px;height:160px;" width="180" height="160" /><br /> konfiger-kotlin</p>{:/}
 
 <p style="text-align: center;" align="center">Light weight package to manage key value based configuration and data files.</p>
 
@@ -267,7 +267,7 @@ object Test_Kotlin {
 
 ### Read file with Stream
 
-Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+Read a key value file using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/main/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
 ```kotlin
 import io.github.thecarisma.*
@@ -289,7 +289,7 @@ object Test_Kotlin {
 
 ### Read String with Stream
 
-Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/master/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
+Read a key value string using the progressive [KonfigerStream](https://github.com/konfiger/konfiger-nodejs/blob/main/src/io/github/thecarisma/KonfigerStream.js), each scan returns the current key value array `[ 'key', 'value']`
 
 ```kotlin
 import io.github.thecarisma.*
@@ -679,14 +679,14 @@ object Test_Kotlin {
 
 ### Annotation
 
-A more cleaner way to map an entry key to a field in an object is to use the KonfigerValue anotation. The annotation accept the key value to map to the field in konfiger.
+A more cleaner way to map an entry key to a field in an object is to use the KonfigerKey anotation. The annotation accept the key value to map to the field in konfiger.
 
 The annotation is used for lookup when resolving or disolving an object and when changing the value of the field by updating it in konfiger. In short the anotation value is used to lookup the field instead of the verbose `matchGetKey` and `matchPutKey` methods.
 
 ```kotlin
 import io.github.thecarisma.InvalidEntryException
 import io.github.thecarisma.Konfiger
-import io.github.thecarisma.KonfigerValue
+import io.github.thecarisma.KonfigerKey
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
@@ -710,8 +710,8 @@ object Test_Kotlin {
     }
 
     internal class PageProps {
-        @KonfigerValue("LoginTitle") var loginTitle: String? = null
-        @KonfigerValue("AgeInstruction") var ageInstruct: String? = null
+        @KonfigerKey("LoginTitle") var loginTitle: String? = null
+        @KonfigerKey("AgeInstruction") var ageInstruct: String? = null
         var NewsletterOptin: String? = null
     }
 }
@@ -870,7 +870,7 @@ The `save` function write the current `Konfiger` to the file, if the file does n
 
 ## Contributing
 
-Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://github.com/konfiger/konfiger.github.io/blob/master/CONTRIBUTING.MD)
+Before you begin contribution please read the contribution guide at [CONTRIBUTING GUIDE](https://github.com/konfiger/konfiger.github.io/blob/main/CONTRIBUTING.MD)
 
 You can open issue or file a request that only address problems in this implementation on this repo, if the issue address the concepts of the package then create an issue or rfc [here](https://github.com/konfiger/konfiger.github.io/)
 
