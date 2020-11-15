@@ -112,13 +112,13 @@ class TestKonfiger_Kotlin {
     @Throws(IOException::class, InvalidEntryException::class)
     fun Set_Get_Delimeter_And_Seperator() {
         val konfiger = Konfiger(File("src/test/resources/test.config.ini"), true)
-        Assert.assertEquals(konfiger.seperator.toLong(), '\n'.toLong())
-        Assert.assertEquals(konfiger.delimeter.toLong(), '='.toLong())
+        Assert.assertEquals(konfiger.separator.toLong(), '\n'.toLong())
+        Assert.assertEquals(konfiger.delimiter.toLong(), '='.toLong())
         Assert.assertTrue(konfiger.toString().split("\n".toRegex()).toTypedArray().size > 2)
-        konfiger.seperator = '-'
-        konfiger.delimeter = '+'
-        Assert.assertEquals(konfiger.seperator.toLong(), '-'.toLong())
-        Assert.assertEquals(konfiger.delimeter.toLong(), '+'.toLong())
+        konfiger.separator = '-'
+        konfiger.delimiter = '+'
+        Assert.assertEquals(konfiger.separator.toLong(), '-'.toLong())
+        Assert.assertEquals(konfiger.delimiter.toLong(), '+'.toLong())
         Assert.assertEquals(konfiger.toString().split("\n".toRegex()).toTypedArray().size.toLong(), 1)
     }
 
@@ -149,9 +149,9 @@ class TestKonfiger_Kotlin {
         for (entry in konfiger.entries()) {
             Assert.assertFalse(entry.value.contains("^g"))
         }
-        konfiger.seperator = 'f'
+        konfiger.separator = 'f'
         Assert.assertEquals(konfiger["Occupation"], "Software Engineer")
-        konfiger.seperator = '\n'
+        konfiger.separator = '\n'
         Assert.assertFalse(konfiger.toString().contains("^g"))
         Assert.assertEquals(konfiger.size().toLong(), 3)
         for (entry in konfiger.entries()) {

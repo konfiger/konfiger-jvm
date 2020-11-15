@@ -1,7 +1,6 @@
 package io.github.thecarisma;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
@@ -13,11 +12,10 @@ import java.util.*;
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
 public class Konfiger {
-
     public static int MAX_CAPACITY = 10000000;
     private final KonfigerStream stream;
-    private boolean lazyLoad = false;
-    private String filePath = "";
+    private boolean lazyLoad;
+    private String filePath;
     private boolean enableCache_ = true;
     private boolean caseSensitive = true;
     private final Map<String, String> konfigerObjects = new LinkedHashMap<>();
@@ -25,17 +23,17 @@ public class Konfiger {
     String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
     private boolean changesOccur = true;
-    private char delimeter = '=';
-    private char seperator = '\n';
+    private char delimiter;
+    private char separator;
     private String stringValue = "";
     private Object attachedResolveObj;
 
-    public Konfiger(String rawString, boolean lazyLoad, char delimeter, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
-        this(new KonfigerStream(rawString, delimeter, seperator, errTolerance), lazyLoad);
+    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(rawString, delimiter, separator, errTolerance), lazyLoad);
     }
 
-    public Konfiger(String rawString, boolean lazyLoad, char delimeter, char seperator) throws IOException, InvalidEntryException {
-        this(new KonfigerStream(rawString, delimeter, seperator, false), lazyLoad);
+    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(rawString, delimiter, separator, false), lazyLoad);
     }
 
     public Konfiger(String rawString) throws IOException, InvalidEntryException {
@@ -46,12 +44,12 @@ public class Konfiger {
         this(new KonfigerStream(rawString, '=', '\n', false), lazyLoad);
     }
 
-    public Konfiger(File file, boolean lazyLoad, char delimeter, char seperator, boolean errTolerance) throws IOException, InvalidEntryException {
-        this(new KonfigerStream(file, delimeter, seperator, errTolerance), lazyLoad);
+    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(file, delimiter, separator, errTolerance), lazyLoad);
     }
 
-    public Konfiger(File file, boolean lazyLoad, char delimeter, char seperator) throws IOException, InvalidEntryException {
-        this(new KonfigerStream(file, delimeter, seperator, false), lazyLoad);
+    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator) throws IOException, InvalidEntryException {
+        this(new KonfigerStream(file, delimiter, separator, false), lazyLoad);
     }
 
     public Konfiger(File file) throws IOException, InvalidEntryException {
@@ -70,8 +68,8 @@ public class Konfiger {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
         this.filePath = konfigerStream.filePath;
-        this.seperator = konfigerStream.seperator;
-        this.delimeter = konfigerStream.delimeter;
+        this.separator = konfigerStream.separator;
+        this.delimiter = konfigerStream.delimiter;
 
         if (!this.lazyLoad) {
             this.lazyLoader();
@@ -437,28 +435,59 @@ public class Konfiger {
         return size() == 0;
     }
 
+    /**
+     * @deprecated use {@link Konfiger#getDelimiter} instead
+     */
+    @Deprecated
     public char getDelimeter() {
-        return delimeter;
+        return delimiter;
     }
 
-    public void setDelimeter(char delimeter) {
-        if (this.delimeter != delimeter) {
-            this.delimeter = delimeter;
+    /**
+     * @deprecated use {@link Konfiger#setDelimiter} instead
+     */
+    @Deprecated
+    public void setDelimeter(char delimiter) {
+        setDelimiter(delimiter);
+    }
+
+    public char getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(char delimiter) {
+        if (this.delimiter != delimiter) {
+            this.delimiter = delimiter;
             changesOccur = true;
         }
     }
 
+    /**
+     * @deprecated use {@link Konfiger#getSeparator} instead
+     */
+    @Deprecated
     public char getSeperator() {
-        return seperator;
+        return separator;
     }
 
-    public void setSeperator(char seperator) {
-        if (this.seperator != seperator) {
+    /**
+     * @deprecated use {@link Konfiger#setSeparator} instead
+     */
+    public void setSeperator(char separator) {
+        setSeparator(separator);
+    }
+
+    public char getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(char separator) {
+        if (this.separator != separator) {
             changesOccur = true;
-            char oldSeperator = this.seperator;
-            this.seperator = seperator;
+            char oldSeparator = this.separator;
+            this.separator = separator;
             for ( String key : konfigerObjects.keySet()) {
-                konfigerObjects.put(key, KonfigerUtil.unEscapeString(konfigerObjects.get(key), oldSeperator));
+                konfigerObjects.put(key, KonfigerUtil.unEscapeString(konfigerObjects.get(key), oldSeparator));
             }
         }
     }
@@ -484,9 +513,9 @@ public class Konfiger {
             stringValue = "";
             int index = 0;
             for (Map.Entry<String, String> entry : entries()) {
-                stringValue += entry.getKey() + delimeter + KonfigerUtil.escapeString(entry.getValue(), seperator);
+                stringValue += entry.getKey() + delimiter + KonfigerUtil.escapeString(entry.getValue(), separator);
                 ++index;
-                if (index < size()) stringValue += seperator;
+                if (index < size()) stringValue += separator;
             }
             changesOccur = false;
         }
@@ -509,11 +538,11 @@ public class Konfiger {
     }
 
     public void appendString(String rawString) throws IOException, InvalidEntryException {
-        appendString(rawString, this.delimeter, this.seperator);
+        appendString(rawString, this.delimiter, this.separator);
     }
 
-    public void appendString(String rawString, char delimeter, char seperator) throws IOException, InvalidEntryException {
-        KonfigerStream _stream = new KonfigerStream(rawString, delimeter, seperator);
+    public void appendString(String rawString, char delimiter, char separator) throws IOException, InvalidEntryException {
+        KonfigerStream _stream = new KonfigerStream(rawString, delimiter, separator);
         while (_stream.hasNext()) {
             String[] obj = _stream.next();
             putString(obj[0], obj[1]);
@@ -522,11 +551,11 @@ public class Konfiger {
     }
 
     public void appendFile(File file) throws IOException, InvalidEntryException {
-        appendFile(file, this.delimeter, this.seperator);
+        appendFile(file, this.delimiter, this.separator);
     }
 
-    public void appendFile(File file, char delimeter, char seperator) throws IOException, InvalidEntryException {
-        KonfigerStream _stream = new KonfigerStream(file, delimeter, seperator);
+    public void appendFile(File file, char delimiter, char separator) throws IOException, InvalidEntryException {
+        KonfigerStream _stream = new KonfigerStream(file, delimiter, separator);
         while (_stream.hasNext()) {
             String[] obj = _stream.next();
             putString(obj[0], obj[1]);

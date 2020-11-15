@@ -36,15 +36,15 @@ public class TestStream_Java {
     }
 
     @Test
-    public void Validate_The_String_Stream_Value() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("Name=Adewale Azeez,Project=konfiger, Date=April 24 2020", '=', ',');
+    public void validate_The_String_Stream_Value() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Name= Adewale Azeez,Project= konfiger , Date=April 24 2020", '=', ',');
         Assert.assertEquals(ks.next()[1], "Adewale Azeez");
         Assert.assertEquals(ks.next()[1], "konfiger");
         Assert.assertEquals(ks.next()[1], "April 24 2020");
     }
 
     @Test
-    public void Test_String_Stream_Key_Trimming() throws IOException, InvalidEntryException {
+    public void test_String_Stream_Key_Trimming() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(" Name =Adewale Azeez:Project =konfiger: Date=April 24 2020", '=', ':');
         Assert.assertTrue(ks.isTrimmingKey());
         ks.setTrimmingKey(false);

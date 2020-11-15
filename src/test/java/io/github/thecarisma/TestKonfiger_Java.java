@@ -117,13 +117,13 @@ public class TestKonfiger_Java {
     public void Set_Get_Delimeter_And_Seperator() throws IOException, InvalidEntryException {
         Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"), true);
 
-        Assert.assertEquals(konfiger.getSeperator(), '\n');
-        Assert.assertEquals(konfiger.getDelimeter(), '=');
+        Assert.assertEquals(konfiger.getSeparator(), '\n');
+        Assert.assertEquals(konfiger.getDelimiter(), '=');
         Assert.assertTrue(konfiger.toString().split("\n").length > 2);
-        konfiger.setSeperator('-');
-        konfiger.setDelimeter('+');
-        Assert.assertEquals(konfiger.getSeperator(), '-');
-        Assert.assertEquals(konfiger.getDelimeter(), '+');
+        konfiger.setSeparator('-');
+        konfiger.setDelimiter('+');
+        Assert.assertEquals(konfiger.getSeparator(), '-');
+        Assert.assertEquals(konfiger.getDelimiter(), '+');
         Assert.assertEquals(konfiger.toString().split("\n").length, 1);
     }
 
@@ -155,9 +155,9 @@ public class TestKonfiger_Java {
         for (Map.Entry<String, String> entry : konfiger.entries()) {
             Assert.assertFalse(entry.getValue().contains("^g"));
         }
-        konfiger.setSeperator('f');
+        konfiger.setSeparator('f');
         Assert.assertEquals(konfiger.get("Occupation"), "Software Engineer");
-        konfiger.setSeperator('\n');
+        konfiger.setSeparator('\n');
         Assert.assertFalse(konfiger.toString().contains("^g"));
         Assert.assertEquals(konfiger.size(), 3);
         for (Map.Entry<String, String> entry : konfiger.entries()) {

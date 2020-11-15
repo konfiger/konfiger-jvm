@@ -6,11 +6,10 @@ import java.io.*;
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
 public class KonfigerStream {
-
-    char delimeter;
-    char seperator;
+    final char delimiter;
+    final char separator;
     boolean errTolerance;
-    private boolean isFile = false;
+    private boolean isFile;
     private String strStream = "" ;
     private InputStream in;
     String filePath = "";
@@ -34,30 +33,30 @@ public class KonfigerStream {
         this(file, '=', '\n', false);
     }
 
-    public KonfigerStream(String rawString, char delimeter, char seperator) {
-        this(rawString, delimeter, seperator, false);
+    public KonfigerStream(String rawString, char delimiter, char separator) {
+        this(rawString, delimiter, separator, false);
     }
 
-    public KonfigerStream(File file, char delimeter, char seperator) throws FileNotFoundException {
-        this(file, delimeter, seperator, false);
+    public KonfigerStream(File file, char delimiter, char separator) throws FileNotFoundException {
+        this(file, delimiter, separator, false);
     }
 
-    public KonfigerStream(String rawString, char delimeter, char seperator, boolean errTolerance) {
+    public KonfigerStream(String rawString, char delimiter, char separator, boolean errTolerance) {
         this.strStream = rawString;
-        this.delimeter = delimeter;
-        this.seperator = seperator;
+        this.delimiter = delimiter;
+        this.separator = separator;
         this.errTolerance = errTolerance;
         this.isFile = false;
     }
 
-    public KonfigerStream(File file, char delimeter, char seperator, boolean errTolerance) throws FileNotFoundException {
+    public KonfigerStream(File file, char delimiter, char separator, boolean errTolerance) throws FileNotFoundException {
         if (!file.exists()) {
             throw new FileNotFoundException("The file does not exist " + file.getAbsolutePath());
         }
         this.filePath = file.getAbsolutePath();
         in = new FileInputStream(file);
-        this.delimeter = delimeter;
-        this.seperator = seperator;
+        this.delimiter = delimiter;
+        this.separator = separator;
         this.errTolerance = errTolerance;
         this.isFile = true;
     }
@@ -125,7 +124,7 @@ public class KonfigerStream {
                         }
                     } while ((i = in.read()) != -1 && (char)i == commentPrefix.charAt(subCount));
                     if (patchkey.equals(commentPrefix)) {
-                        while ((i = in.read()) != -1 && (char)i != seperator) {}
+                        while ((i = in.read()) != -1 && (char)i != separator) {}
                         return hasNext();
                     }
                 }
@@ -146,7 +145,7 @@ public class KonfigerStream {
                             }
                             if (commetPrefixSize == subCount) {
                                 ++readPosition;
-                                while (readPosition < strStream.length() && strStream.charAt(readPosition) != seperator) {
+                                while (readPosition < strStream.length() && strStream.charAt(readPosition) != separator) {
                                     ++readPosition;
                                 }
                                 ++readPosition;
@@ -197,14 +196,14 @@ public class KonfigerStream {
                         isMultiline = true;
                     }
                 }
-                if (c == this.seperator && prevChar != '^') {
+                if (c == this.separator && prevChar != '^') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
                     }
                     break;
                 }
-                if (c == this.delimeter && parseKey) {
+                if (c == this.delimiter && parseKey) {
                     if ((value.length() > 0) && !this.errTolerance) {
                         throw new InvalidEntryException("The input is improperly separated near", line, column);
                     }
@@ -254,14 +253,14 @@ public class KonfigerStream {
                         } while((""+c).trim().isEmpty());
                     }
                 }
-                if (c == this.seperator && prevChar != '^' ) {
+                if (c == this.separator && prevChar != '^' ) {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected near", line, column);
                     }
                     break;
                 }
-                if (c == this.delimeter && parseKey) {
+                if (c == this.delimiter && parseKey) {
                     if ((value.length() > 0) && !this.errTolerance) {
                         throw new InvalidEntryException("The input is improperly separated near", line, column);
                     }
@@ -279,7 +278,7 @@ public class KonfigerStream {
             ++readPosition;
         }
         ret[0] = (trimmingKey ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
-        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.seperator).trim() : KonfigerUtil.unEscapeString(value.toString(), this.seperator));
+        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.separator).trim() : KonfigerUtil.unEscapeString(value.toString(), this.separator));
         return ret;
     }
 

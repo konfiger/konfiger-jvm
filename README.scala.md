@@ -17,7 +17,7 @@ ___
     - [Write to disk](#write-to-disk)
     - [Get Types](#get-types)
     - [Lazy Loading](#lazy-loading)
-    - [Seperator and delimeter](#seperator-and-delimeter)
+    - [Seperator and delimiter](#separator-and-delimiter)
     - [Read file with Stream](#read-file-with-stream)
     - [Read String with Stream](#read-string-with-stream)
     - [Skip Comment entries](#Skip-comment-entries)
@@ -56,7 +56,7 @@ Using mvn-repo:
     <dependency>
         <groupId>io.github.thecarisma</groupId>
         <artifactId>konfiger</artifactId>
-        <version>1.2.4</version>
+        <version>1.2.5</version>
     </dependency>
 </dependencies>
 
@@ -75,7 +75,7 @@ Using jitpack.io:
     <dependency>
         <groupId>com.github.konfiger</groupId>
         <artifactId>konfiger-jvm</artifactId>
-        <version>1.2.4</version>
+        <version>1.2.5</version>
     </dependency>
 </dependencies>
 
@@ -104,7 +104,7 @@ Add the dependency:
 
 ```gradle
 dependencies {
-        implementation 'com.github.konfiger:konfiger-jvm:1.2.4'
+        implementation 'com.github.konfiger:konfiger-jvm:1.2.5'
 }
 ```
 
@@ -242,9 +242,9 @@ object Test_Scala {
 }
 ```
 
-### Seperator and delimeter
+### Seperator and delimiter
 
-Initailize a konfiger object with default seperator and delimeter then change the seperator and selimeter at runtime
+Initailize a konfiger object with default separator and delimiter then change the separator and selimeter at runtime
 
 ```scala
 import io.github.thecarisma._
@@ -256,8 +256,8 @@ object Test_Scala {
   @throws[InvalidEntryException]
   def main(args: Array[String]): Unit = {
     val konfiger = new Konfiger(new File("test/konfiger.conf"), false)
-    konfiger.setDelimeter('?')
-    konfiger.setSeperator(',')
+    konfiger.setDelimiter('?')
+    konfiger.setSeparator(',')
 
     println(konfiger.toString)
   }
@@ -700,7 +700,7 @@ If your entry keys is the same as the object keys you don't need to declare the 
 
 ### Initialization
 
-The main Konfiger contructor is not exported from the package, the two functions are exported for initialization, `fromString` and `fromFile`. The fromString function creates a Konfiger object from a string with valid key value entry or from empty string, the fromFile function creates the Konfiger object from a file, the two functions accept a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimeter` and `seperator`. If the third and fourth parameter is not specified the default is used, delimeter = `=`, seperator = `\n`. If the file or string has different delimeter and seperator always send the third and fourth parameter.
+The main Konfiger contructor is not exported from the package, the two functions are exported for initialization, `fromString` and `fromFile`. The fromString function creates a Konfiger object from a string with valid key value entry or from empty string, the fromFile function creates the Konfiger object from a file, the two functions accept a cumpulsory second parameter `lazyLoad` which indicates whether to read all the entry from the file or string suring initialization. The lazyLoad parameter is useful for progressively read entries from a large file. The two initializing functions also take 2 extra optional parameters `delimiter` and `separator`. If the third and fourth parameter is not specified the default is used, delimiter = `=`, separator = `\n`. If the file or string has different delimiter and separator always send the third and fourth parameter.
 
 The following initializer progressively read the file when needed
 
@@ -730,7 +730,7 @@ val konfiger = new Konfiger("\n" +
       "Twos=2222222222222\n", false);
 ```
 
-Initialize a string which have custom delimeter and seperator
+Initialize a string which have custom delimiter and separator
 
 ```scala
 val konfiger = new Konfiger("Ones:11111111111,Twos:2222222222222", 
@@ -830,7 +830,7 @@ See [https://konfiger.github.io/konfiger-jvm/](https://konfiger.github.io/konfig
 Konfiger stream progressively load the key value entry from a file or string when needed, it uses two method `hasNext` which check if there is still an entry in the stream and `next` for the current key value entry in the stream. 
  
 In Konfiger the key value pair is stored in a `map`, all search updating and removal is done on the `konfigerObjects` in the class. The string sent as first parameter if parsed into valid key value using the separator and delimiter fields and if loaded from file it content is parsed into valid key value pair. The `toString` method also parse the `konfigerObjects` content into a valid string with regards to the 
-separator and delimeter. The value is properly escaped and unescaped.
+separator and delimiter. The value is properly escaped and unescaped.
 
 The `save` function write the current `Konfiger` to the file, if the file does not exist it is created if it can. Everything is written in memory and is disposed on app exit hence it important to call the `save` function when nessasary.
 
