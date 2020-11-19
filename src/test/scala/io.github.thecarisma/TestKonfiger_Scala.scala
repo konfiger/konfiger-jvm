@@ -98,8 +98,8 @@ class TestKonfiger_Scala {
   @Test
   @throws[IOException]
   @throws[InvalidEntryException]
-  def Remove_Entry_And_Validate_Size(): Unit = {
-    val konfiger = new Konfiger("One=111,Two=222,Three=333", false, '=', ',')
+  def testRemoveEntrySize(): Unit = {
+    val konfiger = new Konfiger("One=111,Two=222,Three=333", true, '=', ',')
     Assert.assertEquals(konfiger.size, 3)
     Assert.assertNotEquals(konfiger.get("Two"), null)
     Assert.assertEquals(konfiger.remove("Two"), "222")
@@ -108,6 +108,42 @@ class TestKonfiger_Scala {
     Assert.assertEquals(konfiger.remove(0), "111")
     Assert.assertEquals(konfiger.size, 1)
     Assert.assertEquals(konfiger.get("Three"), "333")
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def testLazySize(): Unit = {
+    val konfiger = new Konfiger("One=111,Two=222,Three=333", true, '=', ',')
+    Assert.assertEquals(konfiger.lazySize, 0)
+    Assert.assertNotEquals(konfiger.lazySize, 3)
+    Assert.assertEquals(konfiger.get("One"), "111")
+    Assert.assertEquals(konfiger.lazySize, 1)
+    Assert.assertEquals(konfiger.get("Two"), "222")
+    Assert.assertEquals(konfiger.lazySize, 2)
+    Assert.assertEquals(konfiger.get("Three"), "333")
+    Assert.assertEquals(konfiger.lazySize, 3)
+    Assert.assertEquals(konfiger.lazySize, konfiger.size)
+  }
+
+  @Test
+  @throws[IOException]
+  @throws[InvalidEntryException]
+  def testRemoveEntryAndLazySize(): Unit = {
+    val konfiger = new Konfiger("One=111,Two=222,Three=333", true, '=', ',')
+    Assert.assertEquals(konfiger.lazySize, 0)
+    Assert.assertNotEquals(konfiger.lazySize, 3)
+    Assert.assertNotEquals(konfiger.get("Two"), null)
+    Assert.assertEquals(konfiger.lazySize, 2)
+    Assert.assertEquals(konfiger.remove("Two"), "222")
+    Assert.assertNotEquals(konfiger.lazySize, 2)
+    Assert.assertEquals(konfiger.lazySize, 1)
+    Assert.assertNull(konfiger.get("Two"))
+    Assert.assertEquals(konfiger.lazySize, 2)
+    Assert.assertEquals(konfiger.remove(0), "111")
+    Assert.assertEquals(konfiger.lazySize, 1)
+    Assert.assertEquals(konfiger.get("Three"), "333")
+    Assert.assertEquals(konfiger.lazySize, 1)
   }
 
   @Test

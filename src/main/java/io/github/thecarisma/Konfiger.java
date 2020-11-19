@@ -426,8 +426,12 @@ public class Konfiger {
 
     public int size() {
         if (!loadingEnds && this.lazyLoad) {
-            String tmp = toString();
+            toString();
         }
+        return konfigerObjects.size();
+    }
+
+    public int lazySize() {
         return konfigerObjects.size();
     }
 
@@ -512,10 +516,11 @@ public class Konfiger {
             }
             stringValue = "";
             int index = 0;
+            int size = size();
             for (Map.Entry<String, String> entry : entries()) {
                 stringValue += entry.getKey() + delimiter + KonfigerUtil.escapeString(entry.getValue(), separator);
                 ++index;
-                if (index < size()) stringValue += separator;
+                if (index < size) stringValue += separator;
             }
             changesOccur = false;
         }

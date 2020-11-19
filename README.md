@@ -228,7 +228,8 @@ public class Test_Java {
         //been read to get the value.
         System.out.println(konfiger.get("Twos"));
         
-        //the size becomes 2, 
+        //the actual entry size becomes 2,
+        System.out.println(konfiger.lazySize());
         
         //to read all the entries simply call the toString() method
         System.out.println(konfiger.toString());
@@ -843,6 +844,7 @@ konfiger.save();
 | public void setCaseSensitivity(boolean caseSensitive) | change the case sensitivity of the konfiger object, if true `get("Key")` and `get("key")` will return different value, if false same value will be returned.
 | public boolean isCaseSensitive() | Return true if the konfiger object is case sensitive and false if it not case sensitive
 | public int size()           | Get the total size of key value entries in the konfiger
+| public int lazySize()           | Get the lazy total number of entry that has been loaded into konfiger.
 | public void clear()           | clear all the key value entries in the konfiger. This does not update the file call the `save` method to update the file
 | public boolean isEmpty()           | Check if the konfiger does not have an key value entry.
 | public void updateAt(int index, String value)           | Update the value at the specified index with the new string value, throws an error if the index is OutOfRange 

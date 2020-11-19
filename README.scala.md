@@ -232,6 +232,7 @@ object Test_Scala {
     println(konfiger.get("Twos"))
 
     //the size becomes 2,
+    println(konfiger.lazySize())
 
     //to read all the entries simply call the toString() method
     println(konfiger.toString)
