@@ -11,7 +11,10 @@ public class KonfigerStream {
     public static class Builder {
         char delimiter;
         char separator;
+        char beginSectionChar;
+        char endSectionChar;
         boolean errTolerance;
+        boolean ignoreInlineComment;
         String filePath;
         String string = "";
         String[] commentPrefixes = new String[] {"//", ";"};
@@ -21,6 +24,8 @@ public class KonfigerStream {
         public Builder() {
             this.delimiter = '=';
             this.separator = '\n';
+            this.beginSectionChar = '[';
+            this.endSectionChar = ']';
         }
 
         public Builder withDelimiter(char delimiter) {
@@ -33,8 +38,23 @@ public class KonfigerStream {
             return this;
         }
 
+        public Builder withBeginSectionChar(char beginSectionChar) {
+            this.beginSectionChar = beginSectionChar;
+            return this;
+        }
+
+        public Builder withEndSectionChar(char endSectionChar) {
+            this.endSectionChar = endSectionChar;
+            return this;
+        }
+
         public Builder withErrTolerance() {
             this.errTolerance = true;
+            return this;
+        }
+
+        public Builder ignoreInlineComment() {
+            this.ignoreInlineComment = true;
             return this;
         }
 
@@ -97,13 +117,15 @@ public class KonfigerStream {
     private int readPosition = 0;
     private boolean isFile;
     private boolean hasNext_ = false;
+    private boolean trimmingSection = true;
     private boolean trimmingKey = true;
     private boolean trimmingValue = true;
     private boolean doneReading_ = false;
+    private String section = "__global__";
     private int i = -1;
     String filePath = "";
     private String patchkey = "";
-    int line = 0;
+    int line = 1;
     int column = 0;
     final Builder builder;
 
@@ -154,6 +176,14 @@ public class KonfigerStream {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public boolean isTrimmingSection() {
+        return trimmingSection;
+    }
+
+    public void setTrimmingSection(boolean trimmingSection) {
+        this.trimmingSection = trimmingSection;
     }
 
     public boolean isTrimmingKey() {
@@ -258,9 +288,24 @@ public class KonfigerStream {
                 if (!hasNext_) {
                     doneReading();
                 }
+
+                if (hasNext_) {
+                    if (patchkey.isEmpty() && (char)i == builder.beginSectionChar) {
+                        section = "";
+                        while ((i = in.read()) != -1) {
+                            if (i == builder.endSectionChar) {
+                                hasNext_ = ((i = in.read()) != -1);
+                                return hasNext();
+                            }
+                            section += (char)i;
+                        }
+                        System.out.println((char)i);
+                    }
+                }
                 return hasNext_;
             } else {
-                while (readPosition < builder.string.length()) {
+                long length = builder.string.length();
+                while (readPosition < length) {
                     if (!(""+builder.string.charAt(readPosition)).trim().isEmpty()) {
                         if ((commentPrefixIndex = commentPrefixMatchIndex(builder.string.charAt(readPosition),
                                 subCount)) > -1) {
@@ -273,7 +318,7 @@ public class KonfigerStream {
                             }
                             if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
                                 ++readPosition;
-                                while (readPosition < builder.string.length() &&
+                                while (readPosition < length &&
                                         builder.string.charAt(readPosition) != builder.separator) {
                                     ++readPosition;
                                 }
@@ -281,7 +326,20 @@ public class KonfigerStream {
                                 return hasNext();
                             }
                         }
+
                         hasNext_ = true;
+                        if (builder.string.charAt(readPosition) == builder.beginSectionChar) {
+                            section = "";
+                            ++readPosition;
+                            while (readPosition < length) {
+                                if (builder.string.charAt(readPosition) == builder.endSectionChar) {
+                                    ++readPosition;
+                                    return hasNext();
+                                }
+                                section += builder.string.charAt(readPosition);
+                                ++readPosition;
+                            }
+                        }
                         return true;
                     }
                     ++readPosition;
@@ -294,14 +352,16 @@ public class KonfigerStream {
     }
 
     public String[] next() throws InvalidEntryException, IOException {
-        String[] ret = new String[2];
+        String[] ret = new String[3];
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
         boolean parseKey = true;
         boolean isMultiline = false;
         char prevChar = '\0';
         char prevPrevChar = '\0';
-        line |= 1;
+        int subCount = 0;
+        int commentPrefixIndex = -1;
+        String patchValue = "";
 
         if (this.isFile) {
             do {
@@ -325,18 +385,38 @@ public class KonfigerStream {
                         isMultiline = true;
                     }
                 }
+                if (!parseKey) {
+                    if ((commentPrefixIndex = commentPrefixMatchIndex(c, subCount)) > -1 && !this.builder.ignoreInlineComment) {
+                        boolean hasInlineComment = false;
+                        do {
+                            subCount++;
+                            if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
+                                while ((i = in.read()) != -1 && (char)i != builder.separator) {}
+                                hasInlineComment = true;
+                                break;
+                            }
+                        } while ((i = in.read()) != -1 &&
+                                ((char)i == builder.commentPrefixes[commentPrefixIndex].charAt(subCount)));
+                        if (hasInlineComment) {
+                            break;
+                        }
+                        patchValue += ((char) i);
+                        subCount = 0;
+
+                    }
+                }
                 if (c == this.builder.separator && prevChar != '^') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.builder.errTolerance) {
                         throw new InvalidEntryException("Invalid entry detected in file '" +
-                                this.filePath + "' near", line+1, column);
+                                this.filePath + "' near", line, column);
                     }
                     break;
                 }
                 if (c == this.builder.delimiter && parseKey) {
                     if ((value.length() > 0) && !this.builder.errTolerance) {
                         throw new InvalidEntryException("The input is improperly separated in file '" +
-                                this.filePath + "' near", line+1, column);
+                                this.filePath + "' near", line, column);
                     }
                     parseKey = false;
                     continue;
@@ -349,12 +429,15 @@ public class KonfigerStream {
                         value.append((char)i);
                         isMultiline = false;
                     }
+                    value.append(patchValue);
+                    patchValue = "";
                 }
                 prevPrevChar = (c == '\r' ? prevPrevChar : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             } while ((i = in.read()) != -1);
         } else {
-            for (;this.readPosition <= this.builder.string.length(); ++this.readPosition) {
+            long length = this.builder.string.length();
+            for (;this.readPosition <= length; ++this.readPosition) {
                 if (this.readPosition == this.builder.string.length()) {
                     if (key.length() > 0) {
                         if (parseKey && !this.builder.errTolerance) {
@@ -385,6 +468,31 @@ public class KonfigerStream {
                         } while((""+c).trim().isEmpty());
                     }
                 }
+                if (!parseKey) {
+                    if ((commentPrefixIndex = commentPrefixMatchIndex(c, subCount)) > -1 && !this.builder.ignoreInlineComment) {
+                        boolean hasInlineComment = false;
+                        do {
+                            subCount++;
+                            if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
+                                while (readPosition < length &&
+                                        builder.string.charAt(readPosition) != builder.separator) {
+                                    ++readPosition;
+                                }
+                                ++readPosition;
+                                hasInlineComment = true;
+                                break;
+                            }
+                            ++readPosition;
+                        } while (builder.string.charAt(readPosition) ==
+                                builder.commentPrefixes[commentPrefixIndex].charAt(subCount));
+                        if (hasInlineComment) {
+                            break;
+                        }
+                        patchValue += (builder.string.charAt(readPosition));
+                        subCount = 0;
+
+                    }
+                }
                 if (c == this.builder.separator && prevChar != '^' ) {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
                     if (parseKey && !this.builder.errTolerance) {
@@ -404,7 +512,8 @@ public class KonfigerStream {
                 if (parseKey) {
                     key.append(c);
                 } else {
-                    value.append(c);
+                    value.append(c).append(patchValue);
+                    patchValue = "";
                 }
                 prevPrevChar = (c == '\r' ? prevPrevChar : prevChar);
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
@@ -412,8 +521,9 @@ public class KonfigerStream {
             ++readPosition;
         }
         ret[0] = (trimmingKey ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
-        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.builder.separator).trim() : 
+        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.builder.separator).trim() :
                 KonfigerUtil.unEscapeString(value.toString(), this.builder.separator));
+        ret[2] = (trimmingSection ? section.trim() : section);;
         return ret;
     }
 

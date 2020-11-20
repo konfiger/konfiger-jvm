@@ -1,16 +1,16 @@
 
 ; This is rather not standard ini file
 [The file props]
-File=test.comment.inf
-Author=Adewale Azeez
+File=test.comment.inf <> Arkward Inline comment, optional
+Author=Adewale Azeez <> Arkward Inline comment 2, optional
 Project=konfiger
 
 ; The second part
 [Second Part]
 // This is also a comment
-Version=2.1.3
+Version=2.1.3 / 2.1.5
 Date=April 2020
-Platform=Cross Platform
+Platform=Cross Platform ; Inline comment, optional
 
 @The KonfigerStream Builder should be like
 [Third Part]

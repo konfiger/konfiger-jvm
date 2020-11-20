@@ -527,6 +527,14 @@ public class Konfiger {
         return stringValue;
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
     public void save() throws IOException {
         save(filePath);
     }

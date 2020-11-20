@@ -72,9 +72,9 @@ public class TestStream_Java {
     }
 
     @Test
-    public void testMultiplePrefix() throws IOException, InvalidEntryException {
+    public void testMultiplePrefixFile() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
-        ks.setCommentPrefixes("[", ";", "//", "@");
+        ks.setCommentPrefixes("[", ";", "//", "@", "<>");
         while (ks.hasNext()) {
             String[] entry = ks.next();
             Assert.assertFalse(entry[0].startsWith("["));
@@ -86,12 +86,13 @@ public class TestStream_Java {
         KonfigerStream ks = new KonfigerStream("; The second part\n" +
                 "[Second Part]\n" +
                 "// This is also a comment\n" +
-                "Version=2.1.3\n" +
-                "Date=April 2020\n" +
+                "Version=2.1.3 / 2.1.5\n" +
+                "Date=April 2020 ; Inline comment\n" +
                 "Platform=Cross Platform");
-        ks.setCommentPrefixes("[", ";", "//", "@");
+        ks.setCommentPrefixes("[", ";", "//", "@", "<>");
         while (ks.hasNext()) {
             String[] entry = ks.next();
+            System.out.println(entry[1]);
             Assert.assertFalse(entry[0].startsWith("["));
         }
     }
@@ -133,7 +134,10 @@ public class TestStream_Java {
 
     @Test
     public void Read_Multiline_Entry_And_Test_Continuation_Char_In_File_Stream() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.contd.conf"))
+                .ignoreInlineComment()
+                .build();
         while (ks.hasNext()) {
             Assert.assertFalse(ks.next()[1].endsWith("\\"));
         }
@@ -141,14 +145,17 @@ public class TestStream_Java {
 
     @Test
     public void Read_Multiline_Entry_And_Test_Continuation_Char_In_String_Stream() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("Description = This project is the closest thing to Android +\n" +
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("Description = This project is the closest thing to Android +\n" +
                 "              [Shared Preference](https://developer.android.com/reference/android/content/SharedPreferences) +\n" +
                 "              in other languages and off the Android platform.\n" +
                 "ProjectName = konfiger\n" +
                 "ProgrammingLanguages = C, C++, C#, Dart, Elixr, Erlang, Go, +\n" +
                 "               Haskell, Java, Kotlin, NodeJS, Powershell, +\n" +
                 "               Python, Ring, Rust, Scala, Visual Basic, +\n" +
-                "               and whatever language possible in the future");
+                "               and whatever language possible in the future")
+                .ignoreInlineComment()
+                .build();
         ks.setContinuationChar('+');
         while (ks.hasNext()) {
             Assert.assertFalse(ks.next()[1].endsWith("\\"));
@@ -157,9 +164,12 @@ public class TestStream_Java {
 
     @Test
     public void Test_Backward_Slash_Ending_Value() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("uri1 = http://uri1.thecarisma.com/core/api/v1/\r\n" +
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("uri1 = http://uri1.thecarisma.com/core/api/v1/\r\n" +
                 "uri2 = http://uri2.thecarisma.com/core/api/v2/\r\n" +
-                "ussd.uri = https://ussd.thecarisma.com/");
+                "ussd.uri = https://ussd.thecarisma.com/")
+                .ignoreInlineComment()
+                .build();
 
         int count = 0;
         while(ks.hasNext()) {
@@ -239,14 +249,14 @@ public class TestStream_Java {
                         "              [Shared Preference](https://developer.android.com/reference/android/content/SharedPreferences) +\n" +
                         "              in other languages and off the Android platform.\n" +
                         "~ProjectName = konfiger\n" +
-                        "# This is a comment\n" +
+                        "## This is a comment\n" +
                         "~ This is another comment\n" +
                         "ProgrammingLanguages = C, C++, C#, Dart, Elixr, Erlang, Go, +\n" +
                         "               Haskell, Java, Kotlin, NodeJS, Powershell, +\n" +
                         "               Python, Ring, Rust, Scala, Visual Basic, +\n" +
                         "               and whatever language possible in the future")
                 .withContinuationChar('+')
-                .withCommentPrefixes("#", "~")
+                .withCommentPrefixes("##", "~")
         );
         while (ks.hasNext()) {
             Assert.assertFalse(ks.next()[1].endsWith("\\"));

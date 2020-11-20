@@ -256,7 +256,7 @@ public class TestKonfiger_Java {
     @Test
     public void Test_Contains_With_Lazy_Load() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
-        ks.setCommentPrefix("[");
+        ks.setCommentPrefixes("[", ";", "//", "@", "<>");
         Konfiger kon = new Konfiger(ks, true);
 
         Assert.assertTrue(kon.contains("File"));
@@ -266,7 +266,10 @@ public class TestKonfiger_Java {
 
     @Test
     public void Read_Multiline_Entry_From_File_Stream() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.contd.conf"))
+                .ignoreInlineComment()
+                .build();
         Konfiger kon = new Konfiger(ks, true);
 
         Assert.assertTrue(kon.getString("ProgrammingLanguages").indexOf("Kotlin, NodeJS, Powershell, Python, Ring, Rust") > 0);
@@ -276,9 +279,15 @@ public class TestKonfiger_Java {
 
     @Test
     public void Check_Size_In_LazyLoad_And_No_LazyLoad() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.contd.conf"))
+                .ignoreInlineComment()
+                .build();
         Konfiger kon = new Konfiger(ks, false);
-        KonfigerStream ks1 = new KonfigerStream(new File("src/test/resources/test.contd.conf"));
+        KonfigerStream ks1 = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.contd.conf"))
+                .ignoreInlineComment()
+                .build();
         Konfiger kon1 = new Konfiger(ks1, true);
 
         Assert.assertTrue(kon.size() > 0);
