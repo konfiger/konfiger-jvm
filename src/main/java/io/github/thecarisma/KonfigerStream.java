@@ -1,29 +1,115 @@
 package io.github.thecarisma;
 
 import java.io.*;
+import java.net.URL;
 
 /**
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
 public class KonfigerStream {
-    final char delimiter;
-    final char separator;
-    boolean errTolerance;
-    private boolean isFile;
-    private String strStream = "" ;
+
+    public static class Builder {
+        char delimiter;
+        char separator;
+        boolean errTolerance;
+        String filePath;
+        String string = "";
+        String[] commentPrefixes = new String[] {"//", ";"};
+        int[] commentPrefixSizes = new int[] {2, 1};
+        char continuationChar = '\\';
+
+        public Builder() {
+            this.delimiter = '=';
+            this.separator = '\n';
+        }
+
+        public Builder withDelimiter(char delimiter) {
+            this.delimiter = delimiter;
+            return this;
+        }
+
+        public Builder withSeparator(char separator) {
+            this.separator = separator;
+            return this;
+        }
+
+        public Builder withErrTolerance() {
+            this.errTolerance = true;
+            return this;
+        }
+
+        public Builder withURL(URL url) throws FileNotFoundException {
+            if (!this.string.isEmpty() && this.filePath != null) {
+                throw new IllegalStateException("The stream can only have one source which is either" +
+                        " string, file or URL. Build using any of withString(...), withFile(...) and withURL(...) but" +
+                        " not combination of the methods.");
+            }
+            File file = new File(url.getPath());
+            if (!file.exists()) {
+                throw new FileNotFoundException("The file does not exist " + url.getPath());
+            }
+            this.filePath = file.getAbsolutePath();
+            return this;
+        }
+
+        public Builder withFile(File file) throws FileNotFoundException {
+            if (!this.string.isEmpty()) {
+                throw new IllegalStateException("The stream can only have one source which is either" +
+                        " string, file or URL. Build using withFile(...) or withString(...).");
+            }
+            if (!file.exists()) {
+                throw new FileNotFoundException("The file does not exist " + file.getAbsolutePath());
+            }
+            this.filePath = file.getAbsolutePath();
+            return this;
+        }
+
+        public Builder withString(String string) {
+            if (this.filePath != null) {
+                throw new IllegalStateException("The stream can only have one source which is either" +
+                        " string, file or URL. Build using withFile(...) or withString(...).");
+            }
+            this.string = string;
+            return this;
+        }
+
+        public Builder withCommentPrefixes(String... commentPrefixes) {
+            this.commentPrefixes = commentPrefixes;
+            this.commentPrefixSizes = new int[this.commentPrefixes.length];
+            for (int index = 0; index < commentPrefixSizes.length; ++index) {
+                this.commentPrefixSizes[index] = this.commentPrefixes[index].length();
+            }
+            return this;
+        }
+
+        public Builder withContinuationChar(char continuationChar) {
+            this.continuationChar = continuationChar;
+            return this;
+        }
+
+        public KonfigerStream build() throws FileNotFoundException {
+            return new KonfigerStream(this);
+        }
+
+    }
+
     private InputStream in;
-    String filePath = "";
     private int readPosition = 0;
+    private boolean isFile;
     private boolean hasNext_ = false;
     private boolean trimmingKey = true;
     private boolean trimmingValue = true;
     private boolean doneReading_ = false;
     private int i = -1;
-    private String commentPrefix = "//";
-    private char continuationChar = '\\';
+    String filePath = "";
     private String patchkey = "";
     int line = 0;
     int column = 0;
+    final Builder builder;
+
+    public KonfigerStream() {
+        this("");
+    }
 
     public KonfigerStream(String rawString) {
         this(rawString, '=', '\n', false);
@@ -42,23 +128,32 @@ public class KonfigerStream {
     }
 
     public KonfigerStream(String rawString, char delimiter, char separator, boolean errTolerance) {
-        this.strStream = rawString;
-        this.delimiter = delimiter;
-        this.separator = separator;
-        this.errTolerance = errTolerance;
-        this.isFile = false;
+        this.builder = builder()
+                .withString(rawString)
+                .withDelimiter(delimiter)
+                .withSeparator(separator);
+        this.builder.errTolerance = errTolerance;
     }
 
     public KonfigerStream(File file, char delimiter, char separator, boolean errTolerance) throws FileNotFoundException {
-        if (!file.exists()) {
-            throw new FileNotFoundException("The file does not exist " + file.getAbsolutePath());
+        this(builder()
+                .withFile(file)
+                .withDelimiter(delimiter)
+                .withSeparator(separator));
+        this.builder.errTolerance = errTolerance;
+    }
+
+    public KonfigerStream(Builder builder) throws FileNotFoundException {
+        this.builder = builder;
+        if (this.builder.filePath != null) {
+            this.isFile = true;
+            this.filePath = this.builder.filePath;
+            in = new FileInputStream(new File(this.filePath));
         }
-        this.filePath = file.getAbsolutePath();
-        in = new FileInputStream(file);
-        this.delimiter = delimiter;
-        this.separator = separator;
-        this.errTolerance = errTolerance;
-        this.isFile = true;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public boolean isTrimmingKey() {
@@ -77,33 +172,63 @@ public class KonfigerStream {
         this.trimmingValue = trimming;
     }
 
+    /**
+     * @deprecated use {@link KonfigerStream#getCommentPrefixes} instead
+     */
+    @Deprecated
     public String getCommentPrefix() {
-        return commentPrefix;
+        if (builder.commentPrefixes.length > 0) {
+            return builder.commentPrefixes[0];
+        }
+        return null;
     }
 
+    /**
+     * @deprecated use {@link KonfigerStream#setCommentPrefixes} instead
+     */
+    @Deprecated
     public void setCommentPrefix(String commentPrefix) {
-        this.commentPrefix = commentPrefix;
+        setCommentPrefixes(commentPrefix);
+    }
+
+    public String[] getCommentPrefixes() {
+        return builder.commentPrefixes;
+    }
+
+    public void setCommentPrefixes(String... commentPrefixes) {
+        Builder builder = new Builder().withCommentPrefixes(commentPrefixes);
+        this.builder.commentPrefixes = builder.commentPrefixes;
+        this.builder.commentPrefixSizes = builder.commentPrefixSizes;
     }
 
     public char getContinuationChar() {
-        return continuationChar;
+        return builder.continuationChar;
     }
 
     public void setContinuationChar(char continuationChar) {
-        this.continuationChar = continuationChar;
+        this.builder.continuationChar = continuationChar;
     }
 
     public void errorTolerance(boolean errTolerance) {
-        this.errTolerance = errTolerance;
+        this.builder.errTolerance = errTolerance;
     }
 
     public boolean isErrorTolerant() {
-        return this.errTolerance;
+        return this.builder.errTolerance;
+    }
+
+    int commentPrefixMatchIndex(char c, int subCount) {
+        for (int index = 0; index < builder.commentPrefixes.length; ++index) {
+            if (builder.commentPrefixes[index].charAt(subCount) == c) {
+                return index;
+            }
+        }
+        return -1;
     }
 
     public boolean hasNext() throws IOException {
         int subCount = 0;
-        int commetPrefixSize = commentPrefix.length();
+        int commentPrefixIndex = -1;
         patchkey = "";
         if (!doneReading_) {
             if (isFile) {
@@ -115,16 +240,17 @@ public class KonfigerStream {
                         column = 0;
                     }
                 }
-                if ((char)i == commentPrefix.charAt(subCount)) {
+                if ((commentPrefixIndex = commentPrefixMatchIndex((char)i, subCount)) > -1) {
                     do {
                         patchkey += (char)i;
                         subCount++;
-                        if (commetPrefixSize == subCount) {
+                        if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
                             break;
                         }
-                    } while ((i = in.read()) != -1 && (char)i == commentPrefix.charAt(subCount));
-                    if (patchkey.equals(commentPrefix)) {
-                        while ((i = in.read()) != -1 && (char)i != separator) {}
+                    } while ((i = in.read()) != -1 &&
+                            ((char)i == builder.commentPrefixes[commentPrefixIndex].charAt(subCount-1)));
+                    if (patchkey.equals(builder.commentPrefixes[commentPrefixIndex])) {
+                        while ((i = in.read()) != -1 && (char)i != builder.separator) {}
                         return hasNext();
                     }
                 }
@@ -134,18 +260,21 @@ public class KonfigerStream {
                 }
                 return hasNext_;
             } else {
-                while (readPosition < strStream.length()) {
-                    if (!(""+strStream.charAt(readPosition)).trim().isEmpty()) {
-                        if (strStream.charAt(readPosition) == commentPrefix.charAt(subCount)) {
-                            while (strStream.charAt(readPosition+subCount) == commentPrefix.charAt(subCount)) {
+                while (readPosition < builder.string.length()) {
+                    if (!(""+builder.string.charAt(readPosition)).trim().isEmpty()) {
+                        if ((commentPrefixIndex = commentPrefixMatchIndex(builder.string.charAt(readPosition),
+                                subCount)) > -1) {
+                            while (builder.string.charAt(readPosition+subCount) ==
+                                    builder.commentPrefixes[commentPrefixIndex].charAt(subCount)) {
                                 ++subCount;
-                                if (commetPrefixSize == subCount) {
+                                if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
                                     break;
                                 }
                             }
-                            if (commetPrefixSize == subCount) {
+                            if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
                                 ++readPosition;
-                                while (readPosition < strStream.length() && strStream.charAt(readPosition) != separator) {
+                                while (readPosition < builder.string.length() &&
+                                        builder.string.charAt(readPosition) != builder.separator) {
                                     ++readPosition;
                                 }
                                 ++readPosition;
@@ -181,7 +310,7 @@ public class KonfigerStream {
                 if (c == '\n') {
                     ++line;
                     column = 0;
-                    if (!parseKey && prevChar == this.continuationChar && prevPrevChar != '\\') {
+                    if (!parseKey && prevChar == this.builder.continuationChar && prevPrevChar != '\\') {
                         String tmpValue = value.toString();
                         value = new StringBuilder();
                         if (tmpValue.charAt(tmpValue.length()-1) == '\r') {
@@ -196,16 +325,18 @@ public class KonfigerStream {
                         isMultiline = true;
                     }
                 }
-                if (c == this.separator && prevChar != '^') {
+                if (c == this.builder.separator && prevChar != '^') {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
-                    if (parseKey && !this.errTolerance) {
-                        throw new InvalidEntryException("Invalid entry detected near", line, column);
+                    if (parseKey && !this.builder.errTolerance) {
+                        throw new InvalidEntryException("Invalid entry detected in file '" +
+                                this.filePath + "' near", line+1, column);
                     }
                     break;
                 }
-                if (c == this.delimiter && parseKey) {
-                    if ((value.length() > 0) && !this.errTolerance) {
-                        throw new InvalidEntryException("The input is improperly separated near", line, column);
+                if (c == this.builder.delimiter && parseKey) {
+                    if ((value.length() > 0) && !this.builder.errTolerance) {
+                        throw new InvalidEntryException("The input is improperly separated in file '" +
+                                this.filePath + "' near", line+1, column);
                     }
                     parseKey = false;
                     continue;
@@ -223,22 +354,23 @@ public class KonfigerStream {
                 prevChar = (c == '\r' ? (prevChar != '\\' ? '\0' : '\\') : c);
             } while ((i = in.read()) != -1);
         } else {
-            for (;this.readPosition <= this.strStream.length(); ++this.readPosition) {
-                if (this.readPosition == this.strStream.length()) {
+            for (;this.readPosition <= this.builder.string.length(); ++this.readPosition) {
+                if (this.readPosition == this.builder.string.length()) {
                     if (key.length() > 0) {
-                        if (parseKey && !this.errTolerance) {
-                            throw new InvalidEntryException("Invalid entry detected near", line, column);
+                        if (parseKey && !this.builder.errTolerance) {
+                            throw new InvalidEntryException("Invalid entry detected in \n<" +
+                                    this.builder.string + ">\nnear", line, column);
                         }
                     }
                     this.doneReading();
                     break;
                 }
-                char c = this.strStream.charAt(this.readPosition);
+                char c = this.builder.string.charAt(this.readPosition);
                 ++column;
                 if (c == '\n') {
                     ++line;
                     column = 0;
-                    if (!parseKey && prevChar == this.continuationChar && prevPrevChar != '\\') {
+                    if (!parseKey && prevChar == this.builder.continuationChar && prevPrevChar != '\\') {
                         String tmpValue = value.toString();
                         value = new StringBuilder();
                         if (tmpValue.charAt(tmpValue.length()-1) == '\r') {
@@ -249,20 +381,22 @@ public class KonfigerStream {
                         value.append(tmpValue);
                         do {
                             ++this.readPosition;
-                            c = this.strStream.charAt(this.readPosition);
+                            c = this.builder.string.charAt(this.readPosition);
                         } while((""+c).trim().isEmpty());
                     }
                 }
-                if (c == this.separator && prevChar != '^' ) {
+                if (c == this.builder.separator && prevChar != '^' ) {
                     if ((key.length() == 0) && (value.length() == 0)) continue;
-                    if (parseKey && !this.errTolerance) {
-                        throw new InvalidEntryException("Invalid entry detected near", line, column);
+                    if (parseKey && !this.builder.errTolerance) {
+                        throw new InvalidEntryException("Invalid entry detected in \n<" +
+                                this.builder.string + ">\nnear", line, column);
                     }
                     break;
                 }
-                if (c == this.delimiter && parseKey) {
-                    if ((value.length() > 0) && !this.errTolerance) {
-                        throw new InvalidEntryException("The input is improperly separated near", line, column);
+                if (c == this.builder.delimiter && parseKey) {
+                    if ((value.length() > 0) && !this.builder.errTolerance) {
+                        throw new InvalidEntryException("The input is improperly separated in \n<" +
+                                this.builder.string + ">\nnear", line, column);
                     }
                     parseKey = false;
                     continue;
@@ -278,7 +412,8 @@ public class KonfigerStream {
             ++readPosition;
         }
         ret[0] = (trimmingKey ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
-        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.separator).trim() : KonfigerUtil.unEscapeString(value.toString(), this.separator));
+        ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.builder.separator).trim() : 
+                KonfigerUtil.unEscapeString(value.toString(), this.builder.separator));
         return ret;
     }
 

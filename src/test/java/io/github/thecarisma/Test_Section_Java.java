@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class Test_Section_Java {
 
-    //@Test
+    @Test
     public void test_KonfigerStream_Section_String() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream("[user]\n" +
                 "name = thecarisma\n" +

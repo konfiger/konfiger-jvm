@@ -68,8 +68,8 @@ public class Konfiger {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
         this.filePath = konfigerStream.filePath;
-        this.separator = konfigerStream.separator;
-        this.delimiter = konfigerStream.delimiter;
+        this.separator = konfigerStream.builder.separator;
+        this.delimiter = konfigerStream.builder.delimiter;
 
         if (!this.lazyLoad) {
             this.lazyLoader();
@@ -162,7 +162,7 @@ public class Konfiger {
 
                 }
             } catch (IllegalAccessException | InvocationTargetException e) {
-                if (!stream.errTolerance) {
+                if (!stream.builder.errTolerance) {
                     e.printStackTrace();
                 }
             } catch (NoSuchFieldException ignored) { }
@@ -269,7 +269,7 @@ public class Konfiger {
             }
             ret = Boolean.parseBoolean((getString(key)));
         } catch (Exception ex) {
-            if (!stream.errTolerance) {
+            if (!stream.builder.errTolerance) {
                 ex.printStackTrace();
             }
         }
@@ -284,7 +284,7 @@ public class Konfiger {
             }
             ret = Long.parseLong(getString(key));
         } catch (Exception ex) {
-            if (!stream.errTolerance) {
+            if (!stream.builder.errTolerance) {
                 ex.printStackTrace();
             }
         }
@@ -299,7 +299,7 @@ public class Konfiger {
             }
             ret = Integer.parseInt(getString(key));
         } catch (Exception ex) {
-            if (!stream.errTolerance) {
+            if (!stream.builder.errTolerance) {
                 ex.printStackTrace();
             }
         }
@@ -314,7 +314,7 @@ public class Konfiger {
             }
             ret = Float.parseFloat(getString(key));
         } catch (Exception ex) {
-            if (!stream.errTolerance) {
+            if (!stream.builder.errTolerance) {
                 ex.printStackTrace();
             }
         }
@@ -329,7 +329,7 @@ public class Konfiger {
             }
             ret = Double.parseDouble(getString(key));
         } catch (Exception ex) {
-            if (!stream.errTolerance) {
+            if (!stream.builder.errTolerance) {
                 ex.printStackTrace();
             }
         }
@@ -377,7 +377,7 @@ public class Konfiger {
                 }
                 loadingEnds = true;
             } catch (IOException | InvalidEntryException ex) {
-                if (!stream.errTolerance) {
+                if (!stream.builder.errTolerance) {
                     ex.printStackTrace();
                 }
                 return false;

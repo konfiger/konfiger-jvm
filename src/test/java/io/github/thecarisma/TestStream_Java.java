@@ -62,12 +62,37 @@ public class TestStream_Java {
         }
     }
 
-    @Test
+    @Test(expected = InvalidEntryException.class)
     public void Test_The_Single_Pair_Commenting_In_File_Stream_1() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
         ks.setCommentPrefix("[");
         while (ks.hasNext()) {
             Assert.assertFalse(ks.next()[0].startsWith("["));
+        }
+    }
+
+    @Test
+    public void testMultiplePrefix() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        ks.setCommentPrefixes("[", ";", "//", "@");
+        while (ks.hasNext()) {
+            String[] entry = ks.next();
+            Assert.assertFalse(entry[0].startsWith("["));
+        }
+    }
+
+    @Test
+    public void testMultiplePrefixString() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("; The second part\n" +
+                "[Second Part]\n" +
+                "// This is also a comment\n" +
+                "Version=2.1.3\n" +
+                "Date=April 2020\n" +
+                "Platform=Cross Platform");
+        ks.setCommentPrefixes("[", ";", "//", "@");
+        while (ks.hasNext()) {
+            String[] entry = ks.next();
+            Assert.assertFalse(entry[0].startsWith("["));
         }
     }
 
@@ -184,6 +209,47 @@ public class TestStream_Java {
         Assert.assertTrue(ks.isErrorTolerant());
         while(ks.hasNext()) {
             Assert.assertNotEquals(ks.next(), null);
+        }
+    }
+
+
+
+    @Test
+    public void testBuilder() throws FileNotFoundException {
+        KonfigerStream.Builder builder = KonfigerStream.builder()
+                .withCommentPrefixes("[", ";", "@")
+                .withErrTolerance()
+                .withDelimiter(':');
+        Assert.assertEquals(builder.commentPrefixes.length, 3);
+        Assert.assertTrue(builder.errTolerance);
+        Assert.assertEquals(builder.delimiter, ':');
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testBuilderSingleStreamSource() throws IOException {
+        KonfigerStream.builder()
+                .withString("Name=thecarisma")
+                .withFile(new File("src/test/resources/test.comment.inf"));
+    }
+
+    @Test
+    public void testConstructorWithBuilder() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(KonfigerStream.builder()
+                .withString("Description = This project is the closest thing to Android +\n" +
+                        "              [Shared Preference](https://developer.android.com/reference/android/content/SharedPreferences) +\n" +
+                        "              in other languages and off the Android platform.\n" +
+                        "~ProjectName = konfiger\n" +
+                        "# This is a comment\n" +
+                        "~ This is another comment\n" +
+                        "ProgrammingLanguages = C, C++, C#, Dart, Elixr, Erlang, Go, +\n" +
+                        "               Haskell, Java, Kotlin, NodeJS, Powershell, +\n" +
+                        "               Python, Ring, Rust, Scala, Visual Basic, +\n" +
+                        "               and whatever language possible in the future")
+                .withContinuationChar('+')
+                .withCommentPrefixes("#", "~")
+        );
+        while (ks.hasNext()) {
+            Assert.assertFalse(ks.next()[1].endsWith("\\"));
         }
     }
 
