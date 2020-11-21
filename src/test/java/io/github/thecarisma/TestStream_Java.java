@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class TestStream_Java {
 
@@ -56,7 +57,7 @@ public class TestStream_Java {
 
     @Test
     public void Test_The_Single_Pair_Commenting_In_String_Stream() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", ':', ',');
+        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,;Project:konfiger,Date:April 24 2020", ':', ',');
         while (ks.hasNext()) {
             Assert.assertNotEquals(ks.next()[0], "Project");
         }
@@ -72,9 +73,9 @@ public class TestStream_Java {
     }
 
     @Test
-    public void testMultiplePrefixFile() throws IOException, InvalidEntryException {
+    public void testMultipleCommentPrefixFile() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
-        ks.setCommentPrefixes("[", ";", "//", "@", "<>");
+        ks.setCommentPrefixes("[", ";", "#", "@", "<>");
         while (ks.hasNext()) {
             String[] entry = ks.next();
             Assert.assertFalse(entry[0].startsWith("["));
@@ -82,24 +83,37 @@ public class TestStream_Java {
     }
 
     @Test
-    public void testMultiplePrefixString() throws IOException, InvalidEntryException {
+    public void testMultipleCommentPrefixString() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream("; The second part\n" +
                 "[Second Part]\n" +
-                "// This is also a comment\n" +
+                "# This is also a comment\n" +
                 "Version=2.1.3 / 2.1.5\n" +
                 "Date=April 2020 ; Inline comment\n" +
                 "Platform=Cross Platform");
-        ks.setCommentPrefixes("[", ";", "//", "@", "<>");
+        ks.setCommentPrefixes("[", ";", "#", "@", "<>");
         while (ks.hasNext()) {
             String[] entry = ks.next();
-            System.out.println(entry[1]);
             Assert.assertFalse(entry[0].startsWith("["));
         }
     }
 
     @Test
-    public void Test_The_Single_Pair_Commenting_In_File_Stream() throws IOException, InvalidEntryException {
+    public void testEntriesCommentFile() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
+        ks.setCommentPrefixes(";", "#", "@", "<>");
+        while (ks.hasNext()) {
+            String[] entry = ks.next();
+            Assert.assertFalse(entry[0].startsWith(";"));
+            Assert.assertFalse(entry[0].startsWith("#"));
+            Assert.assertFalse(entry[0].startsWith("@"));
+            Assert.assertFalse(entry[0].startsWith("<>"));
+        }
+    }
+
+    @Test
+    public void testTheSinglePairCommentingInFileStream() throws IOException, InvalidEntryException {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.txt"),':', ',');
+        ks.setCommentPrefixes("//");
         while (ks.hasNext()) {
             Assert.assertFalse(ks.next()[0].startsWith("//"));
         }

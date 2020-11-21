@@ -12,9 +12,13 @@ import java.util.*;
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
 public class Konfiger {
+
+    // TODO assignment spacer when writing, keep space between key delimiter and separator
+    // TODO space between section should be double separator
+
     public static int MAX_CAPACITY = 10000000;
     private final KonfigerStream stream;
-    private boolean lazyLoad;
+    private final boolean lazyLoad;
     private String filePath;
     private boolean enableCache_ = true;
     private boolean caseSensitive = true;
@@ -77,24 +81,32 @@ public class Konfiger {
     }
 
     public void put(String key, Object value) {
+        put("__global__", key, value);
+    }
+
+    public void put(String section, String key, Object value) {
         if (value instanceof String) {
-            putString(key, (String)value);
+            putString(section, key, (String)value);
         } else if (value instanceof Boolean) {
-            putBoolean(key, (boolean)value);
+            putBoolean(section, key, (boolean)value);
         } else if (value instanceof Long) {
-            putLong(key, (long)value);
+            putLong(section, key, (long)value);
         } else if (value instanceof Integer) {
-            putInt(key, (int)value);
+            putInt(section, key, (int)value);
         } else if (value instanceof Float) {
-            putFloat(key, (float)value);
+            putFloat(section, key, (float)value);
         } else if (value instanceof Double) {
             putDouble(key, (double)value);
         } else {
-            putString(key, value.toString());
+            putString(section, key, value.toString());
         }
     }
 
     public void putString(String key, String value) {
+        putString("__global__", key, value);
+    }
+
+    public void putString(String section, String key, String value) {
         if (lazyLoad && !loadingEnds && konfigerObjects.containsKey(key)) {
             String _value = getString(key);
             if (_value.equals(value)) {
@@ -174,25 +186,49 @@ public class Konfiger {
     }
 
     public void putBoolean(String key, boolean value) {
-        putString(key, Boolean.toString(value));
+        putBoolean("__global__", key, value);
+    }
+
+    public void putBoolean(String section, String key, boolean value) {
+        putString(section, key, Boolean.toString(value));
     }
 
     public void putLong(String key, long value) {
-        putString(key, Long.toString(value));
+        putLong("__global__", key, value);
+    }
+
+    public void putLong(String section, String key, long value) {
+        putString(section, key, Long.toString(value));
     }
 
     public void putInt(String key, int value) {
-        putString(key, Integer.toString(value));
+        putInt("__global__", key, value);
+    }
+
+    public void putInt(String section, String key, int value) {
+        putString(section, key, Integer.toString(value));
     }
 
     public void putFloat(String key, float value) {
-        putString(key, Float.toString(value));
+        putFloat("__global__", key, value);
+    }
+
+    public void putFloat(String section, String key, float value) {
+        putString(section, key, Float.toString(value));
     }
 
     public void putDouble(String key, double value) {
-        putString(key, Double.toString(value));
+        putDouble("__global__", key, value);
     }
 
+    public void putDouble(String section, String key, double value) {
+        putString(section, key, Double.toString(value));
+    }
+
+    /**
+     * @deprecated use {@link Konfiger#getDelimiter} instead
+     */
+    @Deprecated
     public void putComment(String theComment) {
         putString(this.stream.getCommentPrefix(), theComment);
     }
@@ -582,6 +618,7 @@ public class Konfiger {
         }
         while (stream.hasNext()) {
             String[] obj = stream.next();
+            System.out.println(obj);
             putString(obj[0], obj[1]);
         }
         this.loadingEnds = true;

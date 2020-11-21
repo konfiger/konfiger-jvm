@@ -244,8 +244,8 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Test_The_Single_Pair_Commenting_In_String_Stream_Konfiger() throws IOException, InvalidEntryException {
-        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", ':', ',');
+    public void testTheSinglePairCommentingInStringStreamKonfiger() throws IOException, InvalidEntryException {
+        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,;Project:konfiger,Date:April 24 2020", ':', ',');
         Konfiger kon = new Konfiger(ks);
         for (String key : kon.keys()) {
             Assert.assertNotEquals(kon.getString(key), "Project");
@@ -356,6 +356,26 @@ public class TestKonfiger_Java {
         Konfiger kon2 = new Konfiger(new File("src/test/resources/konfiger.conf"), false, '=', ',');
         Assert.assertEquals(kon.toString(), kon.toString());
         Assert.assertEquals(kon2.size(), 5);
+    }
+
+    @Test
+    public void testEntryListener() {
+        EntryListener entryListener = new EntryListener() {
+            @Override
+            public boolean entryAdded(String section, String key, String value) {
+                return false;
+            }
+
+            @Override
+            public boolean entryRemoved(String section, String key, String value) {
+                return false;
+            }
+
+            @Override
+            public boolean entryChanged(String section, String key, String value, String newValue) {
+                return false;
+            }
+        };
     }
 
 }

@@ -17,8 +17,8 @@ public class KonfigerStream {
         boolean ignoreInlineComment;
         String filePath;
         String string = "";
-        String[] commentPrefixes = new String[] {"//", ";"};
-        int[] commentPrefixSizes = new int[] {2, 1};
+        String[] commentPrefixes = new String[] {";"};
+        int[] commentPrefixSizes = new int[] {1};
         char continuationChar = '\\';
 
         public Builder() {
@@ -125,6 +125,8 @@ public class KonfigerStream {
     private int i = -1;
     String filePath = "";
     private String patchkey = "";
+    private String sectionComment = "";
+    private String entryComment = "";
     int line = 1;
     int column = 0;
     final Builder builder;
@@ -210,7 +212,7 @@ public class KonfigerStream {
         if (builder.commentPrefixes.length > 0) {
             return builder.commentPrefixes[0];
         }
-        return null;
+        return ";";
     }
 
     /**
@@ -259,6 +261,7 @@ public class KonfigerStream {
     public boolean hasNext() throws IOException {
         int subCount = 0;
         int commentPrefixIndex = -1;
+        String comment = "";
         patchkey = "";
         if (!doneReading_) {
             if (isFile) {
@@ -280,7 +283,10 @@ public class KonfigerStream {
                     } while ((i = in.read()) != -1 &&
                             ((char)i == builder.commentPrefixes[commentPrefixIndex].charAt(subCount-1)));
                     if (patchkey.equals(builder.commentPrefixes[commentPrefixIndex])) {
-                        while ((i = in.read()) != -1 && (char)i != builder.separator) {}
+                        while ((i = in.read()) != -1 && (char)i != builder.separator) {
+                            comment += (char)i;
+                        }
+                        entryComment = comment;
                         return hasNext();
                     }
                 }
@@ -295,11 +301,12 @@ public class KonfigerStream {
                         while ((i = in.read()) != -1) {
                             if (i == builder.endSectionChar) {
                                 hasNext_ = ((i = in.read()) != -1);
+                                sectionComment = entryComment;
+                                entryComment = "";
                                 return hasNext();
                             }
                             section += (char)i;
                         }
-                        System.out.println((char)i);
                     }
                 }
                 return hasNext_;
@@ -320,9 +327,11 @@ public class KonfigerStream {
                                 ++readPosition;
                                 while (readPosition < length &&
                                         builder.string.charAt(readPosition) != builder.separator) {
+                                    comment += builder.string.charAt(readPosition);
                                     ++readPosition;
                                 }
                                 ++readPosition;
+                                entryComment = comment;
                                 return hasNext();
                             }
                         }
@@ -334,6 +343,8 @@ public class KonfigerStream {
                             while (readPosition < length) {
                                 if (builder.string.charAt(readPosition) == builder.endSectionChar) {
                                     ++readPosition;
+                                    sectionComment = entryComment;
+                                    entryComment = "";
                                     return hasNext();
                                 }
                                 section += builder.string.charAt(readPosition);
@@ -351,10 +362,18 @@ public class KonfigerStream {
         return hasNext_;
     }
 
+    // indexes
+    // 0 -> key
+    // 1 -> value
+    // 2 -> comment
+    // 3 -> inline comment
+    // 4 -> section
+    // 5 -> section comment
     public String[] next() throws InvalidEntryException, IOException {
-        String[] ret = new String[3];
+        String[] ret = new String[6];
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
+        String inlineComment = "";
         boolean parseKey = true;
         boolean isMultiline = false;
         char prevChar = '\0';
@@ -391,7 +410,9 @@ public class KonfigerStream {
                         do {
                             subCount++;
                             if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
-                                while ((i = in.read()) != -1 && (char)i != builder.separator) {}
+                                while ((i = in.read()) != -1 && (char)i != builder.separator) {
+                                    inlineComment += (char)i;
+                                }
                                 hasInlineComment = true;
                                 break;
                             }
@@ -474,9 +495,10 @@ public class KonfigerStream {
                         do {
                             subCount++;
                             if (builder.commentPrefixSizes[commentPrefixIndex] == subCount) {
-                                while (readPosition < length &&
-                                        builder.string.charAt(readPosition) != builder.separator) {
+                                while (readPosition+1 < length &&
+                                        builder.string.charAt(readPosition+1) != builder.separator) {
                                     ++readPosition;
+                                    inlineComment += builder.string.charAt(readPosition);
                                 }
                                 ++readPosition;
                                 hasInlineComment = true;
@@ -523,8 +545,24 @@ public class KonfigerStream {
         ret[0] = (trimmingKey ? (patchkey+key.toString()).trim() : (patchkey+key.toString()));
         ret[1] = (trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.builder.separator).trim() :
                 KonfigerUtil.unEscapeString(value.toString(), this.builder.separator));
-        ret[2] = (trimmingSection ? section.trim() : section);;
+        ret[2] = entryComment;
+        ret[3] = inlineComment;
+        ret[4] = (trimmingSection ? section.trim() : section);
+        ret[5] = sectionComment;
+        entryComment = "";
         return ret;
+    }
+
+    public Entry nextEntry() throws IOException, InvalidEntryException {
+        String[] entry = next();
+        Entry sectionEntry = new Entry();
+        sectionEntry.setKey(entry[0]);
+        sectionEntry.setValue(entry[1]);
+        sectionEntry.setComment(entry[2]);
+        sectionEntry.setInlineComment(entry[3]);
+        sectionEntry.setSection(entry[4]);
+        sectionEntry.setSectionComment(entry[5]);
+        return sectionEntry;
     }
 
     private void doneReading() throws IOException {
