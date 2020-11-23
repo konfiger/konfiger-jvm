@@ -15,10 +15,17 @@ public class KonfigerStream {
         char endSectionChar;
         boolean errTolerance;
         boolean ignoreInlineComment;
+        boolean newlineForMultilineDelimiter;
+        boolean indentationAsMultiline;
+        boolean enableIndentedSection;
+        boolean enableNestedSections;
+        boolean addSpacing;
         String filePath;
         String string = "";
         String[] commentPrefixes = new String[] {";"};
+        String[] multilineCommentPrefixes = new String[] {"```", "'''", "\"\"\""};
         int[] commentPrefixSizes = new int[] {1};
+        int[] multilineCommentPrefixesSizes = new int[] {3,3,3};
         char continuationChar = '\\';
 
         public Builder() {
@@ -55,6 +62,31 @@ public class KonfigerStream {
 
         public Builder ignoreInlineComment() {
             this.ignoreInlineComment = true;
+            return this;
+        }
+
+        public Builder useNewlineForMultilineDelimiter() {
+            this.newlineForMultilineDelimiter = true;
+            return this;
+        }
+
+        public Builder useIndentationAsMultiline() {
+            this.indentationAsMultiline = true;
+            return this;
+        }
+
+        public Builder enableIndentedSection() {
+            this.enableIndentedSection = true;
+            return this;
+        }
+
+        public Builder enableNestedSections() {
+            this.enableNestedSections = true;
+            return this;
+        }
+
+        public Builder withSpacing() {
+            this.addSpacing = true;
             return this;
         }
 
@@ -98,6 +130,15 @@ public class KonfigerStream {
             this.commentPrefixSizes = new int[this.commentPrefixes.length];
             for (int index = 0; index < commentPrefixSizes.length; ++index) {
                 this.commentPrefixSizes[index] = this.commentPrefixes[index].length();
+            }
+            return this;
+        }
+
+        public Builder withMultilineCommentPrefixes(String... multilineCommentPrefixes) {
+            this.multilineCommentPrefixes = commentPrefixes;
+            this.multilineCommentPrefixesSizes = new int[this.multilineCommentPrefixes.length];
+            for (int index = 0; index < multilineCommentPrefixesSizes.length; ++index) {
+                this.multilineCommentPrefixesSizes[index] = this.multilineCommentPrefixes[index].length();
             }
             return this;
         }
@@ -331,7 +372,7 @@ public class KonfigerStream {
                                     ++readPosition;
                                 }
                                 ++readPosition;
-                                entryComment = comment;
+                                entryComment += (!entryComment.isEmpty() ? "\n" : "") + comment;
                                 return hasNext();
                             }
                         }
@@ -553,12 +594,15 @@ public class KonfigerStream {
         return ret;
     }
 
-    public Entry nextEntry() throws IOException, InvalidEntryException {
+    public SectionEntry nextEntry() throws IOException, InvalidEntryException {
         String[] entry = next();
-        Entry sectionEntry = new Entry();
+        SectionEntry sectionEntry = new SectionEntry();
         sectionEntry.setKey(entry[0]);
         sectionEntry.setValue(entry[1]);
-        sectionEntry.setComment(entry[2]);
+        String[] comments = entry[2].split("\n");
+        for (String comment : comments) {
+            sectionEntry.getComments().add(comment);
+        }
         sectionEntry.setInlineComment(entry[3]);
         sectionEntry.setSection(entry[4]);
         sectionEntry.setSectionComment(entry[5]);

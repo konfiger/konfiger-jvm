@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class Test_Section_Java {
 
     @Test
-    public void testKonfigerStreamWithSectionString() throws IOException, InvalidEntryException {
+    public void testStreamEntryString() throws IOException, InvalidEntryException {
         KonfigerStream ks = KonfigerStream.builder()
                 .withString(";comment for details\ndetails = true; yahoo\n" +
                         "[user]\n\n" +
@@ -36,7 +36,7 @@ public class Test_Section_Java {
     }
 
     @Test
-    public void testStreamEntryString() throws IOException, InvalidEntryException {
+    public void testKonfigerStreamWithSectionString() throws IOException, InvalidEntryException {
         KonfigerStream ks = KonfigerStream.builder()
                 .withString(";comment for details\ndetails = true ; yahoo\n" +
                         "[user]\n" +
@@ -48,11 +48,11 @@ public class Test_Section_Java {
                         "twitch = amsiraceht")
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); Entry sectionEntry1 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); Entry sectionEntry2 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); Entry sectionEntry3 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); Entry sectionEntry4 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); Entry sectionEntry5 = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry1 = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry2 = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry3 = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry4 = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry5 = ks.nextEntry();
         Assert.assertEquals(sectionEntry1.toString(), ";comment for details\ndetails = true ; yahoo");
         Assert.assertEquals(sectionEntry2.toString(), "[user]\nname = thecarisma");
         Assert.assertEquals(sectionEntry3.toString(), "[user]\ngender = Unknown");
@@ -96,23 +96,49 @@ public class Test_Section_Java {
     }
 
     @Test
-    public void testStreamEntryFile() throws IOException, InvalidEntryException {
-        
+    public void testMultilineComment1() throws IOException, InvalidEntryException {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("[section with comments only]\n" +
+                        "; first comment\n" +
+                        "; second comment\n" +
+                        "; third comment\n" +
+                        "project = konfiger")
+                .build();
+
+        Assert.assertTrue(ks.hasNext()); SectionEntry entry = ks.nextEntry();
+        Assert.assertEquals(entry.toString('=', ';', true, true),
+                "[section with comments only]\n" +
+                        "''' first comment\n" +
+                        "second comment\n" +
+                        "third comment'''\n" +
+                        "project = konfiger");
     }
 
     @Test
-    public void testKonfigerSectionString() throws IOException, InvalidEntryException {
-        Konfiger kon = new Konfiger(KonfigerStream.builder()
-                .withString("details=true\n" +
-                        "[user]\n\n" +
-                        "name = thecarisma\n" +
-                        "gender = Unknown\n" +
-                        "\n" +
-                        "[social]\r\n" +
-                        "twitter = iamthecarisma\n" +
-                        "twitch = amsiraceht")
-                .build());
+    public void testMultilineComment2() throws IOException, InvalidEntryException {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("[section with comments only]\n" +
+                        "''' first comment\n" +
+                        "second comment\n" +
+                        "third comment'''\n" +
+                        "project = konfiger")
+                .build();
 
+        Assert.assertTrue(ks.hasNext()); SectionEntry entry = ks.nextEntry();
+        System.out.println(entry);
+        Assert.assertEquals(entry.toString('=', ';', true),
+                "[section with comments only]\n" +
+                        "; first comment\n" +
+                        "; second comment\n" +
+                        "; third comment\n" +
+                        "project = konfiger");
+    }
+
+    @Test
+    public void testPythonConfigParserStructure() throws IOException, InvalidEntryException {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/configparser.python.ini"))
+                .build();
     }
 
 }

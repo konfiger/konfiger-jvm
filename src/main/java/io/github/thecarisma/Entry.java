@@ -10,14 +10,8 @@ import java.util.List;
 public class Entry {
     String key;
     String value;
-    String comment;
-    String section;
+    List<String> comments = new ArrayList<>();
     String inlineComment;
-    String sectionComment;
-
-    public Entry() {
-        key = value = section = comment = inlineComment = sectionComment = "";
-    }
 
     public String getKey() {
         return key;
@@ -27,20 +21,16 @@ public class Entry {
         this.key = key;
     }
 
-    public String getComment() {
-        return comment;
+    public List<String> getComments() {
+        return comments;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setComments(List<String> comments) {
+        this.comments = comments;
     }
 
-    public String getSection() {
-        return section;
-    }
-
-    public void setSection(String section) {
-        this.section = section;
+    public void addComment(String comment) {
+        this.comments.add(comment);
     }
 
     public String getValue() {
@@ -59,27 +49,52 @@ public class Entry {
         this.inlineComment = inlineComment;
     }
 
-    public String getSectionComment() {
-        return sectionComment;
-    }
-
-    public void setSectionComment(String sectionComment) {
-        this.sectionComment = sectionComment;
-    }
-
     @Override
     public String toString() {
-        if (section.isEmpty() || section.equals("__global__")) {
-            return String.format("%s%s = %s%s",
-                    comment.isEmpty() ? "" : ";" + comment + "\n",
-                    key, value,
-                    inlineComment.isEmpty() ? "" : " ;" + inlineComment);
+        return toString('=', true);
+    }
+
+    public String toString(char delimiter, boolean addSpacer) {
+        return toString(delimiter, ';', addSpacer, false);
+    }
+
+    public String toString(char delimiter, char commentChar, boolean addSpacer) {
+        return toString(delimiter, commentChar, addSpacer, false);
+    }
+
+    public String toString(char delimiter, char commentChar, boolean addSpacing, boolean commentsAsMultiline) {
+        boolean hasValue = value != null;
+        boolean hasKey = key != null;
+        boolean hasComment = !comments.isEmpty();
+        boolean hasInlineComment = inlineComment != null && !inlineComment.isEmpty();
+        String comment_ = "";
+        if (hasComment) {
+            if (commentsAsMultiline) {
+                comment_ = "'''" + (addSpacing ? " " : "");
+                for (int index = 0; index < comments.size(); ++index) {
+                    comment_ += comments.get(index).trim();
+                    if (index < comments.size()-1) {
+                        comment_ += "\n";
+                    }
+                }
+                comment_ += "'''";
+            } else {
+                for (int index = 0; index < comments.size(); ++index) {
+                    comment_ += commentChar + (addSpacing ? " " : "") + comments.get(index).trim();
+                    if (index < comments.size()-1) {
+                        comment_ += "\n";
+                    }
+                }
+            }
         }
-        return String.format("%s[%s]\n%s%s = %s%s",
-                sectionComment.isEmpty() ? "" : ";" + sectionComment + "\n",
-                section,
-                comment.isEmpty() ? "" : ";" + comment + "\n",
-                key, value,
-                inlineComment.isEmpty() ? "" : " ;" + inlineComment);
+        return String.format("%s%s%s%s%s%s%s%s",
+                !hasComment ? "" : comment_ + (hasKey || hasValue ? "\n" : ""),
+                hasKey ? key : "",
+                (hasKey && hasValue && addSpacing) ? " " : "",
+                (hasKey && hasValue) ? delimiter : "",
+                (hasKey && hasValue && addSpacing) ? " " : "",
+                hasValue ? value : "",
+                (hasInlineComment && addSpacing) ? " " : "",
+                !hasInlineComment ? "" : ";" + (addSpacing ? " " : "") + inlineComment.trim());
     }
 }
