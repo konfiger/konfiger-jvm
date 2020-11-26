@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Entry {
     String key;
-    String value;
+    List<String> values = new ArrayList<>();
     List<String> comments = new ArrayList<>();
     String inlineComment;
 
@@ -21,8 +21,20 @@ public class Entry {
         this.key = key;
     }
 
+    public List<String> getValues() {
+        return values;
+    }
+
+    public void setValues(List<String> values) {
+        this.values = values;
+    }
+
     public List<String> getComments() {
         return comments;
+    }
+
+    public void addValue(String value) {
+        this.values.add(value);
     }
 
     public void setComments(List<String> comments) {
@@ -31,14 +43,6 @@ public class Entry {
 
     public void addComment(String comment) {
         this.comments.add(comment);
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     public String getInlineComment() {
@@ -51,50 +55,90 @@ public class Entry {
 
     @Override
     public String toString() {
-        return toString('=', true);
+        return toString(true, '=');
     }
 
-    public String toString(char delimiter, boolean addSpacer) {
-        return toString(delimiter, ';', addSpacer, false);
+    public String toString(KonfigerStream.Builder builder) {
+        return toString(builder.addAssignmentSpacing,
+                builder.commentsAsMultiline,
+                builder.delimiter,
+                builder.commentPrefixes[0],
+                builder.multilineCommentPrefixes[0],
+                builder.addSpacePrePostCommentKeyword);
     }
 
-    public String toString(char delimiter, char commentChar, boolean addSpacer) {
-        return toString(delimiter, commentChar, addSpacer, false);
+    public String toString(boolean addAssignmentSpacing) {
+        return toString(addAssignmentSpacing,
+                false, '=', ";");
     }
 
-    public String toString(char delimiter, char commentChar, boolean addSpacing, boolean commentsAsMultiline) {
-        boolean hasValue = value != null;
+    public String toString(boolean addAssignmentSpacing, char delimiter) {
+        return toString(addAssignmentSpacing, false, delimiter, ";");
+    }
+
+    public String toString(boolean addAssignmentSpacing, char delimiter, String commentChar) {
+        return toString(addAssignmentSpacing, false, delimiter, commentChar);
+    }
+
+    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar) {
+        return toString(addAssignmentSpacing, commentsAsMultiline, delimiter, commentChar, "'''");
+    }
+
+    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar,
+                           String multilineCommentKeyword) {
+        return toString(addAssignmentSpacing, commentsAsMultiline, delimiter, commentChar,
+                multilineCommentKeyword, false);
+    }
+
+    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar,
+                           String multilineCommentKeyword, boolean addSpacePrePostCommentKeyword) {
+        boolean hasValue = !values.isEmpty();
         boolean hasKey = key != null;
         boolean hasComment = !comments.isEmpty();
         boolean hasInlineComment = inlineComment != null && !inlineComment.isEmpty();
         String comment_ = "";
         if (hasComment) {
             if (commentsAsMultiline) {
-                comment_ = "'''" + (addSpacing ? " " : "");
+                comment_ = multilineCommentKeyword + (addSpacePrePostCommentKeyword ? " " : "");
                 for (int index = 0; index < comments.size(); ++index) {
-                    comment_ += comments.get(index).trim();
+                    comment_ += comments.get(index);
                     if (index < comments.size()-1) {
                         comment_ += "\n";
                     }
                 }
-                comment_ += "'''";
+                comment_ += multilineCommentKeyword;
             } else {
                 for (int index = 0; index < comments.size(); ++index) {
-                    comment_ += commentChar + (addSpacing ? " " : "") + comments.get(index).trim();
+                    comment_ += commentChar + (addSpacePrePostCommentKeyword ? " " : "") + comments.get(index);
                     if (index < comments.size()-1) {
                         comment_ += "\n";
                     }
                 }
             }
         }
-        return String.format("%s%s%s%s%s%s%s%s",
-                !hasComment ? "" : comment_ + (hasKey || hasValue ? "\n" : ""),
-                hasKey ? key : "",
-                (hasKey && hasValue && addSpacing) ? " " : "",
-                (hasKey && hasValue) ? delimiter : "",
-                (hasKey && hasValue && addSpacing) ? " " : "",
-                hasValue ? value : "",
-                (hasInlineComment && addSpacing) ? " " : "",
-                !hasInlineComment ? "" : ";" + (addSpacing ? " " : "") + inlineComment.trim());
+        String strValue = "";
+        if (!hasValue) {
+            strValue = String.format("%s%s%s%s%s%s%s%s",
+                    !hasComment ? "" : comment_ + (hasKey ? "\n" : ""),
+                    hasKey ? key : "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    (hasInlineComment && addSpacePrePostCommentKeyword) ? " " : "",
+                    !hasInlineComment ? "" : commentChar + (addSpacePrePostCommentKeyword ? " " : "") + inlineComment.trim());
+        }
+        for (String value : values) {
+            strValue += String.format("%s%s%s%s%s%s%s%s",
+                    !hasComment ? "" : comment_ + (hasKey || hasValue ? "\n" : ""),
+                    hasKey ? key : "",
+                    (hasKey && hasValue && addAssignmentSpacing) ? " " : "",
+                    (hasKey && hasValue) ? delimiter : "",
+                    (hasKey && hasValue && addAssignmentSpacing) ? " " : "",
+                    hasValue ? value : "",
+                    (hasInlineComment && addSpacePrePostCommentKeyword) ? " " : "",
+                    !hasInlineComment ? "" : commentChar + (addSpacePrePostCommentKeyword ? " " : "") + inlineComment);
+        }
+        return strValue;
     }
 }

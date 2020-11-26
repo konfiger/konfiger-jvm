@@ -15,16 +15,16 @@ public class EntryTest {
         entry.addComment("The ip of the service");
         entry.setInlineComment("must be in the range of 127.0.0.* to 127.0.1.*");
         entry.setKey("ip");
-        entry.setValue("127.0.0.1");
+        entry.addValue("127.0.0.1");
 
-        Assert.assertEquals(entry.toString(), "; The ip of the service\n" +
-                "ip = 127.0.0.1 ; must be in the range of 127.0.0.* to 127.0.1.*");
+        Assert.assertEquals(entry.toString(true), ";The ip of the service\n" +
+                "ip = 127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
 
-        Assert.assertEquals(entry.toString('=', false), ";The ip of the service\n" +
+        Assert.assertEquals(entry.toString(false, '='), ";The ip of the service\n" +
                 "ip=127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
 
-        Assert.assertEquals(entry.toString(':', true), "; The ip of the service\n" +
-                "ip : 127.0.0.1 ; must be in the range of 127.0.0.* to 127.0.1.*");
+        Assert.assertEquals(entry.toString(false, '='), ";The ip of the service\n" +
+                "ip=127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
     }
 
     @Test
@@ -33,24 +33,32 @@ public class EntryTest {
         entry.addComment("The ip of the service");
         entry.setInlineComment("must be in the range of 127.0.0.* to 127.0.1.*");
         entry.setKey("ip");
-        entry.setValue("127.0.0.1");
+        entry.addValue("127.0.0.1");
         entry.setSection("service");
         entry.setSectionComment("The service configurations");
 
-        Assert.assertEquals(entry.toString(), "; The service configurations\n" +
+        KonfigerStream.Builder builder = new KonfigerStream.Builder()
+                .withAssignmentSpacing()
+                .withSpacePrePostCommentKeyword();
+        Assert.assertEquals(entry.toString(builder), "; The service configurations\n" +
                 "[service]\n" +
                 "; The ip of the service\n" +
                 "ip = 127.0.0.1 ; must be in the range of 127.0.0.* to 127.0.1.*");
 
-        Assert.assertEquals(entry.toString('=', false), ";The service configurations\n" +
+        Assert.assertEquals(entry.toString(true), ";The service configurations\n" +
+                "[service]\n" +
+                ";The ip of the service\n" +
+                "ip = 127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
+
+        Assert.assertEquals(entry.toString(false, '='), ";The service configurations\n" +
                 "[service]\n" +
                 ";The ip of the service\n" +
                 "ip=127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
 
-        Assert.assertEquals(entry.toString(':', true), "; The service configurations\n" +
+        Assert.assertEquals(entry.toString(false, ':'), ";The service configurations\n" +
                 "[service]\n" +
-                "; The ip of the service\n" +
-                "ip : 127.0.0.1 ; must be in the range of 127.0.0.* to 127.0.1.*");
+                ";The ip of the service\n" +
+                "ip:127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
     }
 
     @Test
@@ -62,9 +70,9 @@ public class EntryTest {
         entry2.setKey("#a kind of comment");
 
         Entry entry3 = new Entry();
-        entry3.setValue("; valued kind of comment");
+        entry3.addValue("; valued kind of comment");
 
-        Assert.assertEquals(entry.toString(), "; Empty comment only");
+        Assert.assertEquals(entry.toString(), ";Empty comment only");
         Assert.assertEquals(entry2.toString(), "#a kind of comment");
         Assert.assertEquals(entry3.toString(), "; valued kind of comment");
     }
@@ -76,7 +84,7 @@ public class EntryTest {
 
         Entry entry2 = new Entry();
         entry2.setKey("key with empty value");
-        entry2.setValue("");
+        entry2.addValue("");
 
         Assert.assertEquals(entry1.toString(), "key_without_value");
         Assert.assertEquals(entry2.toString(), "key with empty value = ");

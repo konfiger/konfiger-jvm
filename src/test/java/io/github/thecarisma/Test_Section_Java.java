@@ -53,7 +53,7 @@ public class Test_Section_Java {
         Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry3 = ks.nextEntry();
         Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry4 = ks.nextEntry();
         Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry5 = ks.nextEntry();
-        Assert.assertEquals(sectionEntry1.toString(), ";comment for details\ndetails = true ; yahoo");
+        Assert.assertEquals(sectionEntry1.toString(), ";comment for details\ndetails = true; yahoo");
         Assert.assertEquals(sectionEntry2.toString(), "[user]\nname = thecarisma");
         Assert.assertEquals(sectionEntry3.toString(), "[user]\ngender = Unknown");
         Assert.assertEquals(sectionEntry4.toString(), "[social]\ntwitter = iamthecarisma");
@@ -96,6 +96,39 @@ public class Test_Section_Java {
     }
 
     @Test
+    public void testMultilineCommentFile() throws IOException, InvalidEntryException {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/multiline_comment.ini"))
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            Assert.assertEquals(entry.getComments().size(), 3);
+        }
+    }
+
+    @Test
+    public void testMultilineCommentString() throws IOException, InvalidEntryException {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("[section with comments only]\n" +
+                        "''' first comment\n" +
+                        "second's comment\n" +
+                        "third comment'''\n" +
+                        "project = konfiger\n" +
+                        "\n" +
+                        "; first comment\n" +
+                        "; second comment\n" +
+                        "; third comment\n" +
+                        "author = thecarisma")
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            Assert.assertEquals(entry.getComments().size(), 3);
+        }
+    }
+
+    @Test
     public void testMultilineComment1() throws IOException, InvalidEntryException {
         KonfigerStream ks = KonfigerStream.builder()
                 .withString("[section with comments only]\n" +
@@ -106,11 +139,11 @@ public class Test_Section_Java {
                 .build();
 
         Assert.assertTrue(ks.hasNext()); SectionEntry entry = ks.nextEntry();
-        Assert.assertEquals(entry.toString('=', ';', true, true),
+        Assert.assertEquals(entry.toString(true, true, '=', ";"),
                 "[section with comments only]\n" +
                         "''' first comment\n" +
-                        "second comment\n" +
-                        "third comment'''\n" +
+                        " second comment\n" +
+                        " third comment'''\n" +
                         "project = konfiger");
     }
 
@@ -119,19 +152,32 @@ public class Test_Section_Java {
         KonfigerStream ks = KonfigerStream.builder()
                 .withString("[section with comments only]\n" +
                         "''' first comment\n" +
-                        "second comment\n" +
-                        "third comment'''\n" +
+                        " second comment\n" +
+                        " third comment'''\n" +
                         "project = konfiger")
                 .build();
 
         Assert.assertTrue(ks.hasNext()); SectionEntry entry = ks.nextEntry();
-        System.out.println(entry);
-        Assert.assertEquals(entry.toString('=', ';', true),
+        Assert.assertEquals(entry.toString(true, '=', ";"),
                 "[section with comments only]\n" +
                         "; first comment\n" +
                         "; second comment\n" +
                         "; third comment\n" +
                         "project = konfiger");
+    }
+
+    @Test
+    public void testNestedAndIndentedSection() throws IOException, InvalidEntryException {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/nested_section.conf"))
+                .enableIndentedSection()
+                .enableNestedSections()
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            System.out.println(entry);
+        }
     }
 
     @Test

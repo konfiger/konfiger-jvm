@@ -19,13 +19,16 @@ public class KonfigerStream {
         boolean indentationAsMultiline;
         boolean enableIndentedSection;
         boolean enableNestedSections;
-        boolean addSpacing;
+        boolean addAssignmentSpacing;
+        boolean commentsAsMultiline;
+        boolean addSpacePrePostCommentKeyword;
         String filePath;
         String string = "";
         String[] commentPrefixes = new String[] {";"};
         String[] multilineCommentPrefixes = new String[] {"```", "'''", "\"\"\""};
         int[] commentPrefixSizes = new int[] {1};
         int[] multilineCommentPrefixesSizes = new int[] {3,3,3};
+        String subSectionDelimiter = "~~>";
         char continuationChar = '\\';
 
         public Builder() {
@@ -85,8 +88,18 @@ public class KonfigerStream {
             return this;
         }
 
-        public Builder withSpacing() {
-            this.addSpacing = true;
+        public Builder withAssignmentSpacing() {
+            this.addAssignmentSpacing = true;
+            return this;
+        }
+
+        public Builder useCommentsAsMultiline() {
+            this.commentsAsMultiline = true;
+            return this;
+        }
+
+        public Builder withSpacePrePostCommentKeyword() {
+            this.addSpacePrePostCommentKeyword = true;
             return this;
         }
 
@@ -107,7 +120,8 @@ public class KonfigerStream {
         public Builder withFile(File file) throws FileNotFoundException {
             if (!this.string.isEmpty()) {
                 throw new IllegalStateException("The stream can only have one source which is either" +
-                        " string, file or URL. Build using withFile(...) or withString(...).");
+                        " string, file or URL. Build using any of withString(...), withFile(...) and withURL(...) but" +
+                        " not combination of the methods.");
             }
             if (!file.exists()) {
                 throw new FileNotFoundException("The file does not exist " + file.getAbsolutePath());
@@ -119,7 +133,8 @@ public class KonfigerStream {
         public Builder withString(String string) {
             if (this.filePath != null) {
                 throw new IllegalStateException("The stream can only have one source which is either" +
-                        " string, file or URL. Build using withFile(...) or withString(...).");
+                        " string, file or URL. Build using any of withString(...), withFile(...) and withURL(...) but" +
+                        " not combination of the methods.");
             }
             this.string = string;
             return this;
@@ -145,6 +160,11 @@ public class KonfigerStream {
 
         public Builder withContinuationChar(char continuationChar) {
             this.continuationChar = continuationChar;
+            return this;
+        }
+
+        public Builder withSubSectionDelimiter(String subSectionDelimiter) {
+            this.subSectionDelimiter = subSectionDelimiter;
             return this;
         }
 
@@ -299,10 +319,21 @@ public class KonfigerStream {
         return -1;
     }
 
+    int multilineCommentPrefixMatchIndex(char c, int subCount) {
+        for (int index = 0; index < builder.multilineCommentPrefixes.length; ++index) {
+            if (builder.multilineCommentPrefixes[index].charAt(subCount) == c) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
     public boolean hasNext() throws IOException {
         int subCount = 0;
+        int sectionMatcher = 0;
         int commentPrefixIndex = -1;
-        String comment = "";
+        String comment = "", patchComment = "";
+        boolean terminateMultilineComment = false;
         patchkey = "";
         if (!doneReading_) {
             if (isFile) {
@@ -314,6 +345,44 @@ public class KonfigerStream {
                         column = 0;
                     }
                 }
+                if ((commentPrefixIndex = multilineCommentPrefixMatchIndex((char)i, subCount)) > -1) {
+                    do {
+                        patchkey += (char)i;
+                        subCount++;
+                        if (builder.multilineCommentPrefixesSizes[commentPrefixIndex] == subCount) {
+                            break;
+                        }
+                    } while ((i = in.read()) != -1 &&
+                            ((char)i == builder.multilineCommentPrefixes[commentPrefixIndex].charAt(subCount-1)));
+                    if (patchkey.equals(builder.multilineCommentPrefixes[commentPrefixIndex])) {
+                        while ((i = in.read()) != -1) {
+                            if ((commentPrefixIndex = multilineCommentPrefixMatchIndex((char)i, 0)) < 0) {
+                                comment += (char) i;
+                            } else {
+                                subCount = 0;
+                                patchComment = "";
+                                do {
+                                    patchComment += (char)i;
+                                    subCount++;
+                                    if (builder.multilineCommentPrefixesSizes[commentPrefixIndex] == subCount) {
+                                        if (patchComment.equals(builder.multilineCommentPrefixes[commentPrefixIndex])) {
+                                            terminateMultilineComment = true;
+                                        }
+                                        break;
+                                    }
+                                } while ((i = in.read()) != -1);
+                                if (terminateMultilineComment) {
+                                    break;
+                                } else {
+                                    comment += patchComment;
+                                }
+                            }
+                        }
+                        entryComment += (!entryComment.isEmpty() ? "\n" : "") + comment;
+                        return hasNext();
+                    }
+                }
+                subCount = 0;
                 if ((commentPrefixIndex = commentPrefixMatchIndex((char)i, subCount)) > -1) {
                     do {
                         patchkey += (char)i;
@@ -327,7 +396,7 @@ public class KonfigerStream {
                         while ((i = in.read()) != -1 && (char)i != builder.separator) {
                             comment += (char)i;
                         }
-                        entryComment = comment;
+                        entryComment += (!entryComment.isEmpty() ? "\n" : "") + comment;
                         return hasNext();
                     }
                 }
@@ -338,15 +407,31 @@ public class KonfigerStream {
 
                 if (hasNext_) {
                     if (patchkey.isEmpty() && (char)i == builder.beginSectionChar) {
-                        section = "";
+                        ++sectionMatcher;
+                        String internalSection = "";
+                        boolean hasSubSection = false;
                         while ((i = in.read()) != -1) {
-                            if (i == builder.endSectionChar) {
-                                hasNext_ = ((i = in.read()) != -1);
-                                sectionComment = entryComment;
-                                entryComment = "";
-                                return hasNext();
+                            if (i == builder.beginSectionChar) {
+                                ++sectionMatcher;
+                                hasSubSection = true;
+                                continue;
+                            } else if (i == builder.endSectionChar) {
+                                --sectionMatcher;
+                                if (sectionMatcher == 0) {
+                                    hasNext_ = ((i = in.read()) != -1);
+                                    sectionComment = entryComment;
+                                    entryComment = "";
+                                    if (hasSubSection) {
+                                        section += builder.subSectionDelimiter + internalSection;
+                                    } else {
+                                        section = internalSection;
+                                    }
+
+                                    return hasNext();
+                                }
+                                continue;
                             }
-                            section += (char)i;
+                            internalSection += (char)i;
                         }
                     }
                 }
@@ -355,6 +440,50 @@ public class KonfigerStream {
                 long length = builder.string.length();
                 while (readPosition < length) {
                     if (!(""+builder.string.charAt(readPosition)).trim().isEmpty()) {
+                        if ((commentPrefixIndex = multilineCommentPrefixMatchIndex(builder.string.charAt(readPosition),
+                                subCount)) > -1) {
+                            while (builder.string.charAt(readPosition) ==
+                                    builder.multilineCommentPrefixes[commentPrefixIndex].charAt(subCount)) {
+                                patchkey += builder.string.charAt(readPosition);
+                                ++subCount;
+                                ++readPosition;
+                                if (builder.multilineCommentPrefixesSizes[commentPrefixIndex] == subCount) {
+                                    break;
+                                }
+                            }
+                            if (patchkey.equals(builder.multilineCommentPrefixes[commentPrefixIndex])) {
+                                while (readPosition < length) {
+                                    if ((commentPrefixIndex = multilineCommentPrefixMatchIndex(
+                                            builder.string.charAt(readPosition),
+                                            0)) < 0) {
+                                        comment += builder.string.charAt(readPosition);
+                                    } else {
+                                        subCount = 0;
+                                        patchComment = "";
+                                        do {
+                                            patchComment += builder.string.charAt(readPosition);
+                                            subCount++;
+                                            if (builder.multilineCommentPrefixesSizes[commentPrefixIndex] == subCount) {
+                                                if (patchComment.equals(builder.multilineCommentPrefixes[commentPrefixIndex])) {
+                                                    terminateMultilineComment = true;
+                                                }
+                                                break;
+                                            }
+                                        } while ((++readPosition) < length);
+                                        if (terminateMultilineComment) {
+                                            break;
+                                        } else {
+                                            comment += patchComment;
+                                        }
+                                    }
+                                    ++readPosition;
+                                }
+                                ++readPosition;
+                                entryComment += (!entryComment.isEmpty() ? "\n" : "") + comment;
+                                return hasNext();
+                            }
+                        }
+                        subCount = 0;
                         if ((commentPrefixIndex = commentPrefixMatchIndex(builder.string.charAt(readPosition),
                                 subCount)) > -1) {
                             while (builder.string.charAt(readPosition+subCount) ==
@@ -379,10 +508,12 @@ public class KonfigerStream {
 
                         hasNext_ = true;
                         if (builder.string.charAt(readPosition) == builder.beginSectionChar) {
+                            ++sectionMatcher;
                             section = "";
                             ++readPosition;
                             while (readPosition < length) {
                                 if (builder.string.charAt(readPosition) == builder.endSectionChar) {
+                                    --sectionMatcher;
                                     ++readPosition;
                                     sectionComment = entryComment;
                                     entryComment = "";
@@ -598,10 +729,12 @@ public class KonfigerStream {
         String[] entry = next();
         SectionEntry sectionEntry = new SectionEntry();
         sectionEntry.setKey(entry[0]);
-        sectionEntry.setValue(entry[1]);
+        sectionEntry.addValue(entry[1]);
         String[] comments = entry[2].split("\n");
         for (String comment : comments) {
-            sectionEntry.getComments().add(comment);
+            if (!comment.trim().isEmpty()) {
+                sectionEntry.getComments().add(comment);
+            }
         }
         sectionEntry.setInlineComment(entry[3]);
         sectionEntry.setSection(entry[4]);

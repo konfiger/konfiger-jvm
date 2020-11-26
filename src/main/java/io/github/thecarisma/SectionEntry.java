@@ -26,21 +26,20 @@ public class SectionEntry extends Entry {
 
     @Override
     public String toString() {
-        return toString('=', true);
+        return toString(true, '=');
     }
 
-    public String toString(char delimiter, boolean addSpacer) {
-        return toString(delimiter, ';', addSpacer, false);
-    }
-
-    public String toString(char delimiter, char commentChar, boolean addSpacer) {
-        return toString(delimiter, commentChar, addSpacer, false);
-    }
-
-    public String toString(char delimiter, char commentChar, boolean addSpacing, boolean commentsAsMultiline) {
+    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar,
+                           String multilineCommentKeyword, boolean addSpacePrePostCommentKeyword) {
+        String entryValue = super.toString(addAssignmentSpacing, commentsAsMultiline, delimiter, commentChar, multilineCommentKeyword,
+                addSpacePrePostCommentKeyword);
+        if (section == null || section.isEmpty() || section.equals("__global__")) {
+            return entryValue;
+        }
         return String.format("%s[%s]\n%s",
-                sectionComment == null || sectionComment.isEmpty() ? "" : ";" + (addSpacing ? " " : "") + sectionComment + "\n",
+                sectionComment == null || sectionComment.isEmpty() ? "" : commentChar +
+                        (addSpacePrePostCommentKeyword ? " " : "") + sectionComment + "\n",
                 section,
-                super.toString(delimiter, commentChar, addSpacing, commentsAsMultiline));
+                entryValue);
     }
 }
