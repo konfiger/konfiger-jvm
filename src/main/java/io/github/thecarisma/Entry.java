@@ -10,8 +10,8 @@ import java.util.List;
 public class Entry {
     String key;
     List<String> values = new ArrayList<>();
-    List<String> comments = new ArrayList<>();
-    String inlineComment;
+    List<Comment> comments = new ArrayList<>();
+    List<Comment> inlineComments = new ArrayList<>();
 
     public String getKey() {
         return key;
@@ -29,7 +29,7 @@ public class Entry {
         this.values = values;
     }
 
-    public List<String> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
@@ -37,20 +37,38 @@ public class Entry {
         this.values.add(value);
     }
 
-    public void setComments(List<String> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
 
-    public void addComment(String comment) {
+    public void addComment(Comment comment) {
         this.comments.add(comment);
     }
 
-    public String getInlineComment() {
-        return inlineComment;
+    public void addComment(String commentValue) {
+        Comment comment = new Comment();
+        comment.setCommentKeyword(";");
+        comment.setValue(commentValue);
+        this.comments.add(comment);
     }
 
-    public void setInlineComment(String inlineComment) {
-        this.inlineComment = inlineComment;
+    public List<Comment> getInlineComments() {
+        return inlineComments;
+    }
+
+    public void setInlineComments(List<Comment> inlineComments) {
+        this.inlineComments = inlineComments;
+    }
+
+    public void addInlineComment(Comment comment) {
+        this.inlineComments.add(comment);
+    }
+
+    public void addInlineComment(String commentValue) {
+        Comment comment = new Comment();
+        comment.setCommentKeyword(";");
+        comment.setValue(commentValue);
+        this.inlineComments.add(comment);
     }
 
     @Override
@@ -60,60 +78,36 @@ public class Entry {
 
     public String toString(KonfigerStream.Builder builder) {
         return toString(builder.addAssignmentSpacing,
-                builder.commentsAsMultiline,
                 builder.delimiter,
-                builder.commentPrefixes[0],
-                builder.multilineCommentPrefixes[0],
-                builder.addSpacePrePostCommentKeyword);
+                builder.addSpaceBeforeCommentKeyword);
     }
 
     public String toString(boolean addAssignmentSpacing) {
-        return toString(addAssignmentSpacing,
-                false, '=', ";");
+        return toString(addAssignmentSpacing, '=', true);
     }
 
     public String toString(boolean addAssignmentSpacing, char delimiter) {
-        return toString(addAssignmentSpacing, false, delimiter, ";");
+        return toString(addAssignmentSpacing, delimiter, true);
     }
 
-    public String toString(boolean addAssignmentSpacing, char delimiter, String commentChar) {
-        return toString(addAssignmentSpacing, false, delimiter, commentChar);
-    }
-
-    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar) {
-        return toString(addAssignmentSpacing, commentsAsMultiline, delimiter, commentChar, "'''");
-    }
-
-    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar,
-                           String multilineCommentKeyword) {
-        return toString(addAssignmentSpacing, commentsAsMultiline, delimiter, commentChar,
-                multilineCommentKeyword, false);
-    }
-
-    public String toString(boolean addAssignmentSpacing, boolean commentsAsMultiline, char delimiter, String commentChar,
-                           String multilineCommentKeyword, boolean addSpacePrePostCommentKeyword) {
+    public String toString(boolean addAssignmentSpacing, char delimiter, boolean addSpaceBeforeCommentKeyword) {
         boolean hasValue = !values.isEmpty();
         boolean hasKey = key != null;
         boolean hasComment = !comments.isEmpty();
-        boolean hasInlineComment = inlineComment != null && !inlineComment.isEmpty();
+        boolean hasInlineComment = !inlineComments.isEmpty();
         String comment_ = "";
+        String inlineComment_ = "";
         if (hasComment) {
-            if (commentsAsMultiline) {
-                comment_ = multilineCommentKeyword + (addSpacePrePostCommentKeyword ? " " : "");
-                for (int index = 0; index < comments.size(); ++index) {
-                    comment_ += comments.get(index);
-                    if (index < comments.size()-1) {
-                        comment_ += "\n";
-                    }
+            for (int index = 0; index < comments.size(); ++index) {
+                comment_ += comments.get(index).toString();
+                if (index < comments.size()-1) {
+                    comment_ += "\n";
                 }
-                comment_ += multilineCommentKeyword;
-            } else {
-                for (int index = 0; index < comments.size(); ++index) {
-                    comment_ += commentChar + (addSpacePrePostCommentKeyword ? " " : "") + comments.get(index);
-                    if (index < comments.size()-1) {
-                        comment_ += "\n";
-                    }
-                }
+            }
+        }
+        if (hasInlineComment) {
+            for (int index = 0; index < inlineComments.size(); ++index) {
+                inlineComment_ += inlineComments.get(index).toString();
             }
         }
         String strValue = "";
@@ -125,8 +119,8 @@ public class Entry {
                     "",
                     "",
                     "",
-                    (hasInlineComment && addSpacePrePostCommentKeyword) ? " " : "",
-                    !hasInlineComment ? "" : commentChar + (addSpacePrePostCommentKeyword ? " " : "") + inlineComment.trim());
+                    (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
+                    inlineComment_);
         }
         for (String value : values) {
             strValue += String.format("%s%s%s%s%s%s%s%s",
@@ -136,9 +130,47 @@ public class Entry {
                     (hasKey && hasValue) ? delimiter : "",
                     (hasKey && hasValue && addAssignmentSpacing) ? " " : "",
                     hasValue ? value : "",
-                    (hasInlineComment && addSpacePrePostCommentKeyword) ? " " : "",
-                    !hasInlineComment ? "" : commentChar + (addSpacePrePostCommentKeyword ? " " : "") + inlineComment);
+                    (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
+                    inlineComment_);
         }
         return strValue;
+    }
+
+    public static class Comment {
+        boolean isMultiline;
+        String commentKeyword = ";";
+        String value;
+
+        public boolean isMultiline() {
+            return isMultiline;
+        }
+
+        public void setMultiline(boolean multiline) {
+            isMultiline = multiline;
+        }
+
+        public String getCommentKeyword() {
+            return commentKeyword;
+        }
+
+        public void setCommentKeyword(String commentKeyword) {
+            this.commentKeyword = commentKeyword;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s%s%s",
+                    commentKeyword,
+                    value,
+                    isMultiline ? commentKeyword : "");
+        }
     }
 }

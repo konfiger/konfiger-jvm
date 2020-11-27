@@ -124,7 +124,7 @@ import java.io.*;
 import java.util.Map;
 
 public class Test {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         Konfiger konfiger = new Konfiger(new File("test/test.config.ini"), true);
 
         //add a string
@@ -155,7 +155,7 @@ import io.github.thecarisma.*;
 import java.io.*;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         String[] randomValues = { "One", "Two", "Three", "Four", "Five" };
         Konfiger konfiger = new Konfiger("", false);
 
@@ -177,7 +177,7 @@ import io.github.thecarisma.*;
 import java.io.*;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         Konfiger konfiger = new Konfiger("\n" +
                 "String=This is a string\n" +
                 "Number=215415245\n" +
@@ -216,7 +216,7 @@ import io.github.thecarisma.*;
 import java.io.*;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), //the file path
                                 true //lazyLoad true
                                 );
@@ -248,7 +248,7 @@ import io.github.thecarisma.*;
 import java.io.*;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         Konfiger konfiger = new Konfiger(new File("test/konfiger.conf"), false);
         konfiger.setDelimiter('?');
         konfiger.setSeparator(',');
@@ -268,7 +268,7 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         KonfigerStream kStream = new KonfigerStream(new File("test/konfiger.conf"));
         while (kStream.hasNext()) {
             String[] entry = kStream.next();
@@ -288,7 +288,7 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         KonfigerStream kStream = new KonfigerStream("\n" +
                 "String=This is a string\n" +
                 "Number=215415245\n" +
@@ -313,7 +313,7 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         KonfigerStream kStream = new KonfigerStream("\n" +
                 "String=This is a string\n" +
                 "#Number=215415245\n" +
@@ -411,7 +411,7 @@ import io.github.thecarisma.*;
 import java.io.*;
 
 public class Test_Java {
-    public static void main(String[] args) throws IOException, InvalidEntryException {
+    public static void main(String[] args) {
         KonfigerStream ks = new KonfigerStream(new File("test/test.contd.conf"));
         ks.setContinuationChar('+');
 
@@ -805,10 +805,10 @@ konfiger.save();
 
 | Function        | Description         
 | --------------- | ------------- 
-| public Konfiger(File file, boolean lazyLoad) throws IOException, InvalidEntryException  | Create the konfiger object from a file, the first parameter(string) is the file path, the second parameter(boolean) indicates whether to read all the entry in the file in the constructor or when needed, the default delimiter(`=`) and separator(`\n`) will be used. This creates the konfiger object from call to `fromStream(konfigerStream, lazyLoad)` with the konfigerStream initialized with the filePath parameter. The new Konfiger object is returned.
-| public Konfiger(File file, boolean lazyLoad, char delimiter, char separator) throws IOException, InvalidEntryException  | Create the konfiger object from a file, the first(string) parameter is the file path, the second parameter(boolean) indicates whether to read all the entry in the file in the constructor or when needed, the third param(char) is the delimiter and the fourth param(char) is the separator. This creates the konfiger object from call to `fromStream(konfigerStream, lazyLoad)` with the konfigerStream initialized with the filePath parameter. The new Konfiger object is returned.
-| public Konfiger(String rawString, boolean lazyLoad) throws IOException, InvalidEntryException | Create the konfiger object from a string, the first parameter is the String(can be empty), the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed, the default delimiter(`=`) and separator(`\n`) will be used. The new Konfiger object is returned.
-| public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator) throws IOException, InvalidEntryException  | Create the konfiger object from a string, the first parameter is the String(can be empty), the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed, the third param is the delimiter and the fourth param is the separator. The new Konfiger object is returned.
+| public Konfiger(File file, boolean lazyLoad)  | Create the konfiger object from a file, the first parameter(string) is the file path, the second parameter(boolean) indicates whether to read all the entry in the file in the constructor or when needed, the default delimiter(`=`) and separator(`\n`) will be used. This creates the konfiger object from call to `fromStream(konfigerStream, lazyLoad)` with the konfigerStream initialized with the filePath parameter. The new Konfiger object is returned.
+| public Konfiger(File file, boolean lazyLoad, char delimiter, char separator)  | Create the konfiger object from a file, the first(string) parameter is the file path, the second parameter(boolean) indicates whether to read all the entry in the file in the constructor or when needed, the third param(char) is the delimiter and the fourth param(char) is the separator. This creates the konfiger object from call to `fromStream(konfigerStream, lazyLoad)` with the konfigerStream initialized with the filePath parameter. The new Konfiger object is returned.
+| public Konfiger(String rawString, boolean lazyLoad) | Create the konfiger object from a string, the first parameter is the String(can be empty), the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed, the default delimiter(`=`) and separator(`\n`) will be used. The new Konfiger object is returned.
+| public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator)  | Create the konfiger object from a string, the first parameter is the String(can be empty), the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed, the third param is the delimiter and the fourth param is the separator. The new Konfiger object is returned.
 | public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad)  | Create the konfiger object from a KonfigerStream object, the second boolean parameter indicates whether to read all the entry in the file in the constructor or when needed this make data loading progressive as data is only loaded from the file when put or get until the Stream reaches EOF. The new Konfiger object is returned.
 | public void put(String key, Object value)           | Put any object into the konfiger. if the second parameter is a Javascript Object, `JSON.stringify` will be used to get the string value of the object else the appropriate put* method will be called. e.g `put('Name', 'Adewale')` will result in the call `putString('Name', 'Adewale')`.
 | public void putString(String key, String value)           | Put a String into the konfiger, the second parameter must be a string.
@@ -830,10 +830,10 @@ konfiger.save();
 | public double getDouble(String key, double fallbackValue)   | Get a value as Double, the second(Double) parameter is optional if it is specified it is returned if the key does not exist, if the second parameter is not specified `0.0` will be returned. When trying to cast the value to Double if an error occur an exception will be thrown except if error tolerance is set to true then `0.0` will be returned. use `errorTolerance(Boolean)` to set the konfiger object error tolerancy.
 | public String remove(int index)           | Remove a key value entry at a particular index. Returns the value of the entry that was removed.
 | public String remove(String key)           | Remove a key value entry using the entry Key. Returns the value of the entry that was removed.
-| public void appendString(String rawString) throws IOException, InvalidEntryException          | Append new data to the konfiger from a string, the new string delimiter and separator must be the same with the current konfigure delimiter and separator, if it not the same use the `setDelimiter` and `setSeparator` to change the konfiger separator and delimiter to the new file separator and delimiter. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
-| public void appendFile(File file) throws IOException, InvalidEntryException          | Read new datas from the file path and append, the new file delimiter and separator must be the same with the current konfigure delimiter and separator, if it not the same use the `setDelimiter` and `setSeparator` to change the konfiger separator and delimiter to the new file separator and delimiter. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
-| public void appendString(String rawString, char delimiter, char separator) throws IOException, InvalidEntryException          | Append new data to the konfiger from a string. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
-| public void appendFile(File file, char delimiter, char separator) throws IOException, InvalidEntryException          | Read new datas from the file path and append. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| public void appendString(String rawString)          | Append new data to the konfiger from a string, the new string delimiter and separator must be the same with the current konfigure delimiter and separator, if it not the same use the `setDelimiter` and `setSeparator` to change the konfiger separator and delimiter to the new file separator and delimiter. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| public void appendFile(File file)          | Read new datas from the file path and append, the new file delimiter and separator must be the same with the current konfigure delimiter and separator, if it not the same use the `setDelimiter` and `setSeparator` to change the konfiger separator and delimiter to the new file separator and delimiter. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| public void appendString(String rawString, char delimiter, char separator)          | Append new data to the konfiger from a string. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
+| public void appendFile(File file, char delimiter, char separator)          | Read new datas from the file path and append. If the Konfiger is initialized with lazy loading all the data will be loaded before the entries from the new string is added.
 | public void save() throws FileNotFoundException, public void save(String filePath) throws FileNotFoundException         | Save the konfiger datas into a file. The argument filePath is optional if specified the entries is writtent to the filePath else the filePath used to initialize the Konfiger object is used and if the Konfiger is initialized `fromString` and the filePath is not specified an exception is thrown. This does not clear the already added entries.
 | public char getSeperator()           | Get separator char that seperate the key value entry, default is `\n`.
 | public char getDelimeter()           | Get delimiter char that seperated the key from it value, default is `=`.

@@ -10,7 +10,7 @@ import java.util.Map;
 public class TestKonfiger_Java {
 
     @Test
-    public void Validate_Konfiger_String_Stream_Entries() throws IOException, InvalidEntryException {
+    public void Validate_Konfiger_String_Stream_Entries() {
         Konfiger konfiger = new Konfiger("\n" +
                 "String=This is a string\n" +
                 "Number=215415245\n" +
@@ -27,7 +27,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Validate_Konfiger_Entries_Get_Method() throws IOException, InvalidEntryException {
+    public void Validate_Konfiger_Entries_Get_Method() {
         Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"));
         konfiger.put("One", konfiger);
         konfiger.put("Two", "\"hello\", \"world\"");
@@ -49,7 +49,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Validate_LazyLoad_Konfiger_Entries_Get_With_Fallback() throws IOException, InvalidEntryException {
+    public void Validate_LazyLoad_Konfiger_Entries_Get_With_Fallback() {
         Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"), true);
 
         Assert.assertEquals(konfiger.get("Occupation", "Pen Tester"), "Software Engineer");
@@ -59,7 +59,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Validate_Konfiger_Entries_Get_Returned_Types() throws IOException, InvalidEntryException {
+    public void Validate_Konfiger_Entries_Get_Returned_Types() {
         Konfiger konfiger = new Konfiger("");
         konfiger.put("One", konfiger);
         konfiger.putLong("Two", 123456789);
@@ -83,7 +83,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Validate_Konfiger_Default_Value_For_Non_Existing_Key() throws IOException, InvalidEntryException {
+    public void Validate_Konfiger_Default_Value_For_Non_Existing_Key() {
         Konfiger konfiger = new Konfiger("");
 
         Assert.assertNull(konfiger.get("Name"));
@@ -100,7 +100,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void testRemoveEntrySize() throws IOException, InvalidEntryException {
+    public void testRemoveEntrySize() {
         Konfiger konfiger = new Konfiger("One=111,Two=222,Three=333", true, '=', ',');
 
         Assert.assertEquals(konfiger.size(), 3);
@@ -114,7 +114,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void testLazySize() throws IOException, InvalidEntryException {
+    public void testLazySize() {
         Konfiger konfiger = new Konfiger("One=111,Two=222,Three=333", true, '=', ',');
 
         Assert.assertEquals(konfiger.lazySize(), 0);
@@ -129,7 +129,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void testRemoveEntryAndLazySize() throws IOException, InvalidEntryException {
+    public void testRemoveEntryAndLazySize() {
         Konfiger konfiger = new Konfiger("One=111,Two=222,Three=333", true, '=', ',');
 
         Assert.assertEquals(konfiger.lazySize(), 0);
@@ -148,7 +148,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Set_Get_Delimeter_And_Seperator() throws IOException, InvalidEntryException {
+    public void Set_Get_Delimeter_And_Seperator() {
         Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"), true);
 
         Assert.assertEquals(konfiger.getSeparator(), '\n');
@@ -162,7 +162,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Escaping_And_Unescaping_Entries_And_Save() throws IOException, InvalidEntryException {
+    public void Escaping_And_Unescaping_Entries_And_Save() {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.config.ini"));
         KonfigerStream ks1 = new KonfigerStream(new File("src/test/resources/test.txt"), ':',  ',');
         Konfiger konfiger = new Konfiger(ks, true);
@@ -181,7 +181,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Test_Complex_And_Confusing_Seperator() throws IOException, InvalidEntryException {
+    public void Test_Complex_And_Confusing_Seperator() {
         Konfiger konfiger = new Konfiger("Occupation=Software En^gineergLocation=Ni^geriagState=La^gos", false, '=', 'g');
 
         Assert.assertEquals(konfiger.size(), 3);
@@ -200,7 +200,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Append_New_Unparsed_Entries_From_String_And_File() throws IOException, InvalidEntryException {
+    public void Append_New_Unparsed_Entries_From_String_And_File() {
         Konfiger konfiger = new Konfiger("");
 
         Assert.assertEquals(konfiger.size(), 0);
@@ -216,7 +216,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Test_Prev_And_Current_Cache() throws IOException, InvalidEntryException {
+    public void Test_Prev_And_Current_Cache() {
         Konfiger konfiger = new Konfiger("");
 
         konfiger.put("Name", "Adewale");
@@ -244,7 +244,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void testTheSinglePairCommentingInStringStreamKonfiger() throws IOException, InvalidEntryException {
+    public void testTheSinglePairCommentingInStringStreamKonfiger() {
         KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,;Project:konfiger,Date:April 24 2020", ':', ',');
         Konfiger kon = new Konfiger(ks);
         for (String key : kon.keys()) {
@@ -254,7 +254,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Test_Contains_With_Lazy_Load() throws IOException, InvalidEntryException {
+    public void Test_Contains_With_Lazy_Load() {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
         ks.setCommentPrefixes("[", ";", "//", "@", "<>");
         Konfiger kon = new Konfiger(ks, true);
@@ -265,7 +265,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Read_Multiline_Entry_From_File_Stream() throws IOException, InvalidEntryException {
+    public void Read_Multiline_Entry_From_File_Stream() {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/test.contd.conf"))
                 .ignoreInlineComment()
@@ -278,7 +278,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Check_Size_In_LazyLoad_And_No_LazyLoad() throws IOException, InvalidEntryException {
+    public void Check_Size_In_LazyLoad_And_No_LazyLoad() {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/test.contd.conf"))
                 .ignoreInlineComment()
@@ -298,7 +298,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Check_putComment_In_The_Konfiger_Object() throws IOException, InvalidEntryException {
+    public void Check_putComment_In_The_Konfiger_Object() {
         Konfiger kon = new Konfiger("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", false, ':', ',');
         kon.putComment("A comment at the end");
 
@@ -306,7 +306,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Validate_Konfiger_Entries_With_Case_Sensitivity() throws IOException, InvalidEntryException {
+    public void Validate_Konfiger_Entries_With_Case_Sensitivity() {
         Konfiger kon = new Konfiger("String=This is a string\n" +
                 "Number=215415245");
 
@@ -336,7 +336,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Check_The_UpdateAt_Method() throws IOException, InvalidEntryException {
+    public void Check_The_UpdateAt_Method() {
         Konfiger kon = new Konfiger("Name:Adewale Azeez,//Project:konfiger,Date:April 24 2020", false, ':', ',');
 
         Assert.assertEquals(kon.get("Date"), "April 24 2020");
@@ -348,7 +348,7 @@ public class TestKonfiger_Java {
     }
 
     @Test
-    public void Save_Content_And_Validate_Saved_Content() throws IOException, InvalidEntryException {
+    public void Save_Content_And_Validate_Saved_Content() {
         Konfiger kon = new Konfiger("Name=Adewale Azeez,Date=April 24 2020,One=111,Two=222,Three=333", false, '=', ',');
 
         Assert.assertEquals(kon.size(), 5);

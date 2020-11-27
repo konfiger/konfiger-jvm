@@ -32,43 +32,43 @@ public class Konfiger {
     private String stringValue = "";
     private Object attachedResolveObj;
 
-    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
+    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) {
         this(new KonfigerStream(rawString, delimiter, separator, errTolerance), lazyLoad);
     }
 
-    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator) throws IOException, InvalidEntryException {
+    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator) {
         this(new KonfigerStream(rawString, delimiter, separator, false), lazyLoad);
     }
 
-    public Konfiger(String rawString) throws IOException, InvalidEntryException {
+    public Konfiger(String rawString) {
         this(new KonfigerStream(rawString, '=', '\n', false), false);
     }
 
-    public Konfiger(String rawString, boolean lazyLoad) throws IOException, InvalidEntryException {
+    public Konfiger(String rawString, boolean lazyLoad) {
         this(new KonfigerStream(rawString, '=', '\n', false), lazyLoad);
     }
 
-    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) throws IOException, InvalidEntryException {
+    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) {
         this(new KonfigerStream(file, delimiter, separator, errTolerance), lazyLoad);
     }
 
-    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator) throws IOException, InvalidEntryException {
+    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator) {
         this(new KonfigerStream(file, delimiter, separator, false), lazyLoad);
     }
 
-    public Konfiger(File file) throws IOException, InvalidEntryException {
+    public Konfiger(File file) {
         this(new KonfigerStream(file, '=', '\n', false), false);
     }
 
-    public Konfiger(File file, boolean lazyLoad) throws IOException, InvalidEntryException {
+    public Konfiger(File file, boolean lazyLoad) {
         this(new KonfigerStream(file, '=', '\n', false), lazyLoad);
     }
 
-    public Konfiger(KonfigerStream konfigerStream) throws IOException, InvalidEntryException {
+    public Konfiger(KonfigerStream konfigerStream) {
         this(konfigerStream, true);
     }
 
-    public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad) throws IOException, InvalidEntryException {
+    public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad) {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
         this.filePath = konfigerStream.filePath;
@@ -401,18 +401,18 @@ public class Konfiger {
         if (!loadingEnds && this.lazyLoad) {
             try {
                 while (stream.hasNext()) {
-                    String[] obj = stream.next();
-                    putString(obj[0], obj[1]);
+                    SectionEntry obj =  stream.next();
+                    putString(obj.getKey(), obj.getValues().get(0));
                     changesOccur = true;
-                    if (obj[0].equals(key)) {
+                    if (obj.getKey().equals(key)) {
                         if (enableCache_) {
-                            shiftCache(obj[0], obj[1]);
+                            shiftCache(obj.getKey(), obj.getValues().get(0));
                         }
                         return true;
                     }
                 }
                 loadingEnds = true;
-            } catch (IOException | InvalidEntryException ex) {
+            } catch (InvalidFileException | InvalidEntryException ex) {
                 if (!stream.builder.errTolerance) {
                     ex.printStackTrace();
                 }
@@ -546,7 +546,7 @@ public class Konfiger {
             if (lazyLoad) {
                 try {
                     lazyLoader();
-                } catch (IOException | InvalidEntryException e) {
+                } catch (InvalidFileException | InvalidEntryException e) {
                     e.printStackTrace();
                 }
             }
@@ -571,55 +571,59 @@ public class Konfiger {
         this.filePath = filePath;
     }
 
-    public void save() throws IOException {
+    public void save() {
         save(filePath);
     }
 
-    public void save(String filePath) throws IOException {
+    public void save(String filePath) {
         stringValue = toString();
         File file = new File(filePath);
-        if (!file.exists() && !file.createNewFile()) {
-            throw new IOException("Unable to create the file: " + file.getAbsolutePath());
-        }
-        try (PrintWriter out = new PrintWriter(file)) {
-            out.write(stringValue);
+        try {
+            if (!file.exists() && !file.createNewFile()) {
+                throw new IOException("Unable to create the file: " + file.getAbsolutePath());
+            }
+            try (PrintWriter out = new PrintWriter(file)) {
+                out.write(stringValue);
+            }
+        } catch (IOException e) {
+            throw new InvalidFileException(e);
         }
     }
 
-    public void appendString(String rawString) throws IOException, InvalidEntryException {
+    public void appendString(String rawString) throws InvalidFileException, InvalidEntryException {
         appendString(rawString, this.delimiter, this.separator);
     }
 
-    public void appendString(String rawString, char delimiter, char separator) throws IOException, InvalidEntryException {
+    public void appendString(String rawString, char delimiter, char separator) throws InvalidFileException, InvalidEntryException {
         KonfigerStream _stream = new KonfigerStream(rawString, delimiter, separator);
         while (_stream.hasNext()) {
-            String[] obj = _stream.next();
-            putString(obj[0], obj[1]);
+            SectionEntry obj = _stream.next();
+            putString(obj.getKey(), obj.getValues().get(0));
         }
         changesOccur = true;
     }
 
-    public void appendFile(File file) throws IOException, InvalidEntryException {
+    public void appendFile(File file) throws InvalidFileException, InvalidEntryException {
         appendFile(file, this.delimiter, this.separator);
     }
 
-    public void appendFile(File file, char delimiter, char separator) throws IOException, InvalidEntryException {
+    public void appendFile(File file, char delimiter, char separator) throws InvalidFileException, InvalidEntryException {
         KonfigerStream _stream = new KonfigerStream(file, delimiter, separator);
         while (_stream.hasNext()) {
-            String[] obj = _stream.next();
-            putString(obj[0], obj[1]);
+            SectionEntry obj = _stream.next();
+            putString(obj.getKey(), obj.getValues().get(0));
         }
         changesOccur = true;
     }
 
-    private void lazyLoader() throws IOException, InvalidEntryException {
+    private void lazyLoader() throws InvalidFileException, InvalidEntryException {
         if (loadingEnds) {
             return;
         }
         while (stream.hasNext()) {
-            String[] obj = stream.next();
+            SectionEntry obj = stream.next();
             System.out.println(obj);
-            putString(obj[0], obj[1]);
+            putString(obj.getKey(), obj.getValues().get(0));
         }
         this.loadingEnds = true;
     }
