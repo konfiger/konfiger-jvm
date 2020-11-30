@@ -237,13 +237,13 @@ public class TestStream_Java {
 
     @Test
     public void testBuilder() {
-        KonfigerStream.Builder builder = KonfigerStream.builder()
+        Builder builder = KonfigerStream.builder()
                 .withCommentPrefixes("[", ";", "@")
                 .withErrTolerance()
-                .withDelimiter(':');
+                .withDelimiters(new char[]{':'});
         Assert.assertEquals(builder.commentPrefixes.length, 3);
         Assert.assertTrue(builder.errTolerance);
-        Assert.assertEquals(builder.delimiter, ':');
+        Assert.assertEquals(builder.delimiters[0], ':');
     }
 
     @Test(expected = IllegalStateException.class)
@@ -271,6 +271,41 @@ public class TestStream_Java {
         );
         while (ks.hasNext()) {
             Assert.assertFalse(ks.next().getValues().get(0).endsWith("\\"));
+        }
+    }
+
+    @Test
+    public void testMultipleDelimiterFile() {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/multiple_delimiter.conf"))
+                .enableIndentedSection()
+                .enableNestedSections()
+                .withDelimiters(new char[]{':', '=', '-', '~'})
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            Assert.assertFalse(entry.getKey().contains(":"));
+            Assert.assertFalse(entry.getKey().contains("="));
+            Assert.assertFalse(entry.getKey().contains("-"));
+            Assert.assertFalse(entry.getKey().contains("~"));
+        }
+    }
+
+    @Test
+    public void testMultipleSeparatorFile() {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/multiple_separator.conf"))
+                .enableIndentedSection()
+                .enableNestedSections()
+                .withSeparators(new char[]{'\n', '&'})
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            //Assert.assertFalse(entry.getValues().contains("\n"));
+            //Assert.assertFalse(entry.getValues().contains("&"));
+            System.out.println(entry);
         }
     }
 

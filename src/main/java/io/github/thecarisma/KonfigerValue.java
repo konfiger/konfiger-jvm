@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @deprecated use {@link KonfigerKey} instead
+ * @deprecated use {@link EntryKey} instead
  */
 @Deprecated
 @Retention(RetentionPolicy.RUNTIME)

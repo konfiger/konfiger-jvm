@@ -635,8 +635,8 @@ public class Test_Java {
         System.out.println(pageProps.NewsletterOptin);
     }
     static class PageProps {
-        @KonfigerKey("LoginTitle") String loginTitle;
-        @KonfigerKey("AgeInstruction") String ageInstruct;
+        @EntryKey("LoginTitle") String loginTitle;
+        @EntryKey("AgeInstruction") String ageInstruct;
         String NewsletterOptin;
     }
 }

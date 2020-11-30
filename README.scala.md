@@ -682,8 +682,8 @@ object Test_Scala {
   }
 
   class PageProps {
-    @KonfigerKey("LoginTitle") val loginTitle: String = null
-    @KonfigerKey("AgeInstruction") val ageInstruct: String = null
+    @EntryKey("LoginTitle") val loginTitle: String = null
+    @EntryKey("AgeInstruction") val ageInstruct: String = null
     val NewsletterOptin: String = null
   }
 

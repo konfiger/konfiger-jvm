@@ -38,7 +38,7 @@ public class EntryTest {
         entry.setSection("service");
         entry.addSectionComment("The service configurations");
 
-        KonfigerStream.Builder builder = new KonfigerStream.Builder()
+        Builder builder = new Builder()
                 .withAssignmentSpacing()
                 .withSpaceBeforeCommentKeyword();
         Assert.assertEquals(entry.toString(builder), ";The service configurations\n" +

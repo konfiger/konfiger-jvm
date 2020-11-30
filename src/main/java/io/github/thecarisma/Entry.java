@@ -8,10 +8,19 @@ import java.util.List;
  * @date 22-Nov-20 07:17 AM
  */
 public class Entry {
+    int indentLevel;
     String key;
     List<String> values = new ArrayList<>();
     List<Comment> comments = new ArrayList<>();
     List<Comment> inlineComments = new ArrayList<>();
+
+    public int getIndentLevel() {
+        return indentLevel;
+    }
+
+    public void setIndentLevel(int indentLevel) {
+        this.indentLevel = indentLevel;
+    }
 
     public String getKey() {
         return key;
@@ -76,9 +85,9 @@ public class Entry {
         return toString(true, '=');
     }
 
-    public String toString(KonfigerStream.Builder builder) {
+    public String toString(Builder builder) {
         return toString(builder.addAssignmentSpacing,
-                builder.delimiter,
+                builder.delimiters[0],
                 builder.addSpaceBeforeCommentKeyword);
     }
 

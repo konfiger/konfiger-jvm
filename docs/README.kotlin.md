@@ -686,7 +686,7 @@ The annotation is used for lookup when resolving or disolving an object and when
 ```kotlin
 import io.github.thecarisma.InvalidEntryException
 import io.github.thecarisma.Konfiger
-import io.github.thecarisma.KonfigerKey
+import io.github.thecarisma.EntryKey
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 

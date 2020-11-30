@@ -48,10 +48,10 @@ public class TestResolve_Java {
     }
 
     static class TextsAnnotated {
-        @KonfigerKey("Project") String project;
-        @KonfigerKey("Author") String author;
+        @EntryKey("Project") String project;
+        @EntryKey("Author") String author;
         String Platform;
-        @KonfigerKey("File") String file;
+        @EntryKey("File") String file;
     }
 
     static class Entries {
@@ -62,10 +62,10 @@ public class TestResolve_Java {
     }
 
     static class EntriesAnnotated {
-        @KonfigerKey("Project") String project = "konfiger";
-        @KonfigerKey("Author") String author = "Adewale Azeez";
+        @EntryKey("Project") String project = "konfiger";
+        @EntryKey("Author") String author = "Adewale Azeez";
         String Platform = "Cross Platform";
-        @KonfigerKey("File") String file = "test.comment.inf";
+        @EntryKey("File") String file = "test.comment.inf";
     }
 
     static class MixedTypes {
@@ -75,7 +75,7 @@ public class TestResolve_Java {
         int lengthOfRiverNile;
         float pi;
         double pie;
-        @KonfigerKey("AnnotatedEntry") boolean annotatedEntry;
+        @EntryKey("AnnotatedEntry") boolean annotatedEntry;
     }
 
     static class MixedTypesEntries {

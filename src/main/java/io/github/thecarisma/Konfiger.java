@@ -13,8 +13,8 @@ import java.util.*;
  */
 public class Konfiger {
 
-    // TODO assignment spacer when writing, keep space between key delimiter and separator
     // TODO space between section should be double separator
+    // TODO Move configurations and changeable fields to delimiter
 
     public static int MAX_CAPACITY = 10000000;
     private final KonfigerStream stream;
@@ -72,8 +72,8 @@ public class Konfiger {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
         this.filePath = konfigerStream.filePath;
-        this.separator = konfigerStream.builder.separator;
-        this.delimiter = konfigerStream.builder.delimiter;
+        this.separator = konfigerStream.builder.separators[0];
+        this.delimiter = konfigerStream.builder.delimiters[0];
 
         if (!this.lazyLoad) {
             this.lazyLoader();
@@ -136,8 +136,8 @@ public class Konfiger {
             String findKey = "";
             boolean isAnnotated = false;
             for(Field f : fields) {
-                if (f.isAnnotationPresent(KonfigerKey.class)) {
-                    KonfigerKey annotation = f.getAnnotation(KonfigerKey.class);
+                if (f.isAnnotationPresent(EntryKey.class)) {
+                    EntryKey annotation = f.getAnnotation(EntryKey.class);
                     if (annotation.value().equals(key)) {
                         isAnnotated = true;
                         findKey = f.getName();
@@ -648,9 +648,9 @@ public class Konfiger {
         for(Field f : fields) {
             String findKey = "";
             boolean isAnnotated = false;
-            if (f.isAnnotationPresent(KonfigerKey.class)) {
+            if (f.isAnnotationPresent(EntryKey.class)) {
                 isAnnotated = true;
-                KonfigerKey annotation = f.getAnnotation(KonfigerKey.class);
+                EntryKey annotation = f.getAnnotation(EntryKey.class);
                 if (!annotation.value().isEmpty()) {
                     findKey = annotation.value();
                 }
@@ -700,9 +700,9 @@ public class Konfiger {
         for(Field f : fields){
             String findKey = "";
             boolean isAnnotated = false;
-            if (f.isAnnotationPresent(KonfigerKey.class)) {
+            if (f.isAnnotationPresent(EntryKey.class)) {
                 isAnnotated = true;
-                KonfigerKey annotation = f.getAnnotation(KonfigerKey.class);
+                EntryKey annotation = f.getAnnotation(EntryKey.class);
                 if (!annotation.value().isEmpty()) {
                     findKey = annotation.value();
                 }

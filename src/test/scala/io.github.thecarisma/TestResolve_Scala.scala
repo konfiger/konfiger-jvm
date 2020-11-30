@@ -40,10 +40,10 @@ class TestResolve_Scala {
   }
 
   class TextsAnnotated {
-    @KonfigerKey("Project") val project: String = ""
-    @KonfigerKey("Author")  val author: String = ""
+    @EntryKey("Project") val project: String = ""
+    @EntryKey("Author")  val author: String = ""
     val Platform: String = ""
-    @KonfigerKey("File") val file: String = ""
+    @EntryKey("File") val file: String = ""
   }
 
   class Entries {
@@ -54,10 +54,10 @@ class TestResolve_Scala {
   }
 
   class EntriesAnnotated {
-    @KonfigerKey("Project") val project = "konfiger"
-    @KonfigerKey("Author") val author = "Adewale Azeez"
+    @EntryKey("Project") val project = "konfiger"
+    @EntryKey("Author") val author = "Adewale Azeez"
     private[thecarisma] val Platform = "Cross Platform"
-    @KonfigerKey("File") val file = "test.comment.inf"
+    @EntryKey("File") val file = "test.comment.inf"
   }
 
   class MixedTypes {
@@ -67,7 +67,7 @@ class TestResolve_Scala {
     val lengthOfRiverNile = 0
     val pi = .0
     val pie = .0
-    @KonfigerKey("AnnotatedEntry") val annotatedEntry = false
+    @EntryKey("AnnotatedEntry") val annotatedEntry = false
   }
 
   class MixedTypesEntries {
