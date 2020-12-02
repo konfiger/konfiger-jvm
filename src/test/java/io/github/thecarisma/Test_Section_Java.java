@@ -251,11 +251,12 @@ public class Test_Section_Java {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/configparser.python.ini"))
                 .withCommentPrefixes(";", "#")
+                .withDelimiters(new char[] {'=', ':'})
                 .build();
 
         while (ks.hasNext()) {
             SectionEntry entry = ks.nextEntry();
-            System.out.println(entry.toString(true, '=', true, false));
+            System.out.println(entry.getKey());
         }
     }
 

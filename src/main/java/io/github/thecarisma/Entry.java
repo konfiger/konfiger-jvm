@@ -10,6 +10,9 @@ import java.util.List;
 public class Entry {
     int indentLevel;
     String key;
+    char delimiter = '=';
+    char continuationChar = '+';
+    boolean indentAsContinuation;
     List<String> values = new ArrayList<>();
     List<Comment> comments = new ArrayList<>();
     List<Comment> inlineComments = new ArrayList<>();
@@ -28,6 +31,34 @@ public class Entry {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public char getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(char delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public char getContinuationChar() {
+        return continuationChar;
+    }
+
+    public void setContinuationChar(char continuationChar) {
+        this.continuationChar = continuationChar;
+    }
+
+    public boolean getIndentAsContinuation() {
+        return indentAsContinuation;
+    }
+
+    public void setIndentAsContinuation(boolean indentAsContinuation) {
+        this.indentAsContinuation = indentAsContinuation;
+    }
+
+    public String getValue() {
+        return values.size() > 0 ? values.get(0) : "";
     }
 
     public List<String> getValues() {
@@ -82,24 +113,36 @@ public class Entry {
 
     @Override
     public String toString() {
-        return toString(true, '=');
+        return toString(true, delimiter);
     }
 
     public String toString(Builder builder) {
-        return toString(builder.addAssignmentSpacing,
+        return toString(builder.addSpaceBeforeDelimiter,
+                builder.addSpaceAfterDelimiter,
                 builder.delimiters[0],
+                builder.indentAsContinuation,
+                builder.continuationChar,
+                builder.indentation,
                 builder.addSpaceBeforeCommentKeyword);
     }
 
-    public String toString(boolean addAssignmentSpacing) {
-        return toString(addAssignmentSpacing, '=', true);
-    }
-
     public String toString(boolean addAssignmentSpacing, char delimiter) {
-        return toString(addAssignmentSpacing, delimiter, true);
+        return toString(addAssignmentSpacing, addAssignmentSpacing, delimiter,
+                indentAsContinuation, continuationChar, "    ", true);
+    }
+    public String toString(boolean addAssignmentSpacing, char delimiter, boolean addSpaceBeforeCommentKeyword) {
+        return toString(addAssignmentSpacing, addAssignmentSpacing, delimiter,
+                indentAsContinuation, continuationChar, "    ", addSpaceBeforeCommentKeyword);
     }
 
-    public String toString(boolean addAssignmentSpacing, char delimiter, boolean addSpaceBeforeCommentKeyword) {
+    public String toString(boolean addSpaceBeforeDelimiter,
+                           boolean addSpaceAfterDelimiter,
+                           char delimiter,
+                           boolean indentAsContinuation,
+                           char continuationChar,
+                           String indentation,
+                           boolean addSpaceBeforeCommentKeyword) {
+
         boolean hasValue = !values.isEmpty();
         boolean hasKey = key != null;
         boolean hasComment = !comments.isEmpty();
@@ -130,14 +173,28 @@ public class Entry {
                     "",
                     (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);
-        }
-        for (String value : values) {
+        } else {
+            String value = "";
+            int size = values.size();
+            for (int i = 0; i < size; ++i) {
+                String value_ = values.get(i);
+                value += value_;
+                if (indentAsContinuation) {
+                    if (i < size-1) {
+                        value += "\n" + indentation;
+                    }
+                } else {
+                    if (i < size-1) {
+                        value += " " + continuationChar + "\n";
+                    }
+                }
+            }
             strValue += String.format("%s%s%s%s%s%s%s%s",
                     !hasComment ? "" : comment_ + (hasKey || hasValue ? "\n" : ""),
                     hasKey ? key : "",
-                    (hasKey && hasValue && addAssignmentSpacing) ? " " : "",
+                    (hasKey && hasValue && addSpaceBeforeDelimiter) ? " " : "",
                     (hasKey && hasValue) ? delimiter : "",
-                    (hasKey && hasValue && addAssignmentSpacing) ? " " : "",
+                    (hasKey && hasValue && addSpaceAfterDelimiter) ? " " : "",
                     hasValue ? value : "",
                     (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);

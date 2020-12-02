@@ -12,22 +12,25 @@ public class Builder {
     char[] separators;
     char beginSectionChar;
     char endSectionChar;
+    char continuationChar;
     boolean errTolerance;
     boolean ignoreInlineComment;
-    boolean newlineAndIndentationForMultilineDelimiter;
+    boolean indentAsContinuation;
     boolean enableIndentedSection;
     boolean enableNestedSections;
-    boolean addAssignmentSpacing;
+    boolean addSpaceBeforeDelimiter;
+    boolean addSpaceAfterDelimiter;
     boolean commentsAsMultiline;
     boolean addSpaceBeforeCommentKeyword;
+    boolean wrapMultilineValue;
     String filePath;
     String string;
+    String subSectionDelimiter;
+    String indentation = "   ";
     String[] commentPrefixes;
     String[] multilineCommentPrefixes;
     int[] commentPrefixSizes;
     int[] multilineCommentPrefixesSizes;
-    String subSectionDelimiter;
-    char continuationChar;
 
     public Builder() {
         string = "";
@@ -79,13 +82,18 @@ public class Builder {
         return this;
     }
 
+    public Builder wrapMultilineValue() {
+        this.wrapMultilineValue = true;
+        return this;
+    }
+
     public Builder ignoreInlineComment() {
         this.ignoreInlineComment = true;
         return this;
     }
 
-    public Builder useNewlineAndIndentationForMultilineDelimiter() {
-        this.newlineAndIndentationForMultilineDelimiter = true;
+    public Builder useIndentationAsContinuation() {
+        this.indentAsContinuation = true;
         return this;
     }
 
@@ -100,7 +108,18 @@ public class Builder {
     }
 
     public Builder withAssignmentSpacing() {
-        this.addAssignmentSpacing = true;
+        this.addSpaceBeforeDelimiter = true;
+        this.addSpaceAfterDelimiter = true;
+        return this;
+    }
+
+    public Builder withSpaceBeforeDelimiter() {
+        this.addSpaceBeforeDelimiter = true;
+        return this;
+    }
+
+    public Builder withSpaceAfterDelimiter() {
+        this.addSpaceAfterDelimiter = true;
         return this;
     }
 
@@ -176,6 +195,11 @@ public class Builder {
 
     public Builder withSubSectionDelimiter(String subSectionDelimiter) {
         this.subSectionDelimiter = subSectionDelimiter;
+        return this;
+    }
+
+    public Builder withIndentation(String indentation) {
+        this.indentation = indentation;
         return this;
     }
 

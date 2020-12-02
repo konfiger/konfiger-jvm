@@ -38,18 +38,52 @@ public class SectionEntry extends Entry {
         this.sectionComment.add(comment);
     }
 
-    @Override
-    public String toString() {
-        return toString(true, '=');
+    public String toEntryStringOnly() {
+        return toString(true,
+                true,
+                delimiter,
+                indentAsContinuation,
+                continuationChar,
+                true,
+                "    ",
+                false);
     }
 
-    public String toString(boolean addAssignmentSpacing, char delimiter, boolean addSpaceBeforeCommentKeyword) {
-        return toString(addAssignmentSpacing, delimiter, addSpaceBeforeCommentKeyword, true);
+    public String toString(boolean addSpaceBeforeDelimiter,
+                           boolean addSpaceAfterDelimiter,
+                           char delimiter,
+                           boolean indentAsContinuation,
+                           char continuationChar,
+                           String indentation,
+                           boolean addSpaceBeforeCommentKeyword) {
+
+        return toString(addSpaceBeforeDelimiter,
+                addSpaceAfterDelimiter,
+                delimiter,
+                indentAsContinuation,
+                continuationChar,
+                addSpaceBeforeCommentKeyword,
+                indentation,
+                true);
     }
 
-    public String toString(boolean addAssignmentSpacing, char delimiter, boolean addSpaceBeforeCommentKeyword,
+    public String toString(boolean addSpaceBeforeDelimiter,
+                           boolean addSpaceAfterDelimiter,
+                           char delimiter,
+                           boolean indentAsContinuation,
+                           char continuationChar,
+                           boolean addSpaceBeforeCommentKeyword,
+                           String indentation,
                            boolean renderSection) {
-        String entryValue = super.toString(addAssignmentSpacing, delimiter, addSpaceBeforeCommentKeyword);
+
+        String entryValue = super.toString(addSpaceBeforeDelimiter,
+                addSpaceAfterDelimiter,
+                delimiter,
+                indentAsContinuation,
+                continuationChar,
+                indentation,
+                addSpaceBeforeCommentKeyword);
+
         if (section == null || section.isEmpty() || section.equals("__global__") || !renderSection) {
             return entryValue;
         }

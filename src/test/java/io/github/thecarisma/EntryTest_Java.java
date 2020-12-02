@@ -7,7 +7,7 @@ import org.junit.Test;
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  * @date 28-Nov-20 01:50 PM
  */
-public class EntryTest {
+public class EntryTest_Java {
 
     @Test
     public void testEntry() {
@@ -90,5 +90,19 @@ public class EntryTest {
 
         Assert.assertEquals(entry1.toString(), "key_without_value");
         Assert.assertEquals(entry2.toString(), "key with empty value = ");
+    }
+
+    @Test
+    public void testMultipleValuesEntry() {
+        Entry entry1 = new Entry();
+        entry1.setKey("chorus");
+        entry1.addValue("I'm a lumberjack, and I'm okay");
+        entry1.addValue("I sleep all night and I work all day");
+        entry1.addValue("Yea I'm a real lumberjack");
+
+        System.out.println(entry1);
+        entry1.setIndentAsContinuation(true);
+        System.out.println();
+        System.out.println(entry1);
     }
 }

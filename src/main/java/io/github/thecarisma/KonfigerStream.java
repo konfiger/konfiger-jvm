@@ -436,6 +436,7 @@ public class KonfigerStream {
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
         String inlineComment = "";
+        char delimiter = this.builder.delimiters[0];
         boolean parseKey = true;
         boolean isMultiline = false;
         char prevChar = '\0';
@@ -498,6 +499,7 @@ public class KonfigerStream {
                         break;
                     }
                     if (matchesAnyDelimiter(this.builder.delimiters, c) && parseKey) {
+                        delimiter = c;
                         if ((value.length() > 0) && !this.builder.errTolerance) {
                             throw new InvalidEntryException("The input is improperly separated in file '" +
                                     this.filePath + "' near", line, column);
@@ -522,6 +524,7 @@ public class KonfigerStream {
             } catch (IOException ex) {
                 throw new InvalidFileException(ex);
             }
+
         } else {
             long length = this.builder.string.length();
             for (;this.readPosition <= length; ++this.readPosition) {
@@ -594,6 +597,7 @@ public class KonfigerStream {
                     break;
                 }
                 if (matchesAnyDelimiter(this.builder.delimiters, c) && parseKey) {
+                    delimiter = c;
                     if ((value.length() > 0) && !this.builder.errTolerance) {
                         throw new InvalidEntryException("The input is improperly separated in \n<" +
                                 this.builder.string + ">\nnear", line, column);
@@ -613,8 +617,9 @@ public class KonfigerStream {
             ++readPosition;
         }
         entry.setKey((trimmingKey ? (patchkey+key.toString()).trim() : (patchkey+key.toString())));
+        entry.setDelimiter(delimiter);
         if (!value.toString().isEmpty() || !parseKey) {
-            // TODO send list of separator also
+            // TODO send list of separator also to util
             entry.addValue((trimmingValue ? KonfigerUtil.unEscapeString(value.toString(), this.builder.separators[0]).trim() :
                     KonfigerUtil.unEscapeString(value.toString(), this.builder.separators[0])));
         }
