@@ -7,6 +7,7 @@ import java.util.List;
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  * @date 22-Nov-20 07:17 AM
  */
+// TODO cache to string
 public class Entry {
     int indentLevel;
     String key;
@@ -57,8 +58,28 @@ public class Entry {
         this.indentAsContinuation = indentAsContinuation;
     }
 
-    public String getValue() {
+    public String getFirstValue() {
         return values.size() > 0 ? values.get(0) : "";
+    }
+
+    public String getValue(String... params) {
+        String indentation = params.length > 0 ? params[0] : "    ";
+        String value = "";
+        int size = values.size();
+        for (int i = 0; i < size; ++i) {
+            String value_ = values.get(i);
+            value += value_;
+            if (indentAsContinuation) {
+                if (i < size-1) {
+                    value += "\n" + indentation;
+                }
+            } else {
+                if (i < size-1) {
+                    value += (continuationChar != '\0' ? continuationChar : "") + "\n";
+                }
+            }
+        }
+        return value;
     }
 
     public List<String> getValues() {
@@ -174,28 +195,13 @@ public class Entry {
                     (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);
         } else {
-            String value = "";
-            int size = values.size();
-            for (int i = 0; i < size; ++i) {
-                String value_ = values.get(i);
-                value += value_;
-                if (indentAsContinuation) {
-                    if (i < size-1) {
-                        value += "\n" + indentation;
-                    }
-                } else {
-                    if (i < size-1) {
-                        value += " " + continuationChar + "\n";
-                    }
-                }
-            }
             strValue += String.format("%s%s%s%s%s%s%s%s",
                     !hasComment ? "" : comment_ + (hasKey || hasValue ? "\n" : ""),
                     hasKey ? key : "",
                     (hasKey && hasValue && addSpaceBeforeDelimiter) ? " " : "",
                     (hasKey && hasValue) ? delimiter : "",
                     (hasKey && hasValue && addSpaceAfterDelimiter) ? " " : "",
-                    hasValue ? value : "",
+                    hasValue ? getValue() : "",
                     (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);
         }

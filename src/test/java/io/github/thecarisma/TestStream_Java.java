@@ -322,9 +322,9 @@ public class TestStream_Java {
 
         while (ks.hasNext()) {
             SectionEntry entry = ks.nextEntry();
-            Assert.assertFalse(entry.getValue().contains("\n"));
-            Assert.assertFalse(entry.getValue().contains("&"));
-            Assert.assertFalse(entry.getValue().contains("|"));
+            Assert.assertFalse(entry.getFirstValue().contains("\n"));
+            Assert.assertFalse(entry.getFirstValue().contains("&"));
+            Assert.assertFalse(entry.getFirstValue().contains("|"));
         }
     }
 
@@ -340,9 +340,26 @@ public class TestStream_Java {
 
         while (ks.hasNext()) {
             SectionEntry entry = ks.nextEntry();
-            Assert.assertFalse(entry.getValue().contains("\n"));
-            Assert.assertFalse(entry.getValue().contains("&"));
-            Assert.assertFalse(entry.getValue().contains("|"));
+            Assert.assertFalse(entry.getFirstValue().contains("\n"));
+            Assert.assertFalse(entry.getFirstValue().contains("&"));
+            Assert.assertFalse(entry.getFirstValue().contains("|"));
+        }
+    }
+
+    @Test
+    public void testAOCPassportFileFile() {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/passport_file.txt"))
+                .withMultilineCommentPrefixes("---")
+                .withDelimiters(new char[]{':'})
+                .withSeparators(new char[]{' ', '\n'})
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            Assert.assertFalse(entry.getKey().contains(":"));
+            Assert.assertFalse(entry.getFirstValue().contains(" "));
+            System.out.println(entry.getKey() + "->" + entry.getFirstValue());
         }
     }
 
@@ -351,12 +368,33 @@ public class TestStream_Java {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/multiline_value.conf"))
                 .withContinuationChar('\\')
-                //.wrapMultilineValue()
+                .withTrimmingValue(false)
                 .build();
 
         while (ks.hasNext()) {
             SectionEntry entry = ks.nextEntry();
-            System.out.println(entry.toEntryStringOnly());
+            Assert.assertFalse(entry.getKey().contains("\\"));
+            Assert.assertFalse(entry.getFirstValue().startsWith("    "));
+            System.out.println(entry.getKey() + " :" + entry.getValue());
+        }
+    }
+
+    @Test
+    public void testMultilineValueString() {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("verse2 = This right here is astronomical\n" +
+                        "    I see you picked up on my ways\n" +
+                        "    I feel responsible\n" +
+                        "    hello")
+                .withContinuationChar('\\')
+                .withTrimmingValue(false)
+                .build();
+
+        while (ks.hasNext()) {
+            SectionEntry entry = ks.nextEntry();
+            Assert.assertFalse(entry.getKey().contains("\\"));
+            Assert.assertFalse(entry.getFirstValue().startsWith("    "));
+            System.out.println(entry.getKey() + " :" + entry.getValue());
         }
     }
 

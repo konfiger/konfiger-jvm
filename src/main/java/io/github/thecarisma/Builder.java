@@ -13,6 +13,7 @@ public class Builder {
     char beginSectionChar;
     char endSectionChar;
     char continuationChar;
+    int sizeOfSpaceForTab;
     boolean errTolerance;
     boolean ignoreInlineComment;
     boolean indentAsContinuation;
@@ -21,6 +22,9 @@ public class Builder {
     boolean addSpaceBeforeDelimiter;
     boolean addSpaceAfterDelimiter;
     boolean commentsAsMultiline;
+    boolean trimmingKey;
+    boolean trimmingValue;
+    boolean trimmingSection;
     boolean addSpaceBeforeCommentKeyword;
     boolean wrapMultilineValue;
     String filePath;
@@ -40,6 +44,11 @@ public class Builder {
         this.endSectionChar = ']';
         subSectionDelimiter = "~~>";
         continuationChar = '\\';
+
+        sizeOfSpaceForTab = 4;
+        trimmingKey = true;
+        trimmingValue = true;
+        trimmingSection = true;
 
         commentPrefixes = new String[] {";"};
         commentPrefixSizes = new int[] {1};
@@ -67,6 +76,11 @@ public class Builder {
         return this;
     }
 
+    public Builder withSizeOfSpaceForTab(int sizeOfSpaceForTab) {
+        this.sizeOfSpaceForTab = sizeOfSpaceForTab;
+        return this;
+    }
+
     public Builder withBeginSectionChar(char beginSectionChar) {
         this.beginSectionChar = beginSectionChar;
         return this;
@@ -79,6 +93,21 @@ public class Builder {
 
     public Builder withErrTolerance() {
         this.errTolerance = true;
+        return this;
+    }
+
+    public Builder withTrimmingSection(boolean trimmingSection) {
+        this.trimmingSection = trimmingSection;
+        return this;
+    }
+
+    public Builder withTrimmingKey(boolean trimmingKey) {
+        this.trimmingKey = trimmingKey;
+        return this;
+    }
+
+    public Builder withTrimmingValue(boolean trimmingValue) {
+        this.trimmingValue = trimmingValue;
         return this;
     }
 
@@ -180,7 +209,7 @@ public class Builder {
     }
 
     public Builder withMultilineCommentPrefixes(String... multilineCommentPrefixes) {
-        this.multilineCommentPrefixes = commentPrefixes;
+        this.multilineCommentPrefixes = multilineCommentPrefixes;
         this.multilineCommentPrefixesSizes = new int[this.multilineCommentPrefixes.length];
         for (int index = 0; index < multilineCommentPrefixesSizes.length; ++index) {
             this.multilineCommentPrefixesSizes[index] = this.multilineCommentPrefixes[index].length();
