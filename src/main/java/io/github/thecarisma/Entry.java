@@ -9,22 +9,18 @@ import java.util.List;
  */
 // TODO cache to string
 public class Entry {
-    int indentLevel;
     String key;
+    int indentLevel = 0;
     char delimiter = '=';
-    char continuationChar = '+';
+    char continuationChar = '\\';
     boolean indentAsContinuation;
     List<String> values = new ArrayList<>();
     List<Comment> comments = new ArrayList<>();
     List<Comment> inlineComments = new ArrayList<>();
-
-    public int getIndentLevel() {
-        return indentLevel;
-    }
-
-    public void setIndentLevel(int indentLevel) {
-        this.indentLevel = indentLevel;
-    }
+    String section = Konfiger.GLOBAL_SECTION_NAME; // internal use only
+    List<Comment> sectionComment = new ArrayList<>(); // internal use only
+    private String toStringCache = ""; // internal use only. cache
+    private boolean changeOccur = true; // internal use only. cache
 
     public String getKey() {
         return key;
@@ -32,6 +28,16 @@ public class Entry {
 
     public void setKey(String key) {
         this.key = key;
+        changeOccur = true;
+    }
+
+    public int getIndentLevel() {
+        return indentLevel;
+    }
+
+    public void setIndentLevel(int indentLevel) {
+        this.indentLevel = indentLevel;
+        changeOccur = true;
     }
 
     public char getDelimiter() {
@@ -40,6 +46,7 @@ public class Entry {
 
     public void setDelimiter(char delimiter) {
         this.delimiter = delimiter;
+        changeOccur = true;
     }
 
     public char getContinuationChar() {
@@ -48,6 +55,7 @@ public class Entry {
 
     public void setContinuationChar(char continuationChar) {
         this.continuationChar = continuationChar;
+        changeOccur = true;
     }
 
     public boolean getIndentAsContinuation() {
@@ -56,14 +64,17 @@ public class Entry {
 
     public void setIndentAsContinuation(boolean indentAsContinuation) {
         this.indentAsContinuation = indentAsContinuation;
+        changeOccur = true;
     }
 
     public String getFirstValue() {
         return values.size() > 0 ? values.get(0) : "";
     }
 
-    public String getValue(String... params) {
-        String indentation = params.length > 0 ? params[0] : "    ";
+    public String getValue(Object... params) {
+        String indentation = params.length > 0 ? (String)params[0] : "    ";
+        boolean indentAsContinuation = params.length > 1 ? (boolean)params[1] : this.indentAsContinuation;
+        char continuationChar = params.length > 2 ? (char)params[2] : this.continuationChar;
         String value = "";
         int size = values.size();
         for (int i = 0; i < size; ++i) {
@@ -88,6 +99,7 @@ public class Entry {
 
     public void setValues(List<String> values) {
         this.values = values;
+        changeOccur = true;
     }
 
     public List<Comment> getComments() {
@@ -96,14 +108,17 @@ public class Entry {
 
     public void addValue(String value) {
         this.values.add(value);
+        changeOccur = true;
     }
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+        changeOccur = true;
     }
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
+        changeOccur = true;
     }
 
     public void addComment(String commentValue) {
@@ -111,6 +126,7 @@ public class Entry {
         comment.setCommentKeyword(";");
         comment.setValue(commentValue);
         this.comments.add(comment);
+        changeOccur = true;
     }
 
     public List<Comment> getInlineComments() {
@@ -119,10 +135,12 @@ public class Entry {
 
     public void setInlineComments(List<Comment> inlineComments) {
         this.inlineComments = inlineComments;
+        changeOccur = true;
     }
 
     public void addInlineComment(Comment comment) {
         this.inlineComments.add(comment);
+        changeOccur = true;
     }
 
     public void addInlineComment(String commentValue) {
@@ -130,10 +148,14 @@ public class Entry {
         comment.setCommentKeyword(";");
         comment.setValue(commentValue);
         this.inlineComments.add(comment);
+        changeOccur = true;
     }
 
     @Override
     public String toString() {
+        if (!changeOccur) {
+            return toStringCache;
+        }
         return toString(true, delimiter);
     }
 
@@ -170,6 +192,12 @@ public class Entry {
         boolean hasInlineComment = !inlineComments.isEmpty();
         String comment_ = "";
         String inlineComment_ = "";
+        String preIndentation = "";
+        if (indentLevel > 0) {
+            for (int count = 0; count < indentLevel; ++count) {
+                preIndentation += indentation;
+            }
+        }
         if (hasComment) {
             for (int index = 0; index < comments.size(); ++index) {
                 comment_ += comments.get(index).toString();
@@ -183,9 +211,10 @@ public class Entry {
                 inlineComment_ += inlineComments.get(index).toString();
             }
         }
-        String strValue = "";
+        toStringCache = "";
         if (!hasValue) {
-            strValue = String.format("%s%s%s%s%s%s%s%s",
+            toStringCache = String.format("%s%s%s%s%s%s%s%s%s",
+                    preIndentation,
                     !hasComment ? "" : comment_ + (hasKey ? "\n" : ""),
                     hasKey ? key : "",
                     "",
@@ -195,17 +224,20 @@ public class Entry {
                     (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);
         } else {
-            strValue += String.format("%s%s%s%s%s%s%s%s",
-                    !hasComment ? "" : comment_ + (hasKey || hasValue ? "\n" : ""),
+            toStringCache += String.format("%s%s%s%s%s%s%s%s%s",
+                    preIndentation,
+                    !hasComment ? "" : comment_ + "\n",
                     hasKey ? key : "",
-                    (hasKey && hasValue && addSpaceBeforeDelimiter) ? " " : "",
-                    (hasKey && hasValue) ? delimiter : "",
-                    (hasKey && hasValue && addSpaceAfterDelimiter) ? " " : "",
-                    hasValue ? getValue() : "",
+                    (hasKey && addSpaceBeforeDelimiter) ? " " : "",
+                    (hasKey) ? delimiter : "",
+                    (hasKey && addSpaceAfterDelimiter) ? " " : "",
+                    getValue(indentation, indentAsContinuation, continuationChar),
                     (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);
         }
-        return strValue;
+
+        changeOccur = false;
+        return toStringCache;
     }
 
     public static class Comment {
@@ -219,6 +251,9 @@ public class Entry {
 
         public void setMultiline(boolean multiline) {
             isMultiline = multiline;
+            if (isMultiline && commentKeyword.length() < 3) {
+                commentKeyword = "\"\"\"";
+            }
         }
 
         public String getCommentKeyword() {

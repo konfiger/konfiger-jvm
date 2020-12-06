@@ -14,15 +14,31 @@ import java.util.*;
 public class Konfiger {
 
     // TODO space between section should be double separator
-    // TODO Move configurations and changeable fields to delimiter
+    // TODO Move configurations and changeable fields to builder
+
+    public static class Section {
+        List<Entry> entries = new ArrayList<>();
+        Map<String, Section> subSections = new LinkedHashMap<>();
+
+        public void put(Entry entry) {
+            entries.add(entry);
+        }
+        
+        public void put(String key, String value) {
+            Entry entry = new Entry();
+            entry.setKey(key);
+        }
+    }
 
     public static int MAX_CAPACITY = 10000000;
+    public static String GLOBAL_SECTION_NAME = "__global__";
     private final KonfigerStream stream;
     private final boolean lazyLoad;
+    private Map<String, String> konfigerObjects = new LinkedHashMap<>();
+
     private String filePath;
     private boolean enableCache_ = true;
     private boolean caseSensitive = true;
-    private final Map<String, String> konfigerObjects = new LinkedHashMap<>();
     String[] prevCachedObject = {"", ""};
     String[] currentCachedObject = {"", ""};
     private boolean loadingEnds = false;
@@ -32,36 +48,71 @@ public class Konfiger {
     private String stringValue = "";
     private Object attachedResolveObj;
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) {
         this(new KonfigerStream(rawString, delimiter, separator, errTolerance), lazyLoad);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator) {
         this(new KonfigerStream(rawString, delimiter, separator, false), lazyLoad);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(String rawString) {
         this(new KonfigerStream(rawString, '=', '\n', false), false);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(String rawString, boolean lazyLoad) {
         this(new KonfigerStream(rawString, '=', '\n', false), lazyLoad);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(File file, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) {
         this(new KonfigerStream(file, delimiter, separator, errTolerance), lazyLoad);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(File file, boolean lazyLoad, char delimiter, char separator) {
         this(new KonfigerStream(file, delimiter, separator, false), lazyLoad);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
+     * {@link Konfiger#Konfiger(Builder)} instead
+     */
     public Konfiger(File file) {
         this(new KonfigerStream(file, '=', '\n', false), false);
     }
 
+    /**
+     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} instead
+     */
     public Konfiger(File file, boolean lazyLoad) {
         this(new KonfigerStream(file, '=', '\n', false), lazyLoad);
+    }
+
+    public Konfiger(Builder builder) {
+        this(builder.build(), true);
     }
 
     public Konfiger(KonfigerStream konfigerStream) {
@@ -81,7 +132,7 @@ public class Konfiger {
     }
 
     public void put(String key, Object value) {
-        put("__global__", key, value);
+        put(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void put(String section, String key, Object value) {
@@ -103,7 +154,7 @@ public class Konfiger {
     }
 
     public void putString(String key, String value) {
-        putString("__global__", key, value);
+        putString(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void putString(String section, String key, String value) {
@@ -186,7 +237,7 @@ public class Konfiger {
     }
 
     public void putBoolean(String key, boolean value) {
-        putBoolean("__global__", key, value);
+        putBoolean(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void putBoolean(String section, String key, boolean value) {
@@ -194,7 +245,7 @@ public class Konfiger {
     }
 
     public void putLong(String key, long value) {
-        putLong("__global__", key, value);
+        putLong(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void putLong(String section, String key, long value) {
@@ -202,7 +253,7 @@ public class Konfiger {
     }
 
     public void putInt(String key, int value) {
-        putInt("__global__", key, value);
+        putInt(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void putInt(String section, String key, int value) {
@@ -210,7 +261,7 @@ public class Konfiger {
     }
 
     public void putFloat(String key, float value) {
-        putFloat("__global__", key, value);
+        putFloat(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void putFloat(String section, String key, float value) {
@@ -218,7 +269,7 @@ public class Konfiger {
     }
 
     public void putDouble(String key, double value) {
-        putDouble("__global__", key, value);
+        putDouble(Konfiger.GLOBAL_SECTION_NAME, key, value);
     }
 
     public void putDouble(String section, String key, double value) {
@@ -401,7 +452,7 @@ public class Konfiger {
         if (!loadingEnds && this.lazyLoad) {
             try {
                 while (stream.hasNext()) {
-                    SectionEntry obj =  stream.next();
+                    Entry obj =  stream.next();
                     putString(obj.getKey(), obj.getValues().get(0));
                     changesOccur = true;
                     if (obj.getKey().equals(key)) {
@@ -597,7 +648,7 @@ public class Konfiger {
     public void appendString(String rawString, char delimiter, char separator) throws InvalidFileException, InvalidEntryException {
         KonfigerStream _stream = new KonfigerStream(rawString, delimiter, separator);
         while (_stream.hasNext()) {
-            SectionEntry obj = _stream.next();
+            Entry obj = _stream.next();
             putString(obj.getKey(), obj.getValues().get(0));
         }
         changesOccur = true;
@@ -610,7 +661,7 @@ public class Konfiger {
     public void appendFile(File file, char delimiter, char separator) throws InvalidFileException, InvalidEntryException {
         KonfigerStream _stream = new KonfigerStream(file, delimiter, separator);
         while (_stream.hasNext()) {
-            SectionEntry obj = _stream.next();
+            Entry obj = _stream.next();
             putString(obj.getKey(), obj.getValues().get(0));
         }
         changesOccur = true;
@@ -621,7 +672,7 @@ public class Konfiger {
             return;
         }
         while (stream.hasNext()) {
-            SectionEntry obj = stream.next();
+            Entry obj = stream.next();
             System.out.println(obj);
             putString(obj.getKey(), obj.getValues().get(0));
         }

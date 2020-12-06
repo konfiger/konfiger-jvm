@@ -18,7 +18,11 @@ public class Builder {
     boolean ignoreInlineComment;
     boolean indentAsContinuation;
     boolean enableIndentedSection;
+    boolean indentSubSection;
     boolean enableNestedSections;
+    boolean subSectionTitleAsNested;
+    boolean addSeparatorBeforeSection;
+    boolean addSeparatorAfterSection;
     boolean addSpaceBeforeDelimiter;
     boolean addSpaceAfterDelimiter;
     boolean commentsAsMultiline;
@@ -30,7 +34,7 @@ public class Builder {
     String filePath;
     String string;
     String subSectionDelimiter;
-    String indentation = "   ";
+    String indentation = "    ";
     String[] commentPrefixes;
     String[] multilineCommentPrefixes;
     int[] commentPrefixSizes;
@@ -42,7 +46,7 @@ public class Builder {
         separators = new char[]{'\n'};
         this.beginSectionChar = '[';
         this.endSectionChar = ']';
-        subSectionDelimiter = "~~>";
+        subSectionDelimiter = "\\";
         continuationChar = '\\';
 
         sizeOfSpaceForTab = 4;
@@ -131,8 +135,18 @@ public class Builder {
         return this;
     }
 
+    public Builder indentSubSection() {
+        this.indentSubSection = true;
+        return this;
+    }
+
     public Builder enableNestedSections() {
         this.enableNestedSections = true;
+        return this;
+    }
+
+    public Builder writeSubSectionTitleAsNested() {
+        this.subSectionTitleAsNested = true;
         return this;
     }
 
@@ -149,6 +163,16 @@ public class Builder {
 
     public Builder withSpaceAfterDelimiter() {
         this.addSpaceAfterDelimiter = true;
+        return this;
+    }
+
+    public Builder addSeparatorBeforeSection() {
+        this.addSeparatorBeforeSection = true;
+        return this;
+    }
+
+    public Builder addSeparatorAfterSection() {
+        this.addSeparatorAfterSection = true;
         return this;
     }
 

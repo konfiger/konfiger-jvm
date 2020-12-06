@@ -74,7 +74,7 @@ public class TestStream_Java {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
         ks.setCommentPrefixes("[", ";", "#", "@", "<>");
         while (ks.hasNext()) {
-            SectionEntry entry = ks.next();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().startsWith("["));
         }
     }
@@ -89,7 +89,7 @@ public class TestStream_Java {
                 "Platform=Cross Platform");
         ks.setCommentPrefixes("[", ";", "#", "@", "<>");
         while (ks.hasNext()) {
-            SectionEntry entry = ks.next();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().startsWith("["));
         }
     }
@@ -99,7 +99,7 @@ public class TestStream_Java {
         KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
         ks.setCommentPrefixes(";", "#", "@", "<>");
         while (ks.hasNext()) {
-            SectionEntry entry = ks.next();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().startsWith(";"));
             Assert.assertFalse(entry.getKey().startsWith("#"));
             Assert.assertFalse(entry.getKey().startsWith("@"));
@@ -276,13 +276,12 @@ public class TestStream_Java {
     public void testMultipleDelimiterFile() {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/multiple_delimiter.conf"))
-                .enableIndentedSection()
                 .enableNestedSections()
                 .withDelimiters(new char[]{':', '=', '-', '~'})
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains(":"));
             Assert.assertFalse(entry.getKey().contains("="));
             Assert.assertFalse(entry.getKey().contains("-"));
@@ -303,7 +302,7 @@ public class TestStream_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains(":"));
             Assert.assertFalse(entry.getKey().contains("="));
             Assert.assertFalse(entry.getKey().contains("-"));
@@ -321,7 +320,7 @@ public class TestStream_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getFirstValue().contains("\n"));
             Assert.assertFalse(entry.getFirstValue().contains("&"));
             Assert.assertFalse(entry.getFirstValue().contains("|"));
@@ -339,7 +338,7 @@ public class TestStream_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getFirstValue().contains("\n"));
             Assert.assertFalse(entry.getFirstValue().contains("&"));
             Assert.assertFalse(entry.getFirstValue().contains("|"));
@@ -356,10 +355,9 @@ public class TestStream_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains(":"));
             Assert.assertFalse(entry.getFirstValue().contains(" "));
-            System.out.println(entry.getKey() + "->" + entry.getFirstValue());
         }
     }
 
@@ -372,7 +370,7 @@ public class TestStream_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains("\\"));
             Assert.assertFalse(entry.getFirstValue().startsWith("    "));
             System.out.println(entry.getKey() + " :" + entry.getValue());
@@ -382,19 +380,26 @@ public class TestStream_Java {
     @Test
     public void testMultilineValueString() {
         KonfigerStream ks = KonfigerStream.builder()
-                .withString("verse2 = This right here is astronomical\n" +
+                .withString("artist = Travis Scott\n" +
+                        "song = Astronimical\n" +
+                        "verse1 = She tut it was an ocean \\\n" +
+                        "it just a pool \\\n" +
+                        "now I got an opium \\\n" +
+                        "it just a goo\n" +
+                        "\n" +
+                        "verse2 = This right here is astronomical\n" +
                         "    I see you picked up on my ways\n" +
                         "    I feel responsible\n" +
-                        "    hello")
+                        "\"\"\"year = 19XX\"\"\"" +
+                        "\"\"\"year = 201X\"\"\"")
                 .withContinuationChar('\\')
                 .withTrimmingValue(false)
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains("\\"));
             Assert.assertFalse(entry.getFirstValue().startsWith("    "));
-            System.out.println(entry.getKey() + " :" + entry.getValue());
         }
     }
 

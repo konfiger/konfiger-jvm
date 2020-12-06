@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Test_Section_Java {
+public class TestStreamSection_Java {
 
     @Test
     public void testStreamEntryString() {
@@ -25,16 +25,16 @@ public class Test_Section_Java {
                         "twitch = amsiraceht")
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry next1 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next2 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next3 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next4 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next5 = ks.next();
-        /*Assert.assertArrayEquals(next1, new SectionEntry{"details", "true", "comment for details", " yahoo", "__global__", ""});
-        Assert.assertArrayEquals(next2, new SectionEntry{"name", "thecarisma", "", "", "user", ""});
-        Assert.assertArrayEquals(next3, new SectionEntry{"gender", "Unknown", "", "", "user", ""});
-        Assert.assertArrayEquals(next4, new SectionEntry{"twitter", "iamthecarisma", "", "", "social", ""});
-        Assert.assertArrayEquals(next5, new SectionEntry{"twitch", "amsiraceht", "", "", "social", ""});*/
+        Assert.assertTrue(ks.hasNext()); Entry next1 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next2 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next3 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next4 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next5 = ks.next();
+        /*Assert.assertArrayEquals(next1, new Entry{"details", "true", "comment for details", " yahoo", Konfiger.GLOBAL_SECTION_NAME, ""});
+        Assert.assertArrayEquals(next2, new Entry{"name", "thecarisma", "", "", "user", ""});
+        Assert.assertArrayEquals(next3, new Entry{"gender", "Unknown", "", "", "user", ""});
+        Assert.assertArrayEquals(next4, new Entry{"twitter", "iamthecarisma", "", "", "social", ""});
+        Assert.assertArrayEquals(next5, new Entry{"twitch", "amsiraceht", "", "", "social", ""});*/
     }
 
     @Test
@@ -50,16 +50,16 @@ public class Test_Section_Java {
                         "twitch = amsiraceht")
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry1 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry2 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry3 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry4 = ks.nextEntry();
-        Assert.assertTrue(ks.hasNext()); SectionEntry sectionEntry5 = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); Entry sectionEntry1 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry sectionEntry2 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry sectionEntry3 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry sectionEntry4 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry sectionEntry5 = ks.next();
         Assert.assertEquals(sectionEntry1.toString(), ";comment for details\ndetails = true ; yahoo");
-        Assert.assertEquals(sectionEntry2.toString(), "[user]\nname = thecarisma");
-        Assert.assertEquals(sectionEntry3.toString(), "[user]\ngender = Unknown");
-        Assert.assertEquals(sectionEntry4.toString(), "[social]\ntwitter = iamthecarisma");
-        Assert.assertEquals(sectionEntry5.toString(), "[social]\ntwitch = amsiraceht");
+        Assert.assertEquals(sectionEntry2.toString(), "name = thecarisma");
+        Assert.assertEquals(sectionEntry3.toString(), "gender = Unknown");
+        Assert.assertEquals(sectionEntry4.toString(), "twitter = iamthecarisma");
+        Assert.assertEquals(sectionEntry5.toString(), "twitch = amsiraceht");
     }
 
     @Test
@@ -68,33 +68,33 @@ public class Test_Section_Java {
                 .withFile(new File("src/test/resources/payroll.conf"))
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry next1 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next2 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next3 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next4 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next5 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next6 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next7 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next8 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next9 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next10 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next11 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next12 = ks.next();
-        /*Assert.assertArrayEquals(next1, new SectionEntry{"source", "https://en.wikipedia.org/wiki/INI_file", "", "", "__global__", ""});
-        Assert.assertArrayEquals(next2, new SectionEntry{"date", "Nov 20 2020", "", "", "__global__", ""});
-        Assert.assertArrayEquals(next3, new SectionEntry{"name", "John Doe", "", "", "owner",
+        Assert.assertTrue(ks.hasNext()); Entry next1 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next2 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next3 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next4 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next5 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next6 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next7 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next8 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next9 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next10 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next11 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next12 = ks.next();
+        /*Assert.assertArrayEquals(next1, new Entry{"source", "https://en.wikipedia.org/wiki/INI_file", "", "", Konfiger.GLOBAL_SECTION_NAME, ""});
+        Assert.assertArrayEquals(next2, new Entry{"date", "Nov 20 2020", "", "", Konfiger.GLOBAL_SECTION_NAME, ""});
+        Assert.assertArrayEquals(next3, new Entry{"name", "John Doe", "", "", "owner",
                 " Copied from https://en.wikipedia.org/wiki/INI_file last modified 1 April 2001 by John Doe"});
-        Assert.assertArrayEquals(next4, new SectionEntry{"organization", "Acme Widgets Inc.", "", "", "owner",
+        Assert.assertArrayEquals(next4, new Entry{"organization", "Acme Widgets Inc.", "", "", "owner",
                 " Copied from https://en.wikipedia.org/wiki/INI_file last modified 1 April 2001 by John Doe"});
-        Assert.assertArrayEquals(next5, new SectionEntry{"server", "192.0.2.62",
+        Assert.assertArrayEquals(next5, new Entry{"server", "192.0.2.62",
                 " use IP address in case network name resolution is not working", "", "database", ""});
-        Assert.assertArrayEquals(next6, new SectionEntry{"port", "143", "", "", "database", ""});
-        Assert.assertArrayEquals(next7, new SectionEntry{"file", "\"payroll.dat\"", "", "", "database", ""});
-        Assert.assertArrayEquals(next8, new SectionEntry{"extension", "gd2", "", "", "database", ""});
-        Assert.assertArrayEquals(next9, new SectionEntry{"extension", "gettext", "", "", "database", ""});
-        Assert.assertArrayEquals(next10, new SectionEntry{"extension", "gmp", "", "", "database", ""});
-        Assert.assertArrayEquals(next11, new SectionEntry{"extension", "intl", "", "", "database", ""});
-        Assert.assertArrayEquals(next12, new SectionEntry{"extension", "imap", "", "", "database", ""});*/
+        Assert.assertArrayEquals(next6, new Entry{"port", "143", "", "", "database", ""});
+        Assert.assertArrayEquals(next7, new Entry{"file", "\"payroll.dat\"", "", "", "database", ""});
+        Assert.assertArrayEquals(next8, new Entry{"extension", "gd2", "", "", "database", ""});
+        Assert.assertArrayEquals(next9, new Entry{"extension", "gettext", "", "", "database", ""});
+        Assert.assertArrayEquals(next10, new Entry{"extension", "gmp", "", "", "database", ""});
+        Assert.assertArrayEquals(next11, new Entry{"extension", "intl", "", "", "database", ""});
+        Assert.assertArrayEquals(next12, new Entry{"extension", "imap", "", "", "database", ""});*/
     }
 
     @Test
@@ -103,8 +103,8 @@ public class Test_Section_Java {
                 .withFile(new File("src/test/resources/multiline_comment.ini"))
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry next1 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next2 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next1 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next2 = ks.next();
         Assert.assertEquals(next1.getComments().size(), 1);
         Assert.assertEquals(next2.getComments().size(), 3);
     }
@@ -124,8 +124,8 @@ public class Test_Section_Java {
                         "author = thecarisma")
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry next1 = ks.next();
-        Assert.assertTrue(ks.hasNext()); SectionEntry next2 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next1 = ks.next();
+        Assert.assertTrue(ks.hasNext()); Entry next2 = ks.next();
         Assert.assertEquals(next1.getComments().size(), 1);
         Assert.assertEquals(next2.getComments().size(), 3);
     }
@@ -140,7 +140,7 @@ public class Test_Section_Java {
                         "project = konfiger")
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry entry = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); Entry entry = ks.next();
         String multilineComment = "";
         int index = 0;
         for (Entry.Comment comment : entry.getComments()) {
@@ -157,8 +157,7 @@ public class Test_Section_Java {
         entry.setComments(new ArrayList<Entry.Comment>());
         entry.addComment(comment);
         Assert.assertEquals(entry.toString(true, '='),
-                "[section with comments only]\n" +
-                        "''' first comment\n" +
+                "''' first comment\n" +
                         " second comment\n" +
                         " third comment'''\n" +
                         "project = konfiger");
@@ -167,14 +166,13 @@ public class Test_Section_Java {
     @Test
     public void testMultilineComment2() {
         KonfigerStream ks = KonfigerStream.builder()
-                .withString("[section with comments only]\n" +
-                        "''' first comment\n" +
+                .withString("''' first comment\n" +
                         " second comment\n" +
                         " third comment'''\n" +
                         "project = konfiger")
                 .build();
 
-        Assert.assertTrue(ks.hasNext()); SectionEntry entry = ks.nextEntry();
+        Assert.assertTrue(ks.hasNext()); Entry entry = ks.next();
         List<Entry.Comment> commentList = new ArrayList<>();
         for (Entry.Comment comment : entry.getComments()) {
             String[] separated = comment.getValue().split("\n");
@@ -187,8 +185,7 @@ public class Test_Section_Java {
         }
         entry.setComments(commentList);
         Assert.assertEquals(entry.toString(true, '='),
-                "[section with comments only]\n" +
-                        "; first comment\n" +
+                "; first comment\n" +
                         "; second comment\n" +
                         "; third comment\n" +
                         "project = konfiger");
@@ -203,7 +200,7 @@ public class Test_Section_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertNotNull(entry);
         }
     }
@@ -215,7 +212,7 @@ public class Test_Section_Java {
                         "phone = +235012345678\n" +
                         "email = ?\n" +
                         "\n" +
-                        "    [[social-accounts]]\n" +
+                        "    [contact.social-accounts]\n" +
                         "    twitter = iamthecarisma\n" +
                         "    twitch = amsiraceht\n" +
                         "    github = thecarisma")
@@ -224,7 +221,7 @@ public class Test_Section_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertNotNull(entry);
             System.out.println(entry);
         }
@@ -240,7 +237,7 @@ public class Test_Section_Java {
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
+            Entry entry = ks.next();
             Assert.assertNotNull(entry);
             System.out.println(entry);
         }
@@ -249,14 +246,15 @@ public class Test_Section_Java {
     @Test
     public void testPythonConfigParserStructure() {
         KonfigerStream ks = KonfigerStream.builder()
-                .withFile(new File("src/test/resources/configparser.python.ini"))
+                .withFile(new File("src/test/resources/configparser.python.conf"))
                 .withCommentPrefixes(";", "#")
                 .withDelimiters(new char[] {'=', ':'})
+                .withTrimmingValue(false)
                 .build();
 
         while (ks.hasNext()) {
-            SectionEntry entry = ks.nextEntry();
-            System.out.println(entry.getKey());
+            Entry entry = ks.next();
+            System.out.println(entry.getKey() + "->" + entry.getValue());
         }
     }
 

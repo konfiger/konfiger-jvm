@@ -10,7 +10,7 @@ import java.util.Map;
 public class TestKonfiger_Java {
 
     @Test
-    public void Validate_Konfiger_String_Stream_Entries() {
+    public void validateKonfigerStringStreamEntries() {
         Konfiger konfiger = new Konfiger("\n" +
                 "String=This is a string\n" +
                 "Number=215415245\n" +

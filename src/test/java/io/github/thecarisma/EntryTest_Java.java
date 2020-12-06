@@ -29,41 +29,6 @@ public class EntryTest_Java {
     }
 
     @Test
-    public void testSectionEntry() {
-        SectionEntry entry = new SectionEntry();
-        entry.addComment("The ip of the service");
-        entry.addInlineComment("must be in the range of 127.0.0.* to 127.0.1.*");
-        entry.setKey("ip");
-        entry.addValue("127.0.0.1");
-        entry.setSection("service");
-        entry.addSectionComment("The service configurations");
-
-        Builder builder = new Builder()
-                .withAssignmentSpacing()
-                .withSpaceBeforeCommentKeyword();
-        Assert.assertEquals(entry.toString(builder), ";The service configurations\n" +
-                "[service]\n" +
-                ";The ip of the service\n" +
-                "ip = 127.0.0.1 ;must be in the range of 127.0.0.* to 127.0.1.*");
-
-        Assert.assertEquals(entry.toString(true, '=', false),
-                ";The service configurations\n" +
-                "[service]\n" +
-                ";The ip of the service\n" +
-                "ip = 127.0.0.1;must be in the range of 127.0.0.* to 127.0.1.*");
-
-        Assert.assertEquals(entry.toString(false, '='), ";The service configurations\n" +
-                "[service]\n" +
-                ";The ip of the service\n" +
-                "ip=127.0.0.1 ;must be in the range of 127.0.0.* to 127.0.1.*");
-
-        Assert.assertEquals(entry.toString(false, ':'), ";The service configurations\n" +
-                "[service]\n" +
-                ";The ip of the service\n" +
-                "ip:127.0.0.1 ;must be in the range of 127.0.0.* to 127.0.1.*");
-    }
-
-    @Test
     public void testCommentOnlyEntry() {
         Entry entry = new Entry();
         entry.addComment("Empty comment only");
