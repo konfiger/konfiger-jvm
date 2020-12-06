@@ -30,11 +30,14 @@ public class Builder {
     boolean trimmingValue;
     boolean trimmingSection;
     boolean addSpaceBeforeCommentKeyword;
+    boolean addSpaceAfterCommentKeyword;
     boolean wrapMultilineValue;
+    boolean isCaseSensitive;
+    boolean enableEntryCache;
     String filePath;
     String string;
     String subSectionDelimiter;
-    String indentation = "    ";
+    String indentation = Konfiger.DEFAULT_TAB;
     String[] commentPrefixes;
     String[] multilineCommentPrefixes;
     int[] commentPrefixSizes;
@@ -120,6 +123,16 @@ public class Builder {
         return this;
     }
 
+    public Builder withCaseSensitivity(boolean isCaseSensitive) {
+        this.isCaseSensitive = isCaseSensitive;
+        return this;
+    }
+
+    public Builder enableEntryCache(boolean enableEntryCache) {
+        this.enableEntryCache = enableEntryCache;
+        return this;
+    }
+
     public Builder ignoreInlineComment() {
         this.ignoreInlineComment = true;
         return this;
@@ -183,6 +196,11 @@ public class Builder {
 
     public Builder withSpaceBeforeCommentKeyword() {
         this.addSpaceBeforeCommentKeyword = true;
+        return this;
+    }
+
+    public Builder withSpaceAfterCommentKeyword() {
+        this.addSpaceAfterCommentKeyword = true;
         return this;
     }
 
@@ -256,7 +274,15 @@ public class Builder {
         return this;
     }
 
-    public KonfigerStream build() throws FileNotFoundException {
+    public KonfigerStream build() {
         return new KonfigerStream(this);
+    }
+
+    public Konfiger konfiger() {
+        return new Konfiger(this);
+    }
+
+    public Konfiger konfiger(boolean lazyLoad) {
+        return new Konfiger(this, lazyLoad);
     }
 }

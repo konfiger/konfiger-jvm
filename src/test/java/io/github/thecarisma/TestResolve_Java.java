@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class TestResolve_Java {
 
-    static class TextsFlat {
+    /*static class TextsFlat {
         String project;
         String author;
         String Platform;
@@ -319,6 +319,6 @@ public class TestResolve_Java {
 
         kon.put("author", "Adewale");
         Assert.assertEquals(texts.author, "Adewale");
-    }
+    }*/
 
 }

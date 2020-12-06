@@ -372,7 +372,7 @@ public class TestStream_Java {
         while (ks.hasNext()) {
             Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains("\\"));
-            Assert.assertFalse(entry.getFirstValue().startsWith("    "));
+            Assert.assertFalse(entry.getFirstValue().startsWith(Konfiger.DEFAULT_TAB));
             System.out.println(entry.getKey() + " :" + entry.getValue());
         }
     }
@@ -399,7 +399,7 @@ public class TestStream_Java {
         while (ks.hasNext()) {
             Entry entry = ks.next();
             Assert.assertFalse(entry.getKey().contains("\\"));
-            Assert.assertFalse(entry.getFirstValue().startsWith("    "));
+            Assert.assertFalse(entry.getFirstValue().startsWith(Konfiger.DEFAULT_TAB));
         }
     }
 

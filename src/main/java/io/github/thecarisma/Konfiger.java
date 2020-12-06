@@ -7,112 +7,33 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author Adewale Azeez <azeezadewale98@gmail.com>
  */
 public class Konfiger {
 
-    // TODO space between section should be double separator
-    // TODO Move configurations and changeable fields to builder
-
-    public static class Section {
-        List<Entry> entries = new ArrayList<>();
-        Map<String, Section> subSections = new LinkedHashMap<>();
-
-        public void put(Entry entry) {
-            entries.add(entry);
-        }
-        
-        public void put(String key, String value) {
-            Entry entry = new Entry();
-            entry.setKey(key);
-        }
-    }
-
     public static int MAX_CAPACITY = 10000000;
     public static String GLOBAL_SECTION_NAME = "__global__";
-    private final KonfigerStream stream;
+    public static String DEFAULT_TAB = "    ";
+    final KonfigerStream stream;
     private final boolean lazyLoad;
-    private Map<String, String> konfigerObjects = new LinkedHashMap<>();
-
-    private String filePath;
-    private boolean enableCache_ = true;
-    private boolean caseSensitive = true;
-    String[] prevCachedObject = {"", ""};
-    String[] currentCachedObject = {"", ""};
+    Map<String, Section> sections = new LinkedHashMap<>();
+    Object[] prevCachedObject = {"", null};
+    Object[] currentCachedObject = {"", null};
     private boolean loadingEnds = false;
     private boolean changesOccur = true;
-    private char delimiter;
-    private char separator;
     private String stringValue = "";
     private Object attachedResolveObj;
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) {
-        this(new KonfigerStream(rawString, delimiter, separator, errTolerance), lazyLoad);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(String rawString, boolean lazyLoad, char delimiter, char separator) {
-        this(new KonfigerStream(rawString, delimiter, separator, false), lazyLoad);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(String rawString) {
-        this(new KonfigerStream(rawString, '=', '\n', false), false);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(String rawString, boolean lazyLoad) {
-        this(new KonfigerStream(rawString, '=', '\n', false), lazyLoad);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator, boolean errTolerance) {
-        this(new KonfigerStream(file, delimiter, separator, errTolerance), lazyLoad);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(File file, boolean lazyLoad, char delimiter, char separator) {
-        this(new KonfigerStream(file, delimiter, separator, false), lazyLoad);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} or
-     * {@link Konfiger#Konfiger(Builder)} instead
-     */
-    public Konfiger(File file) {
-        this(new KonfigerStream(file, '=', '\n', false), false);
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#Konfiger(KonfigerStream)} instead
-     */
-    public Konfiger(File file, boolean lazyLoad) {
-        this(new KonfigerStream(file, '=', '\n', false), lazyLoad);
-    }
+    List<EntryListener> entryListeners = new ArrayList<>();
 
     public Konfiger(Builder builder) {
         this(builder.build(), true);
+    }
+
+    public Konfiger(Builder builder, boolean lazyLoad) {
+        this(builder.build(), lazyLoad);
     }
 
     public Konfiger(KonfigerStream konfigerStream) {
@@ -122,343 +43,37 @@ public class Konfiger {
     public Konfiger(KonfigerStream konfigerStream, boolean lazyLoad) {
         this.stream = konfigerStream;
         this.lazyLoad = lazyLoad;
-        this.filePath = konfigerStream.filePath;
-        this.separator = konfigerStream.builder.separators[0];
-        this.delimiter = konfigerStream.builder.delimiters[0];
 
         if (!this.lazyLoad) {
-            this.lazyLoader();
+            this.loadAllEntries();
         }
     }
 
-    public void put(String key, Object value) {
-        put(Konfiger.GLOBAL_SECTION_NAME, key, value);
+    public List<EntryListener> getEntryListeners() {
+        return entryListeners;
     }
 
-    public void put(String section, String key, Object value) {
-        if (value instanceof String) {
-            putString(section, key, (String)value);
-        } else if (value instanceof Boolean) {
-            putBoolean(section, key, (boolean)value);
-        } else if (value instanceof Long) {
-            putLong(section, key, (long)value);
-        } else if (value instanceof Integer) {
-            putInt(section, key, (int)value);
-        } else if (value instanceof Float) {
-            putFloat(section, key, (float)value);
-        } else if (value instanceof Double) {
-            putDouble(key, (double)value);
-        } else {
-            putString(section, key, value.toString());
-        }
+    public void addEntryListeners(EntryListener entryListener) {
+        this.entryListeners.add(entryListener);
     }
 
-    public void putString(String key, String value) {
-        putString(Konfiger.GLOBAL_SECTION_NAME, key, value);
-    }
-
-    public void putString(String section, String key, String value) {
-        if (lazyLoad && !loadingEnds && konfigerObjects.containsKey(key)) {
-            String _value = getString(key);
-            if (_value.equals(value)) {
-                return;
-            }
-        }
-        if (!konfigerObjects.containsKey(key)) {
-            if (konfigerObjects.size() == MAX_CAPACITY) {
-                try {
-                    throw new MaxCapacityException();
-                } catch (MaxCapacityException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        konfigerObjects.put(key, value);
-        if (attachedResolveObj != null) {
-            Method matchPutKey = null;
-            Method[] methods = attachedResolveObj.getClass().getDeclaredMethods();
-            Field[] fields = attachedResolveObj.getClass().getDeclaredFields();
-            for(Method method : methods){
-                if (method.getName().equals("matchPutKey")) {
-                    matchPutKey = method;
-                    matchPutKey.setAccessible(true);
-                }
-            }
-            String findKey = "";
-            boolean isAnnotated = false;
-            for(Field f : fields) {
-                if (f.isAnnotationPresent(EntryKey.class)) {
-                    EntryKey annotation = f.getAnnotation(EntryKey.class);
-                    if (annotation.value().equals(key)) {
-                        isAnnotated = true;
-                        findKey = f.getName();
-                        break;
-                    }
-                }
-            }
-            try {
-                if (!isAnnotated && (matchPutKey == null ||
-                        ((findKey = (String) matchPutKey.invoke(attachedResolveObj, key)) == null ||
-                                findKey.equals("")))) {
-
-                    findKey = key;
-                }
-                Field f = attachedResolveObj.getClass().getDeclaredField(findKey);
-                f.setAccessible(true);
-                if (f.getType() == String.class) {
-                    f.set(attachedResolveObj, value);
-
-                } else if (f.getType() == Boolean.class || f.getType() == boolean.class) {
-                    f.setBoolean(attachedResolveObj, Boolean.parseBoolean(value));
-
-                } else if (f.getType() == Long.class || f.getType() == long.class) {
-                    f.setLong(attachedResolveObj, Long.parseLong(value));
-
-                } else if (f.getType() == Integer.class || f.getType() == int.class) {
-                    f.setInt(attachedResolveObj, Integer.parseInt(value));
-
-                } else if (f.getType() == Float.class || f.getType() == float.class) {
-                    f.setFloat(attachedResolveObj, Float.parseFloat(value));
-
-                } else if (f.getType() == Double.class || f.getType() == double.class) {
-                    f.setDouble(attachedResolveObj, Double.parseDouble(value));
-
-                }
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                if (!stream.builder.errTolerance) {
-                    e.printStackTrace();
-                }
-            } catch (NoSuchFieldException ignored) { }
-        }
-        changesOccur = true;
-        if (enableCache_) {
-            shiftCache(key, value);
-        }
-    }
-
-    public void putBoolean(String key, boolean value) {
-        putBoolean(Konfiger.GLOBAL_SECTION_NAME, key, value);
-    }
-
-    public void putBoolean(String section, String key, boolean value) {
-        putString(section, key, Boolean.toString(value));
-    }
-
-    public void putLong(String key, long value) {
-        putLong(Konfiger.GLOBAL_SECTION_NAME, key, value);
-    }
-
-    public void putLong(String section, String key, long value) {
-        putString(section, key, Long.toString(value));
-    }
-
-    public void putInt(String key, int value) {
-        putInt(Konfiger.GLOBAL_SECTION_NAME, key, value);
-    }
-
-    public void putInt(String section, String key, int value) {
-        putString(section, key, Integer.toString(value));
-    }
-
-    public void putFloat(String key, float value) {
-        putFloat(Konfiger.GLOBAL_SECTION_NAME, key, value);
-    }
-
-    public void putFloat(String section, String key, float value) {
-        putString(section, key, Float.toString(value));
-    }
-
-    public void putDouble(String key, double value) {
-        putDouble(Konfiger.GLOBAL_SECTION_NAME, key, value);
-    }
-
-    public void putDouble(String section, String key, double value) {
-        putString(section, key, Double.toString(value));
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#getDelimiter} instead
-     */
-    @Deprecated
-    public void putComment(String theComment) {
-        putString(this.stream.getCommentPrefix(), theComment);
-    }
-
-    public Object get(String key) {
-        if (enableCache_) {
-            if (currentCachedObject[0].equals(key)) {
-                return currentCachedObject[1];
-            }
-            if (prevCachedObject[0].equals(key)) {
-                return prevCachedObject[1];
-            }
-        }
-        if (!caseSensitive) {
-            for (String entryKey : keys()) {
-                if (entryKey.toLowerCase().equals(key.toLowerCase())) {
-                    key = entryKey;
-                    break;
-                }
-            }
-        }
-        if (!contains(key)) {
-            return null;
-        }
-        String value = konfigerObjects.get(key);
-        if (enableCache_) {
-            shiftCache(key, value);
-        }
-        return value;
-    }
-
-    public String getString(String key) {
-        return getString(key, "");
-    }
-
-    public boolean getBoolean(String key) {
-        return getBoolean(key, false);
-    }
-
-    public long getLong(String key) {
-        return getLong(key, 0L);
-    }
-
-    public int getInt(String key) {
-        return getInt(key, 0);
-    }
-
-    public float getFloat(String key) {
-        return getFloat(key, 0F);
-    }
-
-    public double getDouble(String key) {
-        return getDouble(key, 0.0);
-    }
-
-    public Object get(String key, Object fallbackValue) {
-        Object _ret = null;
-        if (lazyLoad && !loadingEnds) {
-            _ret = get(key);
-        }
-        return ( _ret == null ? fallbackValue : _ret );
-    }
-
-    public String getString(String key, String fallbackValue) {
-        Object _ret = get(key);
-        return (_ret != null ? _ret.toString() : fallbackValue);
-    }
-
-    public boolean getBoolean(String key, boolean fallbackValue) {
-        boolean ret = fallbackValue;
-        try {
-            if (!contains(key)) {
-                return ret;
-            }
-            ret = Boolean.parseBoolean((getString(key)));
-        } catch (Exception ex) {
-            if (!stream.builder.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public long getLong(String key, long fallbackValue) {
-        long ret = fallbackValue;
-        try {
-            if (!contains(key)) {
-                return ret;
-            }
-            ret = Long.parseLong(getString(key));
-        } catch (Exception ex) {
-            if (!stream.builder.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public int getInt(String key, int fallbackValue) {
-        int ret = fallbackValue;
-        try {
-            if (!contains(key)) {
-                return ret;
-            }
-            ret = Integer.parseInt(getString(key));
-        } catch (Exception ex) {
-            if (!stream.builder.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public float getFloat(String key, float fallbackValue) {
-        float ret = fallbackValue;
-        try {
-            if (!contains(key)) {
-                return ret;
-            }
-            ret = Float.parseFloat(getString(key));
-        } catch (Exception ex) {
-            if (!stream.builder.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public double getDouble(String key, double fallbackValue) {
-        double ret = fallbackValue;
-        try {
-            if (!contains(key)) {
-                return ret;
-            }
-            ret = Double.parseDouble(getString(key));
-        } catch (Exception ex) {
-            if (!stream.builder.errTolerance) {
-                ex.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public Set<String> keys() {
-        stringValue = toString();
-        return konfigerObjects.keySet();
-    }
-
-    public Collection<String> values() {
-        stringValue = toString();
-        return konfigerObjects.values();
-    }
-
-    public Set<Map.Entry<String, String>> entries() {
-        return konfigerObjects.entrySet();
-    }
-
-    public void enableCache(boolean enableCache_) {
-        this.enableCache_ = enableCache_;
-        prevCachedObject[0] = "";
-        prevCachedObject[1] = "";
-        currentCachedObject[0] = "";
-        currentCachedObject[1] = "";
+    public boolean removeEntryListeners(EntryListener entryListener) {
+        return this.entryListeners.remove(entryListener);
     }
 
     public boolean contains(String key) {
-        if (konfigerObjects.containsKey(key)) {
-            return true;
+        for (Section section : sections.values()) {
+            if (section.contains(key)) {
+                return true;
+            }
         }
         if (!loadingEnds && this.lazyLoad) {
             try {
                 while (stream.hasNext()) {
                     Entry obj =  stream.next();
-                    putString(obj.getKey(), obj.getValues().get(0));
+                    put(obj.section, obj);
                     changesOccur = true;
                     if (obj.getKey().equals(key)) {
-                        if (enableCache_) {
-                            shiftCache(obj.getKey(), obj.getValues().get(0));
-                        }
                         return true;
                     }
                 }
@@ -475,155 +90,69 @@ public class Konfiger {
 
     public void clear() {
         changesOccur = true;
-        enableCache(enableCache_);
-        konfigerObjects.clear();
+        sections.clear();
+        clearCache();
     }
 
-    public String remove(String key) {
-        changesOccur = true;
-        enableCache(enableCache_);
-        return konfigerObjects.remove(key);
-    }
-
-    public String remove(int index) {
-        int i = -1;
-        for (String key : konfigerObjects.keySet()) {
-            ++i;
-            if (i==index) {
-                return remove(key);
-            }
-        }
-        return null;
-    }
-
-    public void updateAt(int index, String value) {
-        if (index < size()) {
-            int i = -1;
-            for (String key : konfigerObjects.keySet()) {
-                ++i;
-                if (i==index) {
-                    this.changesOccur = true;
-                    enableCache(enableCache_);
-                    konfigerObjects.put(key, value);
-                    break;
-                }
-            }
-        }
+    public void clearCache() {
+        prevCachedObject[0] = "";
+        prevCachedObject[1] = null;
+        currentCachedObject[0] = "";
+        currentCachedObject[1] = null;
     }
 
     public int size() {
         if (!loadingEnds && this.lazyLoad) {
-            toString();
+            loadAllEntries();
         }
-        return konfigerObjects.size();
+        return lazySize();
     }
 
     public int lazySize() {
-        return konfigerObjects.size();
+        int size = 0;
+        for (Section section : sections.values()) {
+            size += section.size();
+        }
+        return size;
+    }
+
+    public int sectionSize() {
+        return sections.size();
+    }
+
+    public int lazySectionSize() {
+        if (!loadingEnds && this.lazyLoad) {
+            loadAllEntries();
+        }
+        return sections.size();
     }
 
     public boolean isEmpty() {
         return size() == 0;
     }
 
-    /**
-     * @deprecated use {@link Konfiger#getDelimiter} instead
-     */
-    @Deprecated
-    public char getDelimeter() {
-        return delimiter;
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#setDelimiter} instead
-     */
-    @Deprecated
-    public void setDelimeter(char delimiter) {
-        setDelimiter(delimiter);
-    }
-
-    public char getDelimiter() {
-        return delimiter;
-    }
-
-    public void setDelimiter(char delimiter) {
-        if (this.delimiter != delimiter) {
-            this.delimiter = delimiter;
-            changesOccur = true;
-        }
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#getSeparator} instead
-     */
-    @Deprecated
-    public char getSeperator() {
-        return separator;
-    }
-
-    /**
-     * @deprecated use {@link Konfiger#setSeparator} instead
-     */
-    public void setSeperator(char separator) {
-        setSeparator(separator);
-    }
-
-    public char getSeparator() {
-        return separator;
-    }
-
-    public void setSeparator(char separator) {
-        if (this.separator != separator) {
-            changesOccur = true;
-            char oldSeparator = this.separator;
-            this.separator = separator;
-            for ( String key : konfigerObjects.keySet()) {
-                konfigerObjects.put(key, KonfigerUtil.unEscapeString(konfigerObjects.get(key), oldSeparator));
-            }
-        }
-    }
-
-    public void setCaseSensitivity(boolean caseSensitive) {
-        this.caseSensitive = caseSensitive;
-    }
-
-    public boolean isCaseSensitive() {
-        return caseSensitive;
-    }
-
     @Override
     public String toString() {
         if (changesOccur) {
-            if (lazyLoad) {
+            if (lazyLoad && !loadingEnds) {
                 try {
-                    lazyLoader();
-                } catch (InvalidFileException | InvalidEntryException e) {
-                    e.printStackTrace();
+                    loadAllEntries();
+                } catch (InvalidFileException | InvalidEntryException ex) {
+                    if (!stream.builder.errTolerance) {
+                        ex.printStackTrace();
+                    }
                 }
             }
             stringValue = "";
-            int index = 0;
-            int size = size();
-            for (Map.Entry<String, String> entry : entries()) {
-                stringValue += entry.getKey() + delimiter + KonfigerUtil.escapeString(entry.getValue(), separator);
-                ++index;
-                if (index < size) stringValue += separator;
+            for (Section section : sections.values()) {
+                stringValue += section.toString(stream.builder);
             }
-            changesOccur = false;
         }
         return stringValue;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
     public void save() {
-        save(filePath);
+        save(stream.builder.filePath);
     }
 
     public void save(String filePath) {
@@ -641,53 +170,52 @@ public class Konfiger {
         }
     }
 
-    public void appendString(String rawString) throws InvalidFileException, InvalidEntryException {
-        appendString(rawString, this.delimiter, this.separator);
+    public void appendString(String rawString) {
+        appendString(rawString, stream.builder);
     }
 
-    public void appendString(String rawString, char delimiter, char separator) throws InvalidFileException, InvalidEntryException {
-        KonfigerStream _stream = new KonfigerStream(rawString, delimiter, separator);
+    public void appendString(String rawString, Builder builder) {
+        KonfigerStream _stream = new KonfigerStream(builder);
         while (_stream.hasNext()) {
             Entry obj = _stream.next();
-            putString(obj.getKey(), obj.getValues().get(0));
+            put(obj.section, obj);
         }
         changesOccur = true;
     }
 
-    public void appendFile(File file) throws InvalidFileException, InvalidEntryException {
-        appendFile(file, this.delimiter, this.separator);
+    public void appendFile(File file) {
+        appendFile(file, stream.builder);
     }
 
-    public void appendFile(File file, char delimiter, char separator) throws InvalidFileException, InvalidEntryException {
-        KonfigerStream _stream = new KonfigerStream(file, delimiter, separator);
+    public void appendFile(File file, Builder builder) {
+        KonfigerStream _stream = new KonfigerStream(builder);
         while (_stream.hasNext()) {
             Entry obj = _stream.next();
-            putString(obj.getKey(), obj.getValues().get(0));
+            put(obj.section, obj);
         }
         changesOccur = true;
     }
 
-    private void lazyLoader() throws InvalidFileException, InvalidEntryException {
+    private void loadAllEntries() throws InvalidFileException, InvalidEntryException {
         if (loadingEnds) {
             return;
         }
         while (stream.hasNext()) {
             Entry obj = stream.next();
-            System.out.println(obj);
-            putString(obj.getKey(), obj.getValues().get(0));
+            put(obj.section, obj);
         }
         this.loadingEnds = true;
     }
 
-    private void shiftCache(String key, String value) {
+    private void shiftCache(String key, Section section) {
         prevCachedObject[0] = currentCachedObject[0];
         prevCachedObject[1] = currentCachedObject[1];
         currentCachedObject[0] = key;
-        currentCachedObject[1] = value;
+        currentCachedObject[1] = section;
     }
 
     public void resolve(Object object) throws IllegalAccessException, InvocationTargetException {
-        Method matchGetKey = null;
+        /*Method matchGetKey = null;
         Method[] methods = object.getClass().getDeclaredMethods();
         Field[] fields = object.getClass().getDeclaredFields();
         for(Method method : methods){
@@ -734,12 +262,12 @@ public class Konfiger {
 
                 }
             }
-        }
+        }*/
         this.attachedResolveObj = object;
     }
 
     public void dissolve(Object object) throws IllegalAccessException, InvocationTargetException {
-        Method matchGetKey = null;
+        /*Method matchGetKey = null;
         Method[] methods = object.getClass().getDeclaredMethods();
         Field[] fields = object.getClass().getDeclaredFields();
         for(Method method : methods){
@@ -767,7 +295,7 @@ public class Konfiger {
             f.setAccessible(true); // kotlin is a knuckle head here
             Object v = f.get(object);
             this.konfigerObjects.put(findKey, v.toString());
-        }
+        }*/
     }
 
     public void attach(Object object) {
@@ -779,5 +307,37 @@ public class Konfiger {
         attachedResolveObj = null;
         return tmpObj;
     }
+
+    public void put(String section, Entry entry) {
+        if (section == null || section.isEmpty()) {
+            section = GLOBAL_SECTION_NAME;
+        }
+        String[] nestedSections = section.split(Pattern.quote(this.stream.builder.subSectionDelimiter));
+        for (int index = 0; index < nestedSections.length; ++index) {
+            Section section1 = sections.get(section);
+            if (section1 == null) {
+                section1 = new Section(this);
+                sections.put(section, section1);
+            }
+            section1.put(entry);
+        }
+    }
+
+    public Section g() {
+        Section global = getSection(GLOBAL_SECTION_NAME);
+        if (global == null) {
+            global = new Section(this);
+            sections.put(GLOBAL_SECTION_NAME, global);
+        }
+        return global;
+    }
+
+    public Section getSection(String title) {
+        if (lazyLoad && !loadingEnds && !sections.containsKey(title)) {
+            loadAllEntries();
+        }
+        return sections.get(title);
+    }
+
 
 }

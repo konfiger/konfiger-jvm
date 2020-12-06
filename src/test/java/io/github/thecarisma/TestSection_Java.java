@@ -166,4 +166,63 @@ public class TestSection_Java {
                 .writeSubSectionTitleAsNested()));
     }
 
+    @Test
+    public void testSectionWithSubSectionAndEntriesAndComments() {
+        Section section = new Section();
+        section.setTitle("Profile");
+        Entry.Comment comment1 = new Entry.Comment();
+        comment1.setValue("This is the profile configuration");
+        Entry.Comment comment2 = new Entry.Comment();
+        comment2.setValue("The profile must contain \n - name \n - email \n - picture \n - address");
+        comment2.setMultiline(true);
+        section.addComment(comment2);
+        section.addComment(comment1);
+
+        Entry entry1 = new Entry();
+        entry1.setKey("name");
+        entry1.addValue("thecarisma");
+        Entry entry2 = new Entry();
+        entry2.setKey("email");
+        entry2.addValue("xxxxxxxxx@xxxxx.com");
+        section.put(entry1);
+        section.put(entry2);
+
+        Section subSection1 = new Section();
+        subSection1.setTitle("Location");
+        subSection1.addComment("The location of the user including postal code");
+
+        Section nestedSubSection1 = new Section();
+        nestedSubSection1.setTitle("GPS");
+        subSection1.putSection(nestedSubSection1);
+        Entry.Comment comment3 = new Entry.Comment();
+        comment3.setValue("GPS co-ordinates \nlatitude \nlongitude");
+        comment3.setMultiline(true);
+        nestedSubSection1.addComment(comment3);
+
+        Entry entry3 = new Entry();
+        entry3.setKey("longitude");
+        entry3.addValue("1.23536356");
+        Entry entry4 = new Entry();
+        entry4.setKey("latitude");
+        entry4.addValue("0.5635464");
+        nestedSubSection1.put(entry3);
+        nestedSubSection1.put(entry4);
+
+        Section subSection2 = new Section();
+        subSection2.setTitle("Aliases");
+        subSection2.addComment("User nicknames");
+
+        section.putSection(subSection1);
+        section.putSection(subSection2);
+
+        System.out.println(section.toString());
+        System.out.println(section.toString(new Builder()
+                .indentSubSection()));
+        System.out.println(section.toString(new Builder()
+                .indentSubSection()
+                .addSeparatorBeforeSection()
+                .withSpaceAfterCommentKeyword()
+                .writeSubSectionTitleAsNested()));
+    }
+
 }

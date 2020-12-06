@@ -71,10 +71,15 @@ public class Entry {
         return values.size() > 0 ? values.get(0) : "";
     }
 
-    public String getValue(Object... params) {
-        String indentation = params.length > 0 ? (String)params[0] : "    ";
-        boolean indentAsContinuation = params.length > 1 ? (boolean)params[1] : this.indentAsContinuation;
-        char continuationChar = params.length > 2 ? (char)params[2] : this.continuationChar;
+    public String getValue() {
+        return getValue(Konfiger.DEFAULT_TAB, indentAsContinuation, continuationChar);
+    }
+
+    public String getValue(Builder builder) {
+        return getValue(builder.indentation, builder.indentAsContinuation, builder.continuationChar);
+    }
+
+    public String getValue(String indentation, boolean indentAsContinuation, char continuationChar) {
         String value = "";
         int size = values.size();
         for (int i = 0; i < size; ++i) {
@@ -159,25 +164,18 @@ public class Entry {
         return toString(true, delimiter);
     }
 
-    public String toString(Builder builder) {
-        return toString(builder.addSpaceBeforeDelimiter,
-                builder.addSpaceAfterDelimiter,
-                builder.delimiters[0],
-                builder.indentAsContinuation,
-                builder.continuationChar,
-                builder.indentation,
-                builder.addSpaceBeforeCommentKeyword);
-    }
-
     public String toString(boolean addAssignmentSpacing, char delimiter) {
         return toString(addAssignmentSpacing, addAssignmentSpacing, delimiter,
-                indentAsContinuation, continuationChar, "    ", true);
+                indentAsContinuation, continuationChar, Konfiger.DEFAULT_TAB, true);
     }
     public String toString(boolean addAssignmentSpacing, char delimiter, boolean addSpaceBeforeCommentKeyword) {
         return toString(addAssignmentSpacing, addAssignmentSpacing, delimiter,
-                indentAsContinuation, continuationChar, "    ", addSpaceBeforeCommentKeyword);
+                indentAsContinuation, continuationChar, Konfiger.DEFAULT_TAB, addSpaceBeforeCommentKeyword);
     }
 
+    /**
+     * use {@link Entry#toString(Builder)} instead
+     */
     public String toString(boolean addSpaceBeforeDelimiter,
                            boolean addSpaceAfterDelimiter,
                            char delimiter,
@@ -186,6 +184,18 @@ public class Entry {
                            String indentation,
                            boolean addSpaceBeforeCommentKeyword) {
 
+        Builder builder = new Builder();
+        builder.addSpaceBeforeDelimiter = addSpaceBeforeDelimiter;
+        builder.addSpaceAfterDelimiter = addSpaceAfterDelimiter;
+        builder.delimiters = new char[] {delimiter} ;
+        builder.indentAsContinuation = indentAsContinuation;
+        builder.continuationChar = continuationChar;
+        builder.indentation = indentation;
+        builder.addSpaceBeforeCommentKeyword = addSpaceBeforeCommentKeyword;
+        return toString(builder);
+    }
+
+    public String toString(Builder builder) {
         boolean hasValue = !values.isEmpty();
         boolean hasKey = key != null;
         boolean hasComment = !comments.isEmpty();
@@ -195,12 +205,12 @@ public class Entry {
         String preIndentation = "";
         if (indentLevel > 0) {
             for (int count = 0; count < indentLevel; ++count) {
-                preIndentation += indentation;
+                preIndentation += builder.indentation;
             }
         }
         if (hasComment) {
             for (int index = 0; index < comments.size(); ++index) {
-                comment_ += comments.get(index).toString();
+                comment_ += comments.get(index).toString(builder);
                 if (index < comments.size()-1) {
                     comment_ += "\n";
                 }
@@ -208,12 +218,12 @@ public class Entry {
         }
         if (hasInlineComment) {
             for (int index = 0; index < inlineComments.size(); ++index) {
-                inlineComment_ += inlineComments.get(index).toString();
+                inlineComment_ += inlineComments.get(index).toString(builder);
             }
         }
         toStringCache = "";
         if (!hasValue) {
-            toStringCache = String.format("%s%s%s%s%s%s%s%s%s",
+            toStringCache = String.format("%s%s%s%s%s%s%s%s",
                     preIndentation,
                     !hasComment ? "" : comment_ + (hasKey ? "\n" : ""),
                     hasKey ? key : "",
@@ -221,18 +231,16 @@ public class Entry {
                     "",
                     "",
                     "",
-                    (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
                     inlineComment_);
         } else {
-            toStringCache += String.format("%s%s%s%s%s%s%s%s%s",
+            toStringCache += String.format("%s%s%s%s%s%s%s%s",
                     preIndentation,
                     !hasComment ? "" : comment_ + "\n",
                     hasKey ? key : "",
-                    (hasKey && addSpaceBeforeDelimiter) ? " " : "",
+                    (hasKey && builder.addSpaceBeforeDelimiter) ? " " : "",
                     (hasKey) ? delimiter : "",
-                    (hasKey && addSpaceAfterDelimiter) ? " " : "",
-                    getValue(indentation, indentAsContinuation, continuationChar),
-                    (hasInlineComment && addSpaceBeforeCommentKeyword) ? " " : "",
+                    (hasKey && builder.addSpaceAfterDelimiter) ? " " : "",
+                    getValue(builder),
                     inlineComment_);
         }
 
@@ -241,9 +249,18 @@ public class Entry {
     }
 
     public static class Comment {
+        int indentLevel;
         boolean isMultiline;
         String commentKeyword = ";";
         String value;
+
+        public int getIndentLevel() {
+            return indentLevel;
+        }
+
+        public void setIndentLevel(int indentLevel) {
+            this.indentLevel = indentLevel;
+        }
 
         public boolean isMultiline() {
             return isMultiline;
@@ -277,6 +294,34 @@ public class Entry {
             return String.format("%s%s%s",
                     commentKeyword,
                     value,
+                    isMultiline ? commentKeyword : "");
+        }
+
+        public String toString(Builder builder) {
+            String indentation = "";
+            if (indentLevel > 0) {
+                for (int count = 0; count < indentLevel; ++count) {
+                    indentation += builder.indentation;
+                }
+            }
+
+            StringBuilder formattedValue = new StringBuilder();
+            String[] splitComments = value.split("\n");
+            if (splitComments.length > 0) {
+                formattedValue.append(splitComments[0]);
+            }
+            for (int index = 1; index < splitComments.length; ++index) {
+                formattedValue.append("\n");
+                formattedValue.append(indentation).append(splitComments[index]);
+            }
+
+            return String.format("%s%s%s%s%s%s%s",
+                    indentation,
+                    builder.addSpaceBeforeCommentKeyword ? " " : "",
+                    commentKeyword,
+                    builder.addSpaceAfterCommentKeyword ? " " : "",
+                    formattedValue.toString(),
+                    isMultiline && builder.addSpaceAfterCommentKeyword ? " " : "",
                     isMultiline ? commentKeyword : "");
         }
     }

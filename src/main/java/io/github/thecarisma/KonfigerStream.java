@@ -80,6 +80,14 @@ public class KonfigerStream {
         return new Builder();
     }
 
+    public Konfiger konfiger() {
+        return new Konfiger(this, true);
+    }
+
+    public Konfiger konfiger(boolean lazyLoad) {
+        return new Konfiger(this, lazyLoad);
+    }
+
     /**
      * @deprecated
      */
@@ -138,14 +146,14 @@ public class KonfigerStream {
     }
 
     /**
-     * @deprecated use {@link Konfiger#getContinuationChar} instead
+     * @deprecated use {@link Builder#withContinuationChar(char)} instead
      */
     public char getContinuationChar() {
         return builder.continuationChar;
     }
 
     /**
-     * @deprecated use {@link Konfiger#setContinuationChar} instead
+     * @deprecated use {@link Builder#withContinuationChar(char)} instead
      */
     public void setContinuationChar(char continuationChar) {
         this.builder.continuationChar = continuationChar;
