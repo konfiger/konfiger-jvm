@@ -20,13 +20,17 @@ public class Konfiger {
     final KonfigerStream stream;
     private final boolean lazyLoad;
     Map<String, Section> sections = new LinkedHashMap<>();
-    Object[] prevCachedObject = {"", null};
-    Object[] currentCachedObject = {"", null};
+    Object[] prevCachedObject = {"", null, ""};
+    Object[] currentCachedObject = {"", null, ""};
     private boolean loadingEnds = false;
     private boolean changesOccur = true;
     private String stringValue = "";
     private Object attachedResolveObj;
     List<EntryListener> entryListeners = new ArrayList<>();
+
+    public Konfiger() {
+        this(new KonfigerStream());
+    }
 
     public Konfiger(Builder builder) {
         this(builder.build(), true);
@@ -47,6 +51,14 @@ public class Konfiger {
         if (!this.lazyLoad) {
             this.loadAllEntries();
         }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public Builder getBuilder() {
+        return stream.builder;
     }
 
     public List<EntryListener> getEntryListeners() {
@@ -97,8 +109,10 @@ public class Konfiger {
     public void clearCache() {
         prevCachedObject[0] = "";
         prevCachedObject[1] = null;
+        prevCachedObject[2] = "";
         currentCachedObject[0] = "";
         currentCachedObject[1] = null;
+        currentCachedObject[2] = "";
     }
 
     public int size() {
@@ -133,20 +147,25 @@ public class Konfiger {
 
     @Override
     public String toString() {
-        if (changesOccur) {
-            if (lazyLoad && !loadingEnds) {
-                try {
-                    loadAllEntries();
-                } catch (InvalidFileException | InvalidEntryException ex) {
-                    if (!stream.builder.errTolerance) {
-                        ex.printStackTrace();
-                    }
+        if (!changesOccur) {
+            return stringValue;
+        }
+        return toString(this.stream.builder);
+    }
+
+    public String toString(Builder builder) {
+        if (lazyLoad && !loadingEnds) {
+            try {
+                loadAllEntries();
+            } catch (InvalidFileException | InvalidEntryException ex) {
+                if (!stream.builder.errTolerance) {
+                    ex.printStackTrace();
                 }
             }
-            stringValue = "";
-            for (Section section : sections.values()) {
-                stringValue += section.toString(stream.builder);
-            }
+        }
+        stringValue = "";
+        for (Section section : sections.values()) {
+            stringValue += section.toString(builder);
         }
         return stringValue;
     }
@@ -171,11 +190,13 @@ public class Konfiger {
     }
 
     public void appendString(String rawString) {
-        appendString(rawString, stream.builder);
+        appendString(rawString, new Builder());
     }
 
     public void appendString(String rawString, Builder builder) {
-        KonfigerStream _stream = new KonfigerStream(builder);
+        KonfigerStream _stream = builder
+                .withString(rawString)
+                .build();
         while (_stream.hasNext()) {
             Entry obj = _stream.next();
             put(obj.section, obj);
@@ -184,11 +205,13 @@ public class Konfiger {
     }
 
     public void appendFile(File file) {
-        appendFile(file, stream.builder);
+        appendFile(file, new Builder());
     }
 
     public void appendFile(File file, Builder builder) {
-        KonfigerStream _stream = new KonfigerStream(builder);
+        KonfigerStream _stream = builder
+                .withFile(file)
+                .build();
         while (_stream.hasNext()) {
             Entry obj = _stream.next();
             put(obj.section, obj);
@@ -207,11 +230,13 @@ public class Konfiger {
         this.loadingEnds = true;
     }
 
-    private void shiftCache(String key, Section section) {
+    void shiftCache(String section, String key, Entry value) {
         prevCachedObject[0] = currentCachedObject[0];
         prevCachedObject[1] = currentCachedObject[1];
+        prevCachedObject[2] = currentCachedObject[2];
         currentCachedObject[0] = key;
-        currentCachedObject[1] = section;
+        currentCachedObject[1] = value;
+        currentCachedObject[2] = section;
     }
 
     public void resolve(Object object) throws IllegalAccessException, InvocationTargetException {

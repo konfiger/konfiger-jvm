@@ -8,15 +8,13 @@ import java.util.*;
  */
 public class Section {
     int indentLevel;
-    String title = "";
+    String title = Konfiger.GLOBAL_SECTION_NAME;
     List<Entry.Comment> comments = new ArrayList<>();
     Map<String, List<Entry>> entries = new LinkedHashMap<>();
     Map<String, Section> subSections = new LinkedHashMap<>();
     Builder builder; // internal use only. cache
     private String toStringCache = ""; // internal use only. cache
     private boolean changeOccur = true; // internal use only. cache
-    private final Object[] prevCachedObject = {"", null}; // internal use only. cache
-    private final Object[] currentCachedObject = {"", null}; // internal use only. cache
     private Konfiger konfiger;
 
     public Section() {
@@ -84,16 +82,13 @@ public class Section {
     
     /* OPS */
 
-    /**
-     * @deprecated use {@link Section#entries()} instead
-     */
     public Set<Map.Entry<String, String>> stringEntries() {
         Map<String, String> entryList = new LinkedHashMap<>();
         for (String key : entries.keySet()) {
             List<Entry> entry = entries.get(key);
             String value = "";
-            if (entry.size() > 0) {
-                value = (entry.get(0).getValue());
+            for (Entry ent : entry) {
+                value += ent.getValue();
             }
             entryList.put(key, value);
         }
@@ -124,15 +119,6 @@ public class Section {
         comments.clear();
         entries.clear();
         subSections.clear();
-
-        clearCache();
-    }
-
-    public void clearCache() {
-        prevCachedObject[0] = "";
-        prevCachedObject[1] = null;
-        currentCachedObject[0] = "";
-        currentCachedObject[1] = null;
     }
 
     public List<Entry> remove(String key) {
@@ -303,11 +289,13 @@ public class Section {
     public Entry get(String key) {
         Entry entry = null;
         if (builder.enableEntryCache) {
-            if (currentCachedObject[0].equals(key)) {
-                return (Entry) currentCachedObject[1];
+            if (this.konfiger.currentCachedObject[0].equals(key) &&
+                    this.konfiger.currentCachedObject[2].equals(title)) {
+                return (Entry) this.konfiger.currentCachedObject[1];
             }
-            if (prevCachedObject[0].equals(key)) {
-                return (Entry) prevCachedObject[1];
+            if (this.konfiger.prevCachedObject[0].equals(key) &&
+                    this.konfiger.prevCachedObject[2].equals(title)) {
+                return (Entry) this.konfiger.prevCachedObject[1];
             }
         }
         if (!builder.isCaseSensitive) {
@@ -322,7 +310,7 @@ public class Section {
             entry = entries.get(key).get(0);
         }
         if (builder.enableEntryCache) {
-            shiftCache(key, entry);
+            this.konfiger.shiftCache(title, key, entry);
         }
 
         return entry;
@@ -426,13 +414,6 @@ public class Section {
             }
         }
         return ret;
-    }
-
-    private void shiftCache(String key, Entry entry) {
-        prevCachedObject[0] = currentCachedObject[0];
-        prevCachedObject[1] = currentCachedObject[1];
-        currentCachedObject[0] = key;
-        currentCachedObject[1] = entry;
     }
     
     @Override

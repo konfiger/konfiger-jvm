@@ -238,7 +238,7 @@ public class Entry {
                     !hasComment ? "" : comment_ + "\n",
                     hasKey ? key : "",
                     (hasKey && builder.addSpaceBeforeDelimiter) ? " " : "",
-                    (hasKey) ? delimiter : "",
+                    (hasKey) ? builder.delimiters[0] : "",
                     (hasKey && builder.addSpaceAfterDelimiter) ? " " : "",
                     getValue(builder),
                     inlineComment_);

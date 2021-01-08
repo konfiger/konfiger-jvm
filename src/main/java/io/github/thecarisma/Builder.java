@@ -285,4 +285,142 @@ public class Builder {
     public Konfiger konfiger(boolean lazyLoad) {
         return new Konfiger(this, lazyLoad);
     }
+
+    // getters
+
+    public char[] getDelimiters() {
+        return delimiters;
+    }
+
+    public char[] getSeparators() {
+        return separators;
+    }
+
+    public char getBeginSectionChar() {
+        return beginSectionChar;
+    }
+
+    public char getEndSectionChar() {
+        return endSectionChar;
+    }
+
+    public char getContinuationChar() {
+        return continuationChar;
+    }
+
+    public int getSizeOfSpaceForTab() {
+        return sizeOfSpaceForTab;
+    }
+
+    public boolean isErrTolerance() {
+        return errTolerance;
+    }
+
+    public boolean isIgnoreInlineComment() {
+        return ignoreInlineComment;
+    }
+
+    public boolean isIndentAsContinuation() {
+        return indentAsContinuation;
+    }
+
+    public boolean isEnableIndentedSection() {
+        return enableIndentedSection;
+    }
+
+    public boolean isIndentSubSection() {
+        return indentSubSection;
+    }
+
+    public boolean isEnableNestedSections() {
+        return enableNestedSections;
+    }
+
+    public boolean isSubSectionTitleAsNested() {
+        return subSectionTitleAsNested;
+    }
+
+    public boolean isAddSeparatorBeforeSection() {
+        return addSeparatorBeforeSection;
+    }
+
+    public boolean isAddSeparatorAfterSection() {
+        return addSeparatorAfterSection;
+    }
+
+    public boolean isAddSpaceBeforeDelimiter() {
+        return addSpaceBeforeDelimiter;
+    }
+
+    public boolean isAddSpaceAfterDelimiter() {
+        return addSpaceAfterDelimiter;
+    }
+
+    public boolean isCommentsAsMultiline() {
+        return commentsAsMultiline;
+    }
+
+    public boolean isTrimmingKey() {
+        return trimmingKey;
+    }
+
+    public boolean isTrimmingValue() {
+        return trimmingValue;
+    }
+
+    public boolean isTrimmingSection() {
+        return trimmingSection;
+    }
+
+    public boolean isAddSpaceBeforeCommentKeyword() {
+        return addSpaceBeforeCommentKeyword;
+    }
+
+    public boolean isAddSpaceAfterCommentKeyword() {
+        return addSpaceAfterCommentKeyword;
+    }
+
+    public boolean isWrapMultilineValue() {
+        return wrapMultilineValue;
+    }
+
+    public boolean isCaseSensitive() {
+        return isCaseSensitive;
+    }
+
+    public boolean isEnableEntryCache() {
+        return enableEntryCache;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getString() {
+        return string;
+    }
+
+    public String getSubSectionDelimiter() {
+        return subSectionDelimiter;
+    }
+
+    public String getIndentation() {
+        return indentation;
+    }
+
+    public String[] getCommentPrefixes() {
+        return commentPrefixes;
+    }
+
+    public String[] getMultilineCommentPrefixes() {
+        return multilineCommentPrefixes;
+    }
+
+    public int[] getCommentPrefixSizes() {
+        return commentPrefixSizes;
+    }
+
+    public int[] getMultilineCommentPrefixesSizes() {
+        return multilineCommentPrefixesSizes;
+    }
 }

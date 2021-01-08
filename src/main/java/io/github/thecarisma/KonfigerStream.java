@@ -28,39 +28,7 @@ public class KonfigerStream {
     final Builder builder;
 
     public KonfigerStream() {
-        this("");
-    }
-
-    public KonfigerStream(String rawString) {
-        this(rawString, '=', '\n', false);
-    }
-
-    public KonfigerStream(File file) throws FileNotFoundException {
-        this(file, '=', '\n', false);
-    }
-
-    public KonfigerStream(String rawString, char delimiter, char separator) {
-        this(rawString, delimiter, separator, false);
-    }
-
-    public KonfigerStream(File file, char delimiter, char separator) throws FileNotFoundException {
-        this(file, delimiter, separator, false);
-    }
-
-    public KonfigerStream(String rawString, char delimiter, char separator, boolean errTolerance) {
-        this.builder = builder()
-                .withString(rawString)
-                .withDelimiters(new char[]{delimiter})
-                .withSeparators(new char[]{separator});
-        this.builder.errTolerance = errTolerance;
-    }
-
-    public KonfigerStream(File file, char delimiter, char separator, boolean errTolerance) {
-        this(builder()
-                .withFile(file)
-                .withDelimiters(new char[]{delimiter})
-                .withSeparators(new char[]{separator}));
-        this.builder.errTolerance = errTolerance;
+        this(new Builder());
     }
 
     public KonfigerStream(Builder builder) {
@@ -88,83 +56,8 @@ public class KonfigerStream {
         return new Konfiger(this, lazyLoad);
     }
 
-    /**
-     * @deprecated
-     */
-    public boolean isTrimmingKey() {
-        return this.builder.trimmingKey;
-    }
-
-    /**
-     * @deprecated use {@link Builder#withTrimmingKey(boolean)} instead
-     */
-    public void setTrimmingKey(boolean trimming) {
-        this.builder.trimmingKey = trimming;
-    }
-
-    /**
-     * @deprecated
-     */
-    public boolean isTrimmingValue() {
-        return this.builder.trimmingValue;
-    }
-
-    /**
-     * @deprecated use {@link Builder#withTrimmingValue(boolean)} instead
-     */
-    public void setTrimmingValue(boolean trimming) {
-        this.builder.trimmingValue = trimming;
-    }
-
-    /**
-     * @deprecated use {@link KonfigerStream#getCommentPrefixes} instead
-     */
-    @Deprecated
-    public String getCommentPrefix() {
-        if (builder.commentPrefixes.length > 0) {
-            return builder.commentPrefixes[0];
-        }
-        return ";";
-    }
-
-    /**
-     * @deprecated use {@link KonfigerStream#setCommentPrefixes} instead
-     */
-    @Deprecated
-    public void setCommentPrefix(String commentPrefix) {
-        setCommentPrefixes(commentPrefix);
-    }
-
-    public String[] getCommentPrefixes() {
-        return builder.commentPrefixes;
-    }
-
-    public void setCommentPrefixes(String... commentPrefixes) {
-        Builder builder = new Builder().withCommentPrefixes(commentPrefixes);
-        this.builder.commentPrefixes = builder.commentPrefixes;
-        this.builder.commentPrefixSizes = builder.commentPrefixSizes;
-    }
-
-    /**
-     * @deprecated use {@link Builder#withContinuationChar(char)} instead
-     */
-    public char getContinuationChar() {
-        return builder.continuationChar;
-    }
-
-    /**
-     * @deprecated use {@link Builder#withContinuationChar(char)} instead
-     */
-    public void setContinuationChar(char continuationChar) {
-        this.builder.continuationChar = continuationChar;
-    }
-
-    public void errorTolerance(boolean errTolerance) {
-        this.builder.errTolerance = errTolerance;
-    }
-
-    public boolean isErrorTolerant() {
-        return this.builder.errTolerance;
+    public Builder getBuilder() {
+        return builder;
     }
 
     int commentPrefixMatchIndex(char c, int subCount) {
@@ -741,8 +634,11 @@ public class KonfigerStream {
         }
         if (this.builder.wrapMultilineValue) {
             value = new StringBuilder();
-            for (String value_ : values) {
-                value.append(value_.trim()).append(" ");
+            for (int index = 0; index < values.size(); ++index) {
+                value.append(values.get(index).trim());
+                if (index < values.size()-1) {
+                    value.append(" ");
+                }
             }
             entry.addValue(value.toString());
         } else {

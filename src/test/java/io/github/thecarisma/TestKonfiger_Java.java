@@ -147,116 +147,140 @@ public class TestKonfiger_Java {
         Assert.assertEquals(konfiger.lazySize(), konfiger.size());
     }
 
-    /*@Test
-    public void Set_Get_Delimeter_And_Seperator() {
-        Konfiger konfiger = new Konfiger(new File("src/test/resources/test.config.ini"), true);
+    @Test
+    public void setGetDelimiterAndSeparator() {
+        Konfiger konfiger = Konfiger.builder()
+                .withFile(new File("src/test/resources/test.config.ini"))
+                .konfiger(true);
 
-        Assert.assertEquals(konfiger.getSeparator(), '\n');
-        Assert.assertEquals(konfiger.getDelimiter(), '=');
+        Assert.assertEquals(konfiger.getBuilder().getSeparators()[0], '\n');
+        Assert.assertEquals(konfiger.getBuilder().getDelimiters()[0], '=');
         Assert.assertTrue(konfiger.toString().split("\n").length > 2);
-        konfiger.setSeparator('-');
-        konfiger.setDelimiter('+');
-        Assert.assertEquals(konfiger.getSeparator(), '-');
-        Assert.assertEquals(konfiger.getDelimiter(), '+');
-        Assert.assertEquals(konfiger.toString().split("\n").length, 1);
+        Builder custom = new Builder()
+                .withSeparators(new char[]{'-'})
+                .withDelimiters(new char[]{'+'});
+
+        Assert.assertEquals(custom.getSeparators()[0], '-');
+        Assert.assertEquals(custom.getDelimiters()[0], '+');
+        Assert.assertEquals(konfiger.toString(custom).split("\n").length, 1);
     }
 
     @Test
-    public void Escaping_And_Unescaping_Entries_And_Save() {
-        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.config.ini"));
-        KonfigerStream ks1 = new KonfigerStream(new File("src/test/resources/test.txt"), ':',  ',');
+    public void escapingAndUnescapingEntriesAndSave() {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.config.ini")).build();
+        KonfigerStream ks1 = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.txt"))
+                .withSeparators(new char[]{','})
+                .withDelimiters(new char[]{':'})
+                .build();
         Konfiger konfiger = new Konfiger(ks, true);
         Konfiger konfiger1 = new Konfiger(ks1, true);
 
-        Assert.assertEquals(konfiger.get("Hobby"), "i don't know");
-        Assert.assertEquals(konfiger1.get("Hobby"), konfiger.get("Hobby"));
-        Assert.assertEquals(konfiger1.get("Hobby"), "i don't know");
+        Assert.assertEquals(konfiger.g().getString("Hobby"), "i don't know");
+        Assert.assertEquals(konfiger1.g().getString("Hobby"), konfiger.g().getString("Hobby"));
+        Assert.assertEquals(konfiger1.g().getString("Hobby"), "i don't know");
         konfiger.save("src/test/resources/test.config.ini");
 
-        KonfigerStream newKs = new KonfigerStream(new File("src/test/resources/test.config.ini"));
+        KonfigerStream newKs = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.config.ini")).build();
         Konfiger newKonfiger = new Konfiger(newKs, true);
-        Konfiger newKonfiger1 = new Konfiger(new File("src/test/resources/test.txt"), true, ':',  ',');
+        Konfiger newKonfiger1 = Konfiger.builder()
+                .withFile(new File("src/test/resources/test.txt"))
+                .withSeparators(new char[]{','})
+                .withDelimiters(new char[]{':'})
+                .konfiger(true);
         Assert.assertEquals(konfiger.toString(), newKonfiger.toString());
         Assert.assertEquals(konfiger1.toString(), newKonfiger1.toString());
     }
 
-    @Test
+    /*@Test
     public void Test_Complex_And_Confusing_Seperator() {
-        Konfiger konfiger = new Konfiger("Occupation=Software En^gineergLocation=Ni^geriagState=La^gos", false, '=', 'g');
+        Konfiger konfiger = Konfiger.builder()
+                .withString("Occupation=Software En^gineergLocation=Ni^geriagState=La^gos")
+                .withSeparators(new char[]{'='})
+                .withDelimiters(new char[]{'g'})
+                .konfiger();
 
         Assert.assertEquals(konfiger.size(), 3);
         Assert.assertTrue(konfiger.toString().contains("^g"));
-        for (Map.Entry<String, String> entry : konfiger.entries()) {
+        for (Map.Entry<String, String> entry : konfiger.g().stringEntries()) {
             Assert.assertFalse(entry.getValue().contains("^g"));
         }
-        konfiger.setSeparator('f');
-        Assert.assertEquals(konfiger.get("Occupation"), "Software Engineer");
-        konfiger.setSeparator('\n');
+        //konfiger.setSeparator('f');
+        Assert.assertEquals(konfiger.g().getString("Occupation"), "Software Engineer");
+        //konfiger.setSeparator('\n');
         Assert.assertFalse(konfiger.toString().contains("^g"));
         Assert.assertEquals(konfiger.size(), 3);
-        for (Map.Entry<String, String> entry : konfiger.entries()) {
+        for (Map.Entry<String, String> entry : konfiger.g().stringEntries()) {
             Assert.assertFalse(entry.getValue().contains("\\g"));
         }
-    }
+    }*/
 
     @Test
-    public void Append_New_Unparsed_Entries_From_String_And_File() {
-        Konfiger konfiger = new Konfiger("");
+    public void appendNewUnparsedEntriesFromStringAndFile() {
+        Konfiger konfiger = new Konfiger();
 
         Assert.assertEquals(konfiger.size(), 0);
         konfiger.appendString("Language=English");
         Assert.assertEquals(konfiger.size(), 1);
-        Assert.assertNull(konfiger.get("Name"));
-        Assert.assertNotEquals(konfiger.get("Name"), "Adewale Azeez");
-        Assert.assertEquals(konfiger.get("Language"), "English");
+        Assert.assertNull(konfiger.g().get("Name"));
+        Assert.assertNotEquals(konfiger.g().getString("Name"), "Adewale Azeez");
+        Assert.assertEquals(konfiger.g().getString("Language"), "English");
 
         konfiger.appendFile(new File("src/test/resources/test.config.ini"));
-        Assert.assertNotEquals(konfiger.get("Name"), null);
-        Assert.assertEquals(konfiger.get("Name"), "Adewale Azeez");
+        Assert.assertNotEquals(konfiger.g().get("Name"), null);
+        Assert.assertEquals(konfiger.g().getString("Name"), "Adewale Azeez");
     }
 
     @Test
-    public void Test_Prev_And_Current_Cache() {
-        Konfiger konfiger = new Konfiger("");
+    public void testPrevAndCurrentCache() {
+        Konfiger konfiger = new Builder().enableEntryCache(true).konfiger();
 
-        konfiger.put("Name", "Adewale");
-        konfiger.put("Project", "konfiger");
-        konfiger.putInt("Year", 2020);
+        konfiger.g().putString("Name", "Adewale");
+        konfiger.g().putString("Project", "konfiger");
+        konfiger.g().putInt("Year", 2020);
 
-        Assert.assertEquals(konfiger.getInt("Year"), 2020);
-        Assert.assertEquals(konfiger.get("Project"), "konfiger");
-        Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.getInt("Year"), 2020);
-        Assert.assertEquals(konfiger.currentCachedObject[0], "Name");
-        Assert.assertEquals(konfiger.prevCachedObject[0], "Year");
-        Assert.assertEquals(konfiger.currentCachedObject[1], "Adewale");
-        Assert.assertEquals(konfiger.prevCachedObject[1], "2020");
-        Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.get("Project"), "konfiger");
-        Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.get("Name"), "Adewale");
-        Assert.assertEquals(konfiger.currentCachedObject[0], "Project");
+        Assert.assertEquals(konfiger.g().getInt("Year"), 2020);
+        Assert.assertEquals(konfiger.g().get("Project").getValue(), "konfiger");
+        Assert.assertEquals(konfiger.g().get("Name").getValue(), "Adewale");
+        Assert.assertEquals(konfiger.g().getInt("Year"), 2020);
+        Assert.assertEquals(konfiger.currentCachedObject[0], "Year");
         Assert.assertEquals(konfiger.prevCachedObject[0], "Name");
-        Assert.assertEquals(konfiger.currentCachedObject[1], "konfiger");
-        Assert.assertEquals(konfiger.prevCachedObject[1], "Adewale");
+        Assert.assertEquals(((Entry)konfiger.currentCachedObject[1]).getValue(), "2020");
+        Assert.assertEquals(((Entry)konfiger.prevCachedObject[1]).getValue(), "Adewale");
+        Assert.assertEquals(konfiger.g().get("Name").getValue(), "Adewale");
+        Assert.assertEquals(konfiger.g().get("Name").getValue(), "Adewale");
+        Assert.assertEquals(konfiger.g().get("Project").getValue(), "konfiger");
+        Assert.assertEquals(konfiger.g().get("Name").getValue(), "Adewale");
+        Assert.assertEquals(konfiger.g().get("Name").getValue(), "Adewale");
+        Assert.assertEquals(konfiger.g().get("Name").getValue(), "Adewale");
+        Assert.assertEquals(konfiger.currentCachedObject[0], "Name");
+        Assert.assertEquals(konfiger.prevCachedObject[0], "Project");
+        Assert.assertEquals(((Entry)konfiger.currentCachedObject[1]).getValue(), "Adewale");
+        Assert.assertEquals(((Entry)konfiger.prevCachedObject[1]).getValue(), "konfiger");
     }
 
     @Test
     public void testTheSinglePairCommentingInStringStreamKonfiger() {
-        KonfigerStream ks = new KonfigerStream("Name:Adewale Azeez,;Project:konfiger,Date:April 24 2020", ':', ',');
+        KonfigerStream ks = KonfigerStream.builder()
+                .withString("Name:Adewale Azeez,;Project:konfiger,Date:April 24 2020")
+                .withDelimiters(new char[]{':'})
+                .withSeparators(new char[]{','})
+                .build();
         Konfiger kon = new Konfiger(ks);
-        for (String key : kon.keys()) {
-            Assert.assertNotEquals(kon.getString(key), "Project");
+        for (String key : kon.g().keys()) {
+            Assert.assertNotEquals(kon.g().getString(key), "Project");
         }
         Assert.assertEquals(kon.size(), 2);
     }
 
     @Test
-    public void Test_Contains_With_Lazy_Load() {
-        KonfigerStream ks = new KonfigerStream(new File("src/test/resources/test.comment.inf"));
-        ks.setCommentPrefixes("[", ";", "//", "@", "<>");
+    public void testContainsWithLazyLoad() {
+        KonfigerStream ks = KonfigerStream.builder()
+                .withFile(new File("src/test/resources/test.comment.inf"))
+                .withCommentPrefixes("[", ";", "//", "@", "<>")
+                .build();
         Konfiger kon = new Konfiger(ks, true);
 
         Assert.assertTrue(kon.contains("File"));
@@ -269,15 +293,18 @@ public class TestKonfiger_Java {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/test.contd.conf"))
                 .ignoreInlineComment()
+                .wrapMultilineValue()
                 .build();
-        Konfiger kon = new Konfiger(ks, true);
+        Konfiger kon = new Konfiger(ks, false);
 
-        Assert.assertTrue(kon.getString("ProgrammingLanguages").indexOf("Kotlin, NodeJS, Powershell, Python, Ring, Rust") > 0);
-        Assert.assertEquals(kon.get("ProjectName"), "konfiger");
-        Assert.assertTrue(kon.getString("Description").endsWith(" in other languages and off the Android platform."));
+        Assert.assertTrue(kon.g().getString("ProgrammingLanguages")
+                .indexOf("Kotlin, NodeJS, Powershell, Python, Ring, Rust") > 0);
+        Assert.assertEquals(kon.g().get("ProjectName").getValue(), "konfiger");
+        Assert.assertTrue(kon.g().getString("Description")
+                .endsWith(" in other languages and off the Android platform."));
     }
 
-    @Test
+    /*@Test
     public void Check_Size_In_LazyLoad_And_No_LazyLoad() {
         KonfigerStream ks = KonfigerStream.builder()
                 .withFile(new File("src/test/resources/test.contd.conf"))
